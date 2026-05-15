@@ -19,7 +19,7 @@ function LessonScreen({ lessonId, lesson, topic, onComplete, onExit }) {
   const handleContinue = () => {
     if (answered === 'wrong') setQueue(q => [...q, ex]);
     setAnswered(null);
-    if (idx + 1 >= queue.length) onComplete({ mistakes, correct: correctCount + (answered === 'correct' ? 0 : 0), total: lesson.exercises.length });
+    if (idx + 1 >= queue.length) onComplete({ mistakes, correct: correctCount, total: lesson.exercises.length });
     else setIdx(i => i + 1);
   };
 

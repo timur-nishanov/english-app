@@ -41,6 +41,71 @@
 
 <script type="text/babel">
 
+// ─── Activity tracking helpers ──────────────────────────────────
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function todayKey() { return dateKey(new Date()); }
+
+// Merge a day's activity delta into the activity log
+function addActivity(activity, delta) {
+  const k = todayKey();
+  const d = activity[k] || { lessons: 0, exercises: 0, correct: 0, cards: 0, cardsKnown: 0 };
+  return {
+    ...activity,
+    [k]: {
+      lessons: d.lessons + (delta.lessons || 0),
+      exercises: d.exercises + (delta.exercises || 0),
+      correct: d.correct + (delta.correct || 0),
+      cards: d.cards + (delta.cards || 0),
+      cardsKnown: d.cardsKnown + (delta.cardsKnown || 0),
+    },
+  };
+}
+
+// Consecutive days with activity, counting up to today (or yesterday if today is empty)
+function computeStreak(activity) {
+  let streak = 0;
+  const d = new Date();
+  if (!activity[dateKey(d)]) d.setDate(d.getDate() - 1);
+  while (activity[dateKey(d)]) {
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// Last n calendar days, oldest first
+function lastNDays(n) {
+  const out = [];
+  const now = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    out.push(d);
+  }
+  return out;
+}
+
+function activityTotals(activity) {
+  return Object.values(activity).reduce((a, d) => ({
+    lessons: a.lessons + (d.lessons || 0),
+    exercises: a.exercises + (d.exercises || 0),
+    correct: a.correct + (d.correct || 0),
+    cards: a.cards + (d.cards || 0),
+    cardsKnown: a.cardsKnown + (d.cardsKnown || 0),
+  }), { lessons: 0, exercises: 0, correct: 0, cards: 0, cardsKnown: 0 });
+}
+
+window.dateKey = dateKey;
+window.todayKey = todayKey;
+window.computeStreak = computeStreak;
+window.lastNDays = lastNDays;
+window.activityTotals = activityTotals;
+
 function App() {
   const [screen, setScreen] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
@@ -49,7 +114,7 @@ function App() {
   const [state, setState] = React.useState(() => {
     try {
       const s = JSON.parse(localStorage.getItem('engapp-state'));
-      if (s && s.progress) return { streak: s.streak ?? 12, progress: s.progress };
+      if (s && s.progress) return { progress: s.progress, activity: s.activity || {} };
       return defaults();
     } catch { return defaults(); }
   });
@@ -62,29 +127,10 @@ function App() {
   }, [state]);
 
   function defaults() {
-    return {
-      streak: 12,
-      progress: {
-        'idioms': 0.25,
-        'language': 0,
-        'emphasising': 0,
-        'opposites': 0.33,
-        'conditionals': 0.66,
-        'inversions': 0,
-        'wishes': 0.5,
-        'reported': 0,
-        'gerund': 0.5,
-        'causative': 0,
-        'phrasal-get': 0,
-        'colours': 0,
-        'tenses': 0,
-        'vocab-people': 0.5,
-        'vocab-time': 0,
-        'dining': 0,
-        'feelings': 0,
-      },
-    };
+    return { progress: {}, activity: {} };
   }
+
+  const streak = computeStreak(state.activity);
 
   const go = (s) => setScreen(s);
 
@@ -94,16 +140,26 @@ function App() {
     go({ name: 'lesson', lessonId, topicId: topic.id });
   };
 
-  const completeLesson = ({ mistakes, total }) => {
+  const completeLesson = ({ mistakes, correct, total }) => {
     const topic = TOPICS.find(t => t.id === screen.topicId);
     const lessonsInTopic = Object.entries(LESSONS).filter(([_, l]) => l.topicId === topic.id);
     const lessonIdx = lessonsInTopic.findIndex(([id]) => id === screen.lessonId);
     const newDone = Math.max(Math.floor((state.progress[topic.id] || 0) * topic.lessons), lessonIdx + 1);
+    const correctN = typeof correct === 'number' ? correct : Math.max(0, total - mistakes);
+    const attempts = correctN + mistakes;
     setState(s => ({
       ...s,
       progress: { ...s.progress, [topic.id]: Math.min(1, newDone / topic.lessons) },
+      activity: addActivity(s.activity, { lessons: 1, exercises: attempts, correct: correctN }),
     }));
     go({ name: 'results', mistakes, total, topicId: topic.id });
+  };
+
+  const completeReview = ({ total, known }) => {
+    setState(s => ({
+      ...s,
+      activity: addActivity(s.activity, { cards: total, cardsKnown: known }),
+    }));
   };
 
   let content = null;
@@ -111,7 +167,7 @@ function App() {
     content = (
       <HomeScreen
         progress={state.progress}
-        streak={state.streak}
+        streak={streak}
         onPickLesson={(topic) => go({ name: 'unit', topicId: topic.id })}
         onOpenReview={() => go({ name: 'review' })}
         onOpenProfile={() => go({ name: 'profile' })}
@@ -149,11 +205,11 @@ function App() {
     );
   } else if (screen.name === 'review') {
     content = (
-      <ReviewScreen onExit={() => go({ name: 'home' })} />
+      <ReviewScreen onExit={() => go({ name: 'home' })} onComplete={completeReview} />
     );
   } else if (screen.name === 'profile') {
     content = (
-      <ProfileScreen state={state} onBack={() => go({ name: 'home' })} />
+      <ProfileScreen state={state} streak={streak} onBack={() => go({ name: 'home' })} />
     );
   }
 
@@ -167,11 +223,32 @@ function App() {
 }
 
 // ─── Profile — clean cards, no italic serif ──────────────────────
-function ProfileScreen({ state, onBack }) {
+function ProfileScreen({ state, streak, onBack }) {
+  const activity = state.activity || {};
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((state.progress[t.id] || 0) * t.lessons), 0);
   const totalProgress = doneLessons / totalLessons;
   const completedUnits = TOPICS.filter(t => (state.progress[t.id] || 0) >= 1).length;
+
+  const totals = activityTotals(activity);
+  const accuracy = totals.exercises ? Math.round((totals.correct / totals.exercises) * 100) : 0;
+
+  // Real last-7-days activity for the chart
+  const week = lastNDays(7).map((d) => ({
+    letter: ['S','M','T','W','T','F','S'][d.getDay()],
+    exercises: (activity[dateKey(d)] || {}).exercises || 0,
+  }));
+  const weekMax = Math.max(1, ...week.map(w => w.exercises));
+
+  // "Learning since" — derived from the earliest day with activity
+  const keys = Object.keys(activity).sort();
+  const months = ['January','February','March','April','May','June','July',
+    'August','September','October','November','December'];
+  let since = '';
+  if (keys.length) {
+    const first = new Date(keys[0] + 'T00:00:00');
+    since = ` · learning since ${months[first.getMonth()]}`;
+  }
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
@@ -194,38 +271,42 @@ function ProfileScreen({ state, onBack }) {
             }}>Aleksey</h1>
             <div style={{
               fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1,
-            }}>B2–C1 · learning since April</div>
+            }}>B2–C1{since}</div>
           </div>
         </div>
       </div>
 
       <div style={{ flex: 1, overflow: 'auto', padding: '8px 20px 30px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 22 }}>
-          <StatBlock label="Day streak" value={state.streak} />
+          <StatBlock label="Day streak" value={streak} />
           <StatBlock label="Overall" value={`${Math.round(totalProgress * 100)}%`} />
           <StatBlock label="Lessons done" value={`${doneLessons}/${totalLessons}`} />
           <StatBlock label="Units done" value={`${completedUnits}/${TOPICS.length}`} />
+          <StatBlock label="Accuracy" value={totals.exercises ? `${accuracy}%` : '—'} />
+          <StatBlock label="Words reviewed" value={totals.cards} />
         </div>
 
         <div style={{
           fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
-        }}>This week</div>
+        }}>Last 7 days</div>
         <div style={{
           background: DS.paperCard, borderRadius: 18, padding: 18, marginBottom: 22,
           boxShadow: DS.shadowSm,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 96, gap: 8 }}>
-            {['M','T','W','T','F','S','S'].map((d, i) => {
-              const val = [40, 60, 30, 80, 55, 20, 45][i];
-              const today = i === 3;
+            {week.map((d, i) => {
+              const today = i === week.length - 1;
+              const h = 6 + Math.round((d.exercises / weekMax) * 78);
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <span className="tick" style={{ fontSize: 10, fontWeight: 600, color: d.exercises ? DS.ink3 : 'transparent', letterSpacing: -0.1 }}>{d.exercises || 0}</span>
                   <div style={{
-                    width: '100%', height: val,
-                    background: today ? DS.ink : DS.ink5,
+                    width: '100%', height: h,
+                    background: today ? DS.ink : (d.exercises ? DS.ink4 : DS.ink5),
                     borderRadius: 6,
+                    transition: `height 400ms ${DS.ease}`,
                   }} />
-                  <span className="tick" style={{ fontSize: 11, fontWeight: 600, color: today ? DS.ink : DS.ink3, letterSpacing: -0.1 }}>{d}</span>
+                  <span className="tick" style={{ fontSize: 11, fontWeight: 600, color: today ? DS.ink : DS.ink3, letterSpacing: -0.1 }}>{d.letter}</span>
                 </div>
               );
             })}
@@ -236,6 +317,12 @@ function ProfileScreen({ state, onBack }) {
           fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
         }}>Units in progress</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1).length === 0 && (
+            <div style={{
+              background: DS.paperCard, borderRadius: 14, padding: '14px 14px',
+              fontSize: 13, color: DS.ink3, letterSpacing: -0.1, boxShadow: DS.shadowSm,
+            }}>No units in progress yet — start a lesson to see it here.</div>
+          )}
           {TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1).map((t) => {
             const c = (window.UNIT_COLORS && window.UNIT_COLORS[t.id]) || { bg: DS.paperDeep, fg: DS.ink };
             return (
