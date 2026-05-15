@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>English Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Tight", "Inter", system-ui, sans-serif;
+    background: #1C1F2A;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; color: #0E1013;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  #app-stage {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px; padding: 24px 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  button { font-family: inherit; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="design-system.jsx"></script>
+<script type="text/babel" src="home-screen.jsx"></script>
+<script type="text/babel" src="unit-screen.jsx"></script>
+<script type="text/babel" src="lesson-screen.jsx"></script>
+<script type="text/babel" src="review-screen.jsx"></script>
+
+<script type="text/babel">
+
+function App() {
+  const [screen, setScreen] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
+    catch { return { name: 'home' }; }
+  });
+  const [state, setState] = React.useState(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('engapp-state'));
+      if (s && s.progress) return { streak: s.streak ?? 12, progress: s.progress };
+      return defaults();
+    } catch { return defaults(); }
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('engapp-screen', JSON.stringify(screen));
+  }, [screen]);
+  React.useEffect(() => {
+    localStorage.setItem('engapp-state', JSON.stringify(state));
+  }, [state]);
+
+  function defaults() {
+    return {
+      streak: 12,
+      progress: {
+        'idioms': 0.25,
+        'language': 0,
+        'emphasising': 0,
+        'opposites': 0.33,
+        'conditionals': 0.66,
+        'inversions': 0,
+        'wishes': 0.5,
+        'reported': 0,
+        'gerund': 0.5,
+        'causative': 0,
+        'phrasal-get': 0,
+        'colours': 0,
+        'tenses': 0,
+        'vocab-people': 0.5,
+        'vocab-time': 0,
+        'dining': 0,
+        'feelings': 0,
+      },
+    };
+  }
+
+  const go = (s) => setScreen(s);
+
+  const startLesson = (lessonId) => {
+    const l = LESSONS[lessonId];
+    const topic = TOPICS.find(t => t.id === l.topicId);
+    go({ name: 'lesson', lessonId, topicId: topic.id });
+  };
+
+  const completeLesson = ({ mistakes, total }) => {
+    const topic = TOPICS.find(t => t.id === screen.topicId);
+    const lessonsInTopic = Object.entries(LESSONS).filter(([_, l]) => l.topicId === topic.id);
+    const lessonIdx = lessonsInTopic.findIndex(([id]) => id === screen.lessonId);
+    const newDone = Math.max(Math.floor((state.progress[topic.id] || 0) * topic.lessons), lessonIdx + 1);
+    setState(s => ({
+      ...s,
+      progress: { ...s.progress, [topic.id]: Math.min(1, newDone / topic.lessons) },
+    }));
+    go({ name: 'results', mistakes, total, topicId: topic.id });
+  };
+
+  let content = null;
+  if (screen.name === 'home') {
+    content = (
+      <HomeScreen
+        progress={state.progress}
+        streak={state.streak}
+        onPickLesson={(topic) => go({ name: 'unit', topicId: topic.id })}
+        onOpenReview={() => go({ name: 'review' })}
+        onOpenProfile={() => go({ name: 'profile' })}
+      />
+    );
+  } else if (screen.name === 'unit') {
+    const topic = TOPICS.find(t => t.id === screen.topicId);
+    content = (
+      <UnitScreen
+        topic={topic}
+        progress={state.progress}
+        onStartLesson={startLesson}
+        onBack={() => go({ name: 'home' })}
+      />
+    );
+  } else if (screen.name === 'lesson') {
+    const topic = TOPICS.find(t => t.id === screen.topicId);
+    const lesson = LESSONS[screen.lessonId];
+    content = (
+      <LessonScreen
+        lessonId={screen.lessonId}
+        lesson={lesson}
+        topic={topic}
+        onComplete={completeLesson}
+        onExit={() => go({ name: 'unit', topicId: topic.id })}
+      />
+    );
+  } else if (screen.name === 'results') {
+    content = (
+      <ResultsScreen
+        mistakes={screen.mistakes}
+        total={screen.total}
+        onDone={() => go({ name: 'unit', topicId: screen.topicId })}
+      />
+    );
+  } else if (screen.name === 'review') {
+    content = (
+      <ReviewScreen onExit={() => go({ name: 'home' })} />
+    );
+  } else if (screen.name === 'profile') {
+    content = (
+      <ProfileScreen state={state} onBack={() => go({ name: 'home' })} />
+    );
+  }
+
+  return (
+    <div id="app-stage">
+      <IOSDevice width={402} height={844}>
+        {content}
+      </IOSDevice>
+    </div>
+  );
+}
+
+// ─── Profile — clean cards, no italic serif ──────────────────────
+function ProfileScreen({ state, onBack }) {
+  const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
+  const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((state.progress[t.id] || 0) * t.lessons), 0);
+  const totalProgress = doneLessons / totalLessons;
+  const completedUnits = TOPICS.filter(t => (state.progress[t.id] || 0) >= 1).length;
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
+      <div style={{
+        padding: `${DS.topSafe}px 20px 20px`, background: DS.paper,
+      }}>
+        <BackButton onClick={onBack} label="Home" color={DS.ink} />
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: 99,
+            background: DS.ink, color: DS.paperCard,
+            fontFamily: DS.display, fontWeight: 700,
+            fontSize: 26, letterSpacing: -0.5,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>A</div>
+          <div>
+            <h1 style={{
+              fontFamily: DS.display, fontSize: 24, fontWeight: 700,
+              letterSpacing: -0.6, color: DS.ink, margin: 0, lineHeight: 1.1,
+            }}>Aleksey</h1>
+            <div style={{
+              fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1,
+            }}>B2–C1 · learning since April</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: 'auto', padding: '8px 20px 30px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 22 }}>
+          <StatBlock label="Day streak" value={state.streak} />
+          <StatBlock label="Overall" value={`${Math.round(totalProgress * 100)}%`} />
+          <StatBlock label="Lessons done" value={`${doneLessons}/${totalLessons}`} />
+          <StatBlock label="Units done" value={`${completedUnits}/${TOPICS.length}`} />
+        </div>
+
+        <div style={{
+          fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
+        }}>This week</div>
+        <div style={{
+          background: DS.paperCard, borderRadius: 18, padding: 18, marginBottom: 22,
+          boxShadow: DS.shadowSm,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 96, gap: 8 }}>
+            {['M','T','W','T','F','S','S'].map((d, i) => {
+              const val = [40, 60, 30, 80, 55, 20, 45][i];
+              const today = i === 3;
+              return (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <div style={{
+                    width: '100%', height: val,
+                    background: today ? DS.ink : DS.ink5,
+                    borderRadius: 6,
+                  }} />
+                  <span className="tick" style={{ fontSize: 11, fontWeight: 600, color: today ? DS.ink : DS.ink3, letterSpacing: -0.1 }}>{d}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{
+          fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
+        }}>Units in progress</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1).map((t) => {
+            const c = (window.UNIT_COLORS && window.UNIT_COLORS[t.id]) || { bg: DS.paperDeep, fg: DS.ink };
+            return (
+              <div key={t.id} style={{
+                background: DS.paperCard, borderRadius: 14, padding: '12px 14px',
+                display: 'flex', alignItems: 'center', gap: 12,
+                boxShadow: DS.shadowSm,
+              }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 10,
+                  background: c.bg, color: c.fg,
+                  fontFamily: DS.display, fontWeight: 700, fontSize: 15,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', letterSpacing: -0.4,
+                }}>{t.mark}</div>
+                <span style={{
+                  flex: 1, fontFamily: DS.display, fontWeight: 600,
+                  fontSize: 15, color: DS.ink, letterSpacing: -0.3,
+                }}>{t.title}</span>
+                <span className="tick" style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1 }}>{Math.round((state.progress[t.id] || 0) * 100)}%</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatBlock({ label, value }) {
+  return (
+    <div style={{
+      background: DS.paperCard, borderRadius: 16, padding: '14px 14px',
+      boxShadow: DS.shadowSm,
+    }}>
+      <div style={{
+        fontSize: 12, fontWeight: 500, color: DS.ink3, letterSpacing: -0.1,
+      }}>{label}</div>
+      <div className="tick" style={{
+        fontFamily: DS.display, fontSize: 26, fontWeight: 700, color: DS.ink,
+        marginTop: 4, letterSpacing: -0.6,
+      }}>{value}</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
