@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F4F2EC">
 <title>English Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +26,12 @@
   }
   *, *::before, *::after { box-sizing: border-box; }
   button { font-family: inherit; }
+
+  /* On phones, fill the whole screen instead of showing the device mockup */
+  @media (max-width: 600px), (pointer: coarse) {
+    html, body { overflow: hidden; background: #F4F2EC; }
+    #app-stage { padding: 0; gap: 0; width: 100%; }
+  }
 </style>
 </head>
 <body>
