@@ -105,6 +105,15 @@ const DS = {
     .stagger > *:nth-child(16) { animation-delay: 525ms; }
     .stagger > *:nth-child(17) { animation-delay: 560ms; }
     .stagger > *:nth-child(18) { animation-delay: 595ms; }
+    .stagger > *:nth-child(19) { animation-delay: 630ms; }
+    .stagger > *:nth-child(20) { animation-delay: 665ms; }
+    .stagger > *:nth-child(21) { animation-delay: 700ms; }
+    .stagger > *:nth-child(22) { animation-delay: 735ms; }
+    .stagger > *:nth-child(23) { animation-delay: 770ms; }
+    .stagger > *:nth-child(24) { animation-delay: 805ms; }
+    .stagger > *:nth-child(25) { animation-delay: 840ms; }
+    .stagger > *:nth-child(26) { animation-delay: 875ms; }
+    .stagger > *:nth-child(27) { animation-delay: 910ms; }
 
     .row-press { transition: background 160ms ${EASE}, transform 200ms ${EASE}; }
     .row-press:active:not(:disabled) { background: ${DS.paperDeep} !important; transform: scale(0.992); }

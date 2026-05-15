@@ -1,14 +1,22 @@
 // ─── VOCABULARY REVIEW — clean flashcards, SF Pro ───────────────
 
-function ReviewScreen({ onExit }) {
+function ReviewScreen({ onExit, onComplete }) {
   const [idx, setIdx] = React.useState(0);
   const [flipped, setFlipped] = React.useState(false);
   const [knownCount, setKnownCount] = React.useState(0);
   const [deck] = React.useState(() => shuffleDeck(VOCAB_CARDS).slice(0, 20));
   const [swipeX, setSwipeX] = React.useState(0);
+  const recorded = React.useRef(false);
 
   const card = deck[idx];
   const done = idx >= deck.length;
+
+  React.useEffect(() => {
+    if (done && !recorded.current) {
+      recorded.current = true;
+      onComplete && onComplete({ total: deck.length, known: knownCount });
+    }
+  }, [done, knownCount, deck.length, onComplete]);
 
   if (done) {
     return (

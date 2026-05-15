@@ -160,6 +160,15 @@ const UNIT_COLORS = {
   'vocab-time':   { bg: '#FCE0EF', fg: '#A6336F' },
   'dining':       { bg: '#FFEAD1', fg: '#9C5818' },
   'feelings':     { bg: '#E2F0FF', fg: '#1F4FCC' },
+  'intro-verbs':  { bg: '#E0F1F5', fg: '#0F6C84' },
+  'work-career':  { bg: '#E6EEFF', fg: '#1F4FCC' },
+  'business':     { bg: '#E6F4EA', fg: '#147542' },
+  'work-colleagues': { bg: '#FFF1C2', fg: '#9B7400' },
+  'working-life': { bg: '#F1E5FF', fg: '#6B3FBF' },
+  'money':        { bg: '#E2F4EA', fg: '#147542' },
+  'binomials':    { bg: '#FFE8DC', fg: '#B5683F' },
+  'mind':         { bg: '#F1E5FF', fg: '#6B3FBF' },
+  'socialising':  { bg: '#FCE0EF', fg: '#A6336F' },
 };
 
 function TopicRow({ topic, progress, totalLessons, onClick }) {
