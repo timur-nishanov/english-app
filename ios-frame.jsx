@@ -191,6 +191,39 @@ function IOSDevice({
   children, width = 402, height = 874, dark = false,
   title, keyboard = false,
 }) {
+  // On a real phone, fill the whole viewport instead of drawing the mockup frame.
+  const [fullscreen, setFullscreen] = React.useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(max-width: 600px), (pointer: coarse)').matches;
+  });
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 600px), (pointer: coarse)');
+    const handler = (e) => setFullscreen(e.matches);
+    if (mq.addEventListener) mq.addEventListener('change', handler);
+    else mq.addListener(handler);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', handler);
+      else mq.removeListener(handler);
+    };
+  }, []);
+
+  if (fullscreen) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0,
+        width: '100%', height: '100%',
+        background: (window.DS && window.DS.paper) || '#F4F2EC',
+        overflow: 'hidden',
+        fontFamily: '-apple-system, system-ui, sans-serif',
+        WebkitFontSmoothing: 'antialiased',
+      }}>
+        {children}
+        {keyboard && <IOSKeyboard dark={dark} />}
+      </div>
+    );
+  }
+
   return (
     <div style={{
       width, height, borderRadius: 48, overflow: 'hidden',
