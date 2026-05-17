@@ -166,6 +166,15 @@ function loadDailyMix() {
   return generateDailyMix();
 }
 
+function shuffleList(a) {
+  const arr = a.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function App() {
   const [screen, setScreen] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
@@ -179,6 +188,10 @@ function App() {
     } catch { return defaults(); }
   });
   const [daily, setDaily] = React.useState(loadDailyMix);
+  const [prefs, setPrefs] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('engapp-prefs')) || {}; }
+    catch { return {}; }
+  });
 
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
@@ -189,6 +202,11 @@ function App() {
   React.useEffect(() => {
     localStorage.setItem('engapp-daily', JSON.stringify(daily));
   }, [daily]);
+  React.useEffect(() => {
+    localStorage.setItem('engapp-prefs', JSON.stringify(prefs));
+  }, [prefs]);
+
+  const changePrefs = (topicId, p) => setPrefs(x => ({ ...x, [topicId]: p }));
 
   function defaults() {
     return { progress: {}, activity: {} };
@@ -198,10 +216,8 @@ function App() {
 
   const go = (s) => setScreen(s);
 
-  const startLesson = (lessonId) => {
-    const l = LESSONS[lessonId];
-    const topic = TOPICS.find(t => t.id === l.topicId);
-    go({ name: 'lesson', lessonId, topicId: topic.id });
+  const startLesson = (topicId, tags, shuffle) => {
+    go({ name: 'lesson', lessonId: topicId, topicId, tags: tags || null, shuffle: !!shuffle });
   };
 
   const completeLesson = ({ mistakes, correct, total }) => {
@@ -249,22 +265,41 @@ function App() {
         progress={state.progress}
         streak={streak}
         daily={daily}
-        onPickLesson={(topic) => startLesson(topic.id)}
+        onPickLesson={(topic) => go({ name: 'category', topicId: topic.id })}
         onOpenReview={() => go({ name: 'review' })}
         onOpenProfile={() => go({ name: 'profile' })}
         onOpenDaily={openDaily}
       />
     );
+  } else if (screen.name === 'category') {
+    const topic = TOPICS.find(t => t.id === screen.topicId);
+    content = (
+      <CategoryScreen
+        topic={topic}
+        lesson={LESSONS[topic.id]}
+        prefs={prefs[topic.id]}
+        onChangePrefs={changePrefs}
+        onStart={startLesson}
+        onBack={() => go({ name: 'home' })}
+      />
+    );
   } else if (screen.name === 'lesson') {
     const topic = TOPICS.find(t => t.id === screen.topicId);
-    const lesson = LESSONS[screen.lessonId];
+    const base = LESSONS[screen.lessonId];
+    let exs = base.exercises;
+    if (screen.tags && screen.tags.length) {
+      const filtered = exs.filter(e => screen.tags.includes(e.tag));
+      if (filtered.length) exs = filtered;
+    }
+    if (screen.shuffle) exs = shuffleList(exs);
+    const lesson = { ...base, exercises: exs };
     content = (
       <LessonScreen
         lessonId={screen.lessonId}
         lesson={lesson}
         topic={topic}
         onComplete={completeLesson}
-        onExit={() => go({ name: 'home' })}
+        onExit={() => go({ name: 'category', topicId: topic.id })}
       />
     );
   } else if (screen.name === 'daily') {
