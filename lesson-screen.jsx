@@ -470,3 +470,5 @@ function shuffle(a) {
 
 window.LessonScreen = LessonScreen;
 window.ResultsScreen = ResultsScreen;
+window.ExerciseView = ExerciseView;
+window.FeedbackBar = FeedbackBar;

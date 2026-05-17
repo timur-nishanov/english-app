@@ -48,6 +48,7 @@
 <script type="text/babel" src="unit-screen.jsx"></script>
 <script type="text/babel" src="lesson-screen.jsx"></script>
 <script type="text/babel" src="review-screen.jsx"></script>
+<script type="text/babel" src="daily-screen.jsx"></script>
 
 <script type="text/babel">
 
@@ -116,6 +117,55 @@ window.computeStreak = computeStreak;
 window.lastNDays = lastNDays;
 window.activityTotals = activityTotals;
 
+// ─── Storage migration ──────────────────────────────────────────
+// v2: content restructured to 10 units with new ids — old per-topic
+// progress is meaningless, so reset it. The activity log is date-keyed
+// and stays valid, so the streak and stats are preserved.
+const APP_VERSION = 2;
+(function migrate() {
+  let ver = 0;
+  try { ver = Number(localStorage.getItem('engapp-version')) || 0; } catch (e) {}
+  if (ver >= APP_VERSION) return;
+  try {
+    const s = JSON.parse(localStorage.getItem('engapp-state'));
+    const activity = (s && s.activity) || {};
+    localStorage.setItem('engapp-state', JSON.stringify({ progress: {}, activity }));
+  } catch (e) {
+    localStorage.removeItem('engapp-state');
+  }
+  localStorage.removeItem('engapp-daily');
+  localStorage.removeItem('engapp-screen');
+  try { localStorage.setItem('engapp-version', String(APP_VERSION)); } catch (e) {}
+})();
+
+// ─── Daily mix ──────────────────────────────────────────────────
+function allExercises() {
+  const out = [];
+  Object.values(LESSONS).forEach(l => l.exercises.forEach(ex => out.push(ex)));
+  return out;
+}
+
+function generateDailyMix() {
+  const pool = allExercises();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return {
+    date: todayKey(),
+    exercises: pool.slice(0, 5),
+    doneIndex: 0, mistakes: 0, correct: 0, completed: false,
+  };
+}
+
+function loadDailyMix() {
+  try {
+    const d = JSON.parse(localStorage.getItem('engapp-daily'));
+    if (d && d.date === todayKey() && Array.isArray(d.exercises) && d.exercises.length) return d;
+  } catch (e) {}
+  return generateDailyMix();
+}
+
 function App() {
   const [screen, setScreen] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
@@ -128,6 +178,7 @@ function App() {
       return defaults();
     } catch { return defaults(); }
   });
+  const [daily, setDaily] = React.useState(loadDailyMix);
 
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
@@ -135,6 +186,9 @@ function App() {
   React.useEffect(() => {
     localStorage.setItem('engapp-state', JSON.stringify(state));
   }, [state]);
+  React.useEffect(() => {
+    localStorage.setItem('engapp-daily', JSON.stringify(daily));
+  }, [daily]);
 
   function defaults() {
     return { progress: {}, activity: {} };
@@ -172,25 +226,33 @@ function App() {
     }));
   };
 
+  const openDaily = () => {
+    setDaily(d => (d.date === todayKey() ? d : generateDailyMix()));
+    go({ name: 'daily' });
+  };
+  const advanceDaily = ({ doneIndex, mistakes, correct }) => {
+    setDaily(d => ({ ...d, doneIndex, mistakes, correct }));
+  };
+  const completeDaily = ({ mistakes, correct, total }) => {
+    const correctN = typeof correct === 'number' ? correct : Math.max(0, total - mistakes);
+    setDaily(d => ({ ...d, doneIndex: total, mistakes, correct: correctN, completed: true }));
+    setState(s => ({
+      ...s,
+      activity: addActivity(s.activity, { exercises: correctN + mistakes, correct: correctN }),
+    }));
+  };
+
   let content = null;
   if (screen.name === 'home') {
     content = (
       <HomeScreen
         progress={state.progress}
         streak={streak}
-        onPickLesson={(topic) => go({ name: 'unit', topicId: topic.id })}
+        daily={daily}
+        onPickLesson={(topic) => startLesson(topic.id)}
         onOpenReview={() => go({ name: 'review' })}
         onOpenProfile={() => go({ name: 'profile' })}
-      />
-    );
-  } else if (screen.name === 'unit') {
-    const topic = TOPICS.find(t => t.id === screen.topicId);
-    content = (
-      <UnitScreen
-        topic={topic}
-        progress={state.progress}
-        onStartLesson={startLesson}
-        onBack={() => go({ name: 'home' })}
+        onOpenDaily={openDaily}
       />
     );
   } else if (screen.name === 'lesson') {
@@ -202,7 +264,16 @@ function App() {
         lesson={lesson}
         topic={topic}
         onComplete={completeLesson}
-        onExit={() => go({ name: 'unit', topicId: topic.id })}
+        onExit={() => go({ name: 'home' })}
+      />
+    );
+  } else if (screen.name === 'daily') {
+    content = (
+      <DailyScreen
+        daily={daily}
+        onAdvance={advanceDaily}
+        onComplete={completeDaily}
+        onExit={() => go({ name: 'home' })}
       />
     );
   } else if (screen.name === 'results') {
@@ -210,7 +281,7 @@ function App() {
       <ResultsScreen
         mistakes={screen.mistakes}
         total={screen.total}
-        onDone={() => go({ name: 'unit', topicId: screen.topicId })}
+        onDone={() => go({ name: 'home' })}
       />
     );
   } else if (screen.name === 'review') {

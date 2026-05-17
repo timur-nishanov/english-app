@@ -1,9 +1,17 @@
 // ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
 
-function HomeScreen({ progress, streak, onPickLesson, onOpenReview, onOpenProfile }) {
+function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenProfile, onOpenDaily }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
+
+  const dailyTotal = (daily && daily.exercises ? daily.exercises.length : 5);
+  const dailyDone = daily ? (daily.doneIndex || 0) : 0;
+  const dailyCompleted = !!(daily && daily.completed);
+  const dailyTitle = dailyCompleted ? 'Done today ✓' : `${dailyTotal} quick exercises`;
+  const dailySub = dailyCompleted
+    ? 'Come back tomorrow for a new set'
+    : (dailyDone > 0 ? `${dailyDone}/${dailyTotal} done · keep going` : 'Mix of everything you’ve learned');
 
   return (
     <div style={{
@@ -57,6 +65,49 @@ function HomeScreen({ progress, streak, onPickLesson, onOpenReview, onOpenProfil
       </div>
 
       <div style={{ flex: 1, overflow: 'auto', padding: '14px 20px 30px' }}>
+
+        {/* Daily mix — 5 random exercises, generated once a day */}
+        <button
+          onClick={onOpenDaily}
+          className="tap anim-slide-u"
+          style={{
+            width: '100%', textAlign: 'left', cursor: 'pointer',
+            background: DS.accent, color: DS.paperCard,
+            borderRadius: 22, padding: '20px 20px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            fontFamily: DS.sans, border: 'none',
+            marginBottom: 12, boxShadow: DS.shadowMd,
+          }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 99,
+            background: 'rgba(255,255,255,0.16)', color: DS.paperCard,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 5h3.2c1.6 0 2.7 .9 3.6 2.2l2.4 3.6c.9 1.3 2 2.2 3.6 2.2H19" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 17h3.2c1.6 0 2.7-.9 3.6-2.2l2.4-3.6c.9-1.3 2-2.2 3.6-2.2H19" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16.5 2.5L19.5 5l-3 2.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16.5 12L19.5 14.5l-3 2.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
+              opacity: 0.7, marginBottom: 2,
+            }}>Daily mix</div>
+            <div style={{
+              fontFamily: DS.display, fontSize: 19,
+              fontWeight: 600, letterSpacing: -0.4,
+            }}>{dailyTitle}</div>
+            <div style={{ fontSize: 13, marginTop: 3, opacity: 0.8, letterSpacing: -0.1 }}>
+              {dailySub}
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 10 16">
+            <path d="M1 1l7 7-7 7" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          </svg>
+        </button>
 
         {/* Featured — vocabulary review */}
         <button
@@ -142,33 +193,16 @@ function HomeScreen({ progress, streak, onPickLesson, onOpenReview, onOpenProfil
 
 // Soft pastel color per unit — derived from the mark letter
 const UNIT_COLORS = {
-  'idioms':       { bg: '#FFE8DC', fg: '#B5683F' },
-  'language':     { bg: '#E6EEFF', fg: '#1F4FCC' },
-  'emphasising':  { bg: '#FFF1C2', fg: '#9B7400' },
-  'opposites':    { bg: '#E6F4EA', fg: '#147542' },
-  'freetime':     { bg: '#F1E5FF', fg: '#6B3FBF' },
-  'colours':      { bg: '#FCE0EF', fg: '#A6336F' },
-  'conditionals': { bg: '#E0F1F5', fg: '#0F6C84' },
-  'inversions':   { bg: '#FFEFC8', fg: '#8A6400' },
-  'wishes':       { bg: '#FFE0E0', fg: '#A82B22' },
-  'reported':     { bg: '#E6EEFF', fg: '#1F4FCC' },
-  'gerund':       { bg: '#E6F4EA', fg: '#147542' },
-  'causative':    { bg: '#F5E6D9', fg: '#8E5429' },
-  'phrasal-get':  { bg: '#E0F1F5', fg: '#0F6C84' },
-  'tenses':       { bg: '#F1E5FF', fg: '#6B3FBF' },
-  'vocab-people': { bg: '#FFE8DC', fg: '#B5683F' },
-  'vocab-time':   { bg: '#FCE0EF', fg: '#A6336F' },
-  'dining':       { bg: '#FFEAD1', fg: '#9C5818' },
-  'feelings':     { bg: '#E2F0FF', fg: '#1F4FCC' },
-  'intro-verbs':  { bg: '#E0F1F5', fg: '#0F6C84' },
-  'work-career':  { bg: '#E6EEFF', fg: '#1F4FCC' },
-  'business':     { bg: '#E6F4EA', fg: '#147542' },
-  'work-colleagues': { bg: '#FFF1C2', fg: '#9B7400' },
-  'working-life': { bg: '#F1E5FF', fg: '#6B3FBF' },
-  'money':        { bg: '#E2F4EA', fg: '#147542' },
-  'binomials':    { bg: '#FFE8DC', fg: '#B5683F' },
-  'mind':         { bg: '#F1E5FF', fg: '#6B3FBF' },
-  'socialising':  { bg: '#FCE0EF', fg: '#A6336F' },
+  'idioms-expressions':      { bg: '#FFE8DC', fg: '#B5683F' },
+  'work-money':             { bg: '#E2F4EA', fg: '#147542' },
+  'people-feelings':        { bg: '#E2F0FF', fg: '#1F4FCC' },
+  'everyday-life':          { bg: '#F1E5FF', fg: '#6B3FBF' },
+  'conditionals-inversions':{ bg: '#E0F1F5', fg: '#0F6C84' },
+  'tenses':                 { bg: '#FCE0EF', fg: '#A6336F' },
+  'reported-speech':        { bg: '#FFE0E0', fg: '#A82B22' },
+  'verb-patterns':          { bg: '#FFF1C2', fg: '#9B7400' },
+  'phrasal-verbs':          { bg: '#FFEAD1', fg: '#9C5818' },
+  'word-formation':         { bg: '#E6EEFF', fg: '#1F4FCC' },
 };
 
 function TopicRow({ topic, progress, totalLessons, onClick }) {
