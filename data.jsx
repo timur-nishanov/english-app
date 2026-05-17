@@ -13,7 +13,7 @@ const TOPICS = [
   {id:"word-formation",n:"10",title:"Word Formation",subtitle:"Prefixes, opposites, suffixes",mark:"W",lessons:1}
 ];
 
-// Exercise types: 'choice' | 'gap' | 'bank' | 'type' | 'match'  ·  each has a 'tag'
+// Exercise types: 'choice' | 'gap' | 'gaptype' | 'bank' | 'type' | 'match'  ·  each has a 'tag'
 
 const LESSONS = {
   "idioms-expressions": {
@@ -80,6 +80,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Complete the binomial.","sentence":"He searched the drawer for a few ___ and ends to fix the chair.","options":["odds","bits","this","wear"],"answer":"odds","tag":"Binomials"},
       {"type":"type","prompt":"Complete: “The water in the pool was ice ___ when we jumped in.”","answer":"cold","tag":"Emphasis"},
       {"type":"bank","prompt":"Build the sentence.","answer":"It was a blessing in disguise","bank":["It","was","a","blessing","in","disguise","luck","really"],"tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Type the missing word in this binomial.","sentence":"We have been friends through thick and ___ for twenty years.","answer":"thin","tag":"Binomials","hint":"…and ___ — opposite of thick."},
+      {"type":"gaptype","prompt":"Complete the common idiom.","sentence":"Learning the names was a piece of ___ — really easy.","answer":"cake","tag":"Common idioms"},
     ]
   },
   "work-money": {
@@ -142,6 +144,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Complete the phrase.","sentence":"The struggling firm was forced to file for ___ after years of debt.","options":["bankruptcy","promotion","flexitime","overtime"],"answer":"bankruptcy","tag":"Business"},
       {"type":"type","prompt":"Complete: “Every month a large slice of my pay goes to the government as ___.”","answer":"tax","tag":"Money"},
       {"type":"match","prompt":"Match each routine term with its meaning.","pairs":[["clock off","stop work at the end of a shift"],["the daily grind","dull, repetitive everyday work"],["a night shift","a working period during the night"],["get on with","have a friendly relationship with"]],"tag":"Colleagues & routine"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"After thirty years with the firm, she finally decided to ___ and enjoy her pension.","answer":"retire","tag":"Career"},
+      {"type":"gaptype","prompt":"Complete the sentence.","sentence":"I can not go out tonight; I am completely out of ___ until payday.","answer":"money","tag":"Money"},
     ]
   },
   "people-feelings": {
@@ -201,6 +205,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Complete with a colloquial name for a person.","sentence":"He’s a real ___ — he never spends a penny if he can avoid it.","options":["miser","go-getter","high-flyer","day-dreamer"],"answer":"miser","tag":"People types"},
       {"type":"bank","prompt":"Build the sentence.","answer":"I had to break the ice at the party","bank":["I","had","to","break","the","ice","at","the","party","melt"],"tag":"Socialising"},
       {"type":"type","prompt":"Complete: “I was in two ___ about whether to accept the offer.”","answer":"minds","tag":"Mind"},
+      {"type":"gaptype","prompt":"Complete the compound adjective.","sentence":"He never says a bad word about anyone; he is very ___-natured.","answer":"good","tag":"Character"},
+      {"type":"gaptype","prompt":"Complete the idiom about feelings.","sentence":"I was over the ___ when I heard I had passed the exam.","answer":"moon","tag":"Feelings"},
     ]
   },
   "everyday-life": {
@@ -263,6 +269,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Choose the leisure word.","sentence":"He is completely ___ on chess and plays it every single evening.","options":["hooked","bored","fed","worn"],"answer":"hooked","tag":"Leisure"},
       {"type":"type","prompt":"Complete: “There were six of us, so we agreed to split the ___ evenly.”","answer":"bill","tag":"Dining"},
       {"type":"match","prompt":"Match each colour expression with its meaning.","pairs":[["green with envy","feeling jealous"],["a red-letter day","a memorably happy day"],["pitch black","completely dark"],["auburn","reddish-brown"]],"tag":"Colour"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"We were so hungry we decided to eat ___ rather than cook at home.","answer":"out","tag":"Dining"},
+      {"type":"gaptype","prompt":"Complete the time expression.","sentence":"Sorry I am late — I completely lost ___ of time.","answer":"track","tag":"Time"},
     ]
   },
   "conditionals-inversions": {
@@ -311,6 +319,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Complete the inverted conditional.","sentence":"___ you change your mind, please let me know.","options":["Should","Were","Had","Did"],"answer":"Should","tag":"Conditionals"},
       {"type":"type","prompt":"Complete: \"If only I ___ (have) more patience with them yesterday.\"","answer":"had had","tag":"Wishes & regrets"},
       {"type":"bank","prompt":"Build the sentence.","answer":"Never before had I felt so welcome","bank":["Never","before","had","I","felt","so","welcome","have","was"],"tag":"Inversions"},
+      {"type":"gaptype","prompt":"Type the correct verb form (second conditional).","sentence":"If I ___ you, I would apologise straight away.","answer":"were","accept":["was"],"tag":"Conditionals"},
+      {"type":"gaptype","prompt":"Complete the wish (wish + modal).","sentence":"I wish I ___ spend more time with my family.","answer":"could","tag":"Wishes & regrets"},
     ]
   },
   "tenses": {
@@ -355,6 +365,8 @@ const LESSONS = {
       {"type":"choice","prompt":"Which sentence correctly uses the present perfect continuous?","options":["I have been studying English for three years.","I have studied English since three years.","I am studying English for three years.","I study English for three years."],"answer":"I have been studying English for three years.","tag":"Perfect tenses"},
       {"type":"type","prompt":"Complete: \"By the time you arrive, the meeting ___ (finish).\"","answer":"will have finished","tag":"Future forms"},
       {"type":"match","prompt":"Match each habit structure to its meaning.","pairs":[["used to + infinitive","a past state no longer true"],["be used to + -ing","being accustomed to something"],["get used to + -ing","becoming accustomed to something"],["would + infinitive","a repeated past action"]],"tag":"Habits"},
+      {"type":"gaptype","prompt":"Type the missing auxiliary (be going to).","sentence":"Look at those clouds — I think it ___ going to rain.","answer":"is","tag":"Future forms"},
+      {"type":"gaptype","prompt":"Type the missing auxiliary (present perfect).","sentence":"She ___ lived in Paris since 2010.","answer":"has","tag":"Perfect tenses"},
     ]
   },
   "reported-speech": {
@@ -393,6 +405,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Report the wh-question.","sentence":"They asked me how long I ___ for the company.","options":["had worked","have worked","work","was working"],"answer":"had worked","tag":"Questions & commands"},
       {"type":"bank","prompt":"Build the sentence.","answer":"He apologised for arriving late","bank":["He","apologised","for","arriving","late","to","said"],"tag":"Reporting verbs"},
       {"type":"type","prompt":"Complete: \"I won’t do it!\" → She ___ to do it. (verb + to-infinitive, said no)","answer":"refused","tag":"Reporting verbs"},
+      {"type":"gaptype","prompt":"Backshift the modal. Direct: \"I will call you.\"","sentence":"He said that he ___ call me later.","answer":"would","tag":"Backshift"},
+      {"type":"gaptype","prompt":"Complete the reported command.","sentence":"She told me ___ to be late again.","answer":"not","tag":"Questions & commands"},
     ]
   },
   "verb-patterns": {
@@ -433,6 +447,8 @@ const LESSONS = {
       {"type":"choice","prompt":"Try + gerund vs + to-infinitive: \"She tried ___ the heavy box, but it wouldn’t move.\"","options":["to lift","lifting","lift","lifted"],"answer":"to lift","tag":"Change of meaning"},
       {"type":"bank","prompt":"Build the sentence.","answer":"I had my passport renewed last week","bank":["I","had","my","passport","renewed","last","week","got","renewing"],"tag":"Causative"},
       {"type":"type","prompt":"Complete: \"I regret ___ you that the event is cancelled.\" (verb + to-infinitive, formal bad news)","answer":"to","tag":"Change of meaning"},
+      {"type":"gaptype","prompt":"Complete the pattern (can’t help + -ing).","sentence":"I can not help ___ about the interview tomorrow.","answer":"thinking","tag":"Gerund vs infinitive"},
+      {"type":"gaptype","prompt":"Complete the causative (have something done).","sentence":"She had her hair ___ before the wedding.","answer":"cut","tag":"Causative"},
     ]
   },
   "phrasal-verbs": {
@@ -473,6 +489,8 @@ const LESSONS = {
       {"type":"gap","prompt":"Complete the sentence.","sentence":"It was hard to ___ across my point because nobody was listening.","options":["get","put","look","come"],"answer":"get","tag":"Get"},
       {"type":"bank","prompt":"Build the sentence.","answer":"She came down with the flu","bank":["She","came","down","with","the","flu","up","over"],"tag":"Come & go"},
       {"type":"match","prompt":"Match each phrasal verb to its meaning.","pairs":[["look into","investigate"],["break off","end suddenly"],["look down on","despise"],["break out","escape or begin"]],"tag":"Look & break"},
+      {"type":"gaptype","prompt":"Type the missing particle verb.","sentence":"Could you ___ off your shoes before coming inside?","answer":"take","tag":"Take"},
+      {"type":"gaptype","prompt":"Type the missing verb.","sentence":"The meeting was ___ off until next week because the manager was ill.","answer":"put","tag":"Put"},
     ]
   },
   "word-formation": {
@@ -507,6 +525,8 @@ const LESSONS = {
       {"type":"choice","prompt":"Choose the correct noun formed from the verb “decide”.","options":["decision","decisive","deciding","decisional"],"answer":"decision","tag":"Suffixes"},
       {"type":"type","prompt":"Complete: “The singer is a ___-known star across the world.”","answer":"well","tag":"Compounds"},
       {"type":"match","prompt":"Match each description to its compound adjective.","pairs":[["known all over the world","world-famous"],["having dark hair","dark-haired"],["grown at home","home-grown"],["having blue eyes","blue-eyed"]],"tag":"Compounds"},
+      {"type":"gaptype","prompt":"Add the correct negative prefix.","sentence":"It is ___possible to finish this in one day — far too much work.","answer":"im","tag":"Negative prefixes"},
+      {"type":"gaptype","prompt":"Type the root word (kind + -ness).","sentence":"Her ___ness and warmth made everyone feel welcome.","answer":"kind","tag":"Suffixes"},
     ]
   },
 };
@@ -832,6 +852,26 @@ const VOCAB_CARDS = [
   {"en":"make ends meet","def":"manage on a limited income","ex":"They struggle to make ends meet."},
   {"en":"live beyond your means","def":"spend more than you earn","ex":"He lives beyond his means."},
   {"en":"tighten your belt","def":"spend less money than before","ex":"We had to tighten our belts."},
+
+  // More advanced words & expressions
+  {"en":"bend over backwards","def":"try very hard to help or please someone","ex":"They bent over backwards to make us feel welcome."},
+  {"en":"a blessing in disguise","def":"something that seems bad but turns out good","ex":"Losing that job was a blessing in disguise."},
+  {"en":"call it a day","def":"decide to stop working for the day","ex":"It's late — let's call it a day."},
+  {"en":"on the same page","def":"in agreement; sharing the same understanding","ex":"Let's make sure we're all on the same page."},
+  {"en":"a far cry from","def":"very different from","ex":"This flat is a far cry from our old house."},
+  {"en":"get cold feet","def":"become nervous and reluctant before an event","ex":"He got cold feet just before the wedding."},
+  {"en":"food for thought","def":"something worth thinking about carefully","ex":"Her talk gave us plenty of food for thought."},
+  {"en":"the bottom line","def":"the most important fact to consider","ex":"The bottom line is we can't afford it."},
+  {"en":"meticulous","def":"showing great attention to detail","ex":"She is meticulous about her research notes."},
+  {"en":"resilient","def":"able to recover quickly from difficulties","ex":"Children are often remarkably resilient."},
+  {"en":"ambivalent","def":"having mixed feelings about something","ex":"I feel ambivalent about moving abroad."},
+  {"en":"pragmatic","def":"dealing with things sensibly and practically","ex":"We need a pragmatic solution, not a perfect one."},
+  {"en":"daunting","def":"seeming difficult and intimidating","ex":"Public speaking can be a daunting task."},
+  {"en":"compelling","def":"so convincing or interesting it holds attention","ex":"She made a compelling argument."},
+  {"en":"eloquent","def":"fluent and persuasive in speech or writing","ex":"He gave an eloquent speech at the ceremony."},
+  {"en":"jeopardise","def":"put something at risk of being harmed or lost","ex":"Missing the deadline could jeopardise the deal."},
+  {"en":"underestimate","def":"think something is smaller or less important than it is","ex":"Never underestimate the value of rest."},
+  {"en":"thrive","def":"grow or develop well; flourish","ex":"The business thrived after the move."},
 ];
 
 window.TOPICS = TOPICS;

@@ -1,6 +1,6 @@
 // ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
 
-function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenProfile, onOpenDaily }) {
+function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenVocabTest, onOpenProfile, onOpenDaily }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
@@ -119,7 +119,7 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
             borderRadius: 22, padding: '20px 20px',
             display: 'flex', alignItems: 'center', gap: 14,
             fontFamily: DS.sans, border: 'none',
-            marginBottom: 26, boxShadow: DS.shadowMd,
+            marginBottom: 10, boxShadow: DS.shadowMd,
           }}>
           <div style={{
             width: 46, height: 46, borderRadius: 99,
@@ -147,6 +147,47 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
           </div>
           <svg width="14" height="14" viewBox="0 0 10 16">
             <path d="M1 1l7 7-7 7" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          </svg>
+        </button>
+
+        {/* Vocabulary test */}
+        <button
+          onClick={onOpenVocabTest}
+          className="tap anim-slide-u"
+          style={{
+            width: '100%', textAlign: 'left', cursor: 'pointer',
+            background: DS.paperCard, color: DS.ink,
+            borderRadius: 22, padding: '20px 20px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            fontFamily: DS.sans, border: 'none',
+            marginBottom: 26, boxShadow: DS.shadowSm,
+          }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 99,
+            background: DS.accentSoft, color: DS.accentDark,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M4 4.5h14M4 11h14M4 17.5h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <path d="M14.5 16.5l2 2 3.5-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
+              color: DS.ink3, marginBottom: 2,
+            }}>Check yourself</div>
+            <div style={{
+              fontFamily: DS.display, fontSize: 19,
+              fontWeight: 600, letterSpacing: -0.4,
+            }}>Vocabulary test</div>
+            <div style={{ fontSize: 13, marginTop: 3, color: DS.ink3, letterSpacing: -0.1 }}>
+              10 questions · match the word
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 10 16">
+            <path d="M1 1l7 7-7 7" stroke={DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           </svg>
         </button>
 

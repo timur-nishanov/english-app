@@ -37,6 +37,7 @@ function LessonScreen({ lessonId, lesson, topic, onComplete, onExit }) {
 function ExerciseView({ ex, topic, answered, onAnswer }) {
   if (ex.type === 'choice') return <ChoiceExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'gap')    return <GapExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'gaptype') return <GapTypeExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'bank')   return <BankExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'type')   return <TypeExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'match')  return <MatchExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
@@ -64,6 +65,7 @@ function kindOf(type) {
   return ({
     choice: 'Multiple choice',
     gap: 'Fill the gap',
+    gaptype: 'Fill the gap',
     bank: 'Word bank',
     type: 'Type the answer',
     match: 'Match pairs',
@@ -166,6 +168,73 @@ function GapExercise({ ex, answered, onAnswer, topic }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function GapTypeExercise({ ex, answered, onAnswer, topic }) {
+  const [val, setVal] = React.useState('');
+  const inputRef = React.useRef(null);
+  React.useEffect(() => { setVal(''); setTimeout(() => inputRef.current?.focus(), 50); }, [ex]);
+
+  const norm = s => s.trim().toLowerCase();
+  const accepted = [ex.answer, ...(ex.accept || [])].map(norm);
+  const commit = () => {
+    if (answered || !val.trim()) return;
+    onAnswer(accepted.includes(norm(val)));
+  };
+  const isCorrect = answered && accepted.includes(norm(val));
+
+  const parts = ex.sentence.split('___');
+  const blank = (answered ? (val.trim() || '______') : (val.trim() || '______'));
+  const blankColor = answered ? (isCorrect ? DS.correct : DS.wrong) : val.trim() ? DS.accent : DS.ink3;
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('gaptype')} />
+      <div style={{
+        background: DS.paperCard, borderRadius: 18,
+        padding: '20px 20px', marginBottom: 18,
+        boxShadow: DS.shadowSm,
+      }}>
+        <div style={{
+          fontFamily: DS.display,
+          fontSize: 19, lineHeight: 1.5, color: DS.ink, fontWeight: 500, letterSpacing: -0.3,
+        }}>
+          {parts[0]}
+          <span style={{
+            display: 'inline-block', minWidth: 60, padding: '0 10px',
+            borderBottom: `2px solid ${blankColor}`, color: blankColor, fontWeight: 600,
+            margin: '0 2px', transition: `all 220ms ${DS.ease}`,
+          }}>{blank}</span>
+          {parts[1]}
+        </div>
+      </div>
+      <input ref={inputRef} value={val} onChange={e => setVal(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && commit()} disabled={!!answered}
+        placeholder="Type the missing word…"
+        className={answered && !isCorrect ? 'anim-shake' : ''}
+        style={{
+          width: '100%', padding: '17px 18px', borderRadius: 16,
+          border: `1.5px solid ${answered ? (isCorrect ? DS.correct : DS.wrong) : 'transparent'}`,
+          fontSize: 17, fontWeight: 500, fontFamily: DS.sans,
+          background: DS.paperCard, color: DS.ink, outline: 'none', boxSizing: 'border-box',
+          transition: `border-color 200ms ${DS.ease}`,
+          boxShadow: DS.shadowSm, letterSpacing: -0.3,
+        }}/>
+      {ex.hint && (
+        <div style={{
+          marginTop: 10, fontSize: 13, color: DS.ink3,
+          padding: '0 4px', letterSpacing: -0.1,
+        }}>Hint: {ex.hint}</div>
+      )}
+      {!answered && (
+        <div style={{ marginTop: 18 }}>
+          <PrimaryButton onClick={commit} color={val.trim() ? DS.ink : DS.ink5} disabled={!val.trim()}>
+            Check answer
+          </PrimaryButton>
+        </div>
+      )}
     </div>
   );
 }
