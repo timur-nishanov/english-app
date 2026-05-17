@@ -117,37 +117,42 @@ function ChoiceExercise({ ex, answered, onAnswer, topic }) {
   );
 }
 
+function GapSentence({ sentence, value, color }) {
+  const parts = sentence.split('___');
+  return (
+    <div style={{
+      background: DS.paperCard, borderRadius: 18,
+      padding: '20px 20px', marginBottom: 18,
+      boxShadow: DS.shadowSm,
+    }}>
+      <div style={{
+        fontFamily: DS.display,
+        fontSize: 19, lineHeight: 1.5, color: DS.ink, fontWeight: 500, letterSpacing: -0.3,
+      }}>
+        {parts[0]}
+        <span style={{
+          display: 'inline-block', minWidth: 60, padding: '0 10px',
+          borderBottom: `2px solid ${color}`, color, fontWeight: 600,
+          margin: '0 2px', transition: `all 220ms ${DS.ease}`,
+        }}>{value}</span>
+        {parts[1]}
+      </div>
+    </div>
+  );
+}
+
 function GapExercise({ ex, answered, onAnswer, topic }) {
   const [picked, setPicked] = React.useState(null);
   const opts = React.useMemo(() => shuffle(ex.options), [ex]);
   React.useEffect(() => { setPicked(null); }, [ex]);
   const commit = (o) => { if (answered) return; setPicked(o); onAnswer(o === ex.answer); };
 
-  const parts = ex.sentence.split('___');
-  const blank = picked || '______';
   const blankColor = answered ? (picked === ex.answer ? DS.correct : DS.wrong) : picked ? DS.accent : DS.ink3;
 
   return (
     <div>
       <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('gap')} />
-      <div style={{
-        background: DS.paperCard, borderRadius: 18,
-        padding: '20px 20px', marginBottom: 20,
-        boxShadow: DS.shadowSm,
-      }}>
-        <div style={{
-          fontFamily: DS.display,
-          fontSize: 19, lineHeight: 1.5, color: DS.ink, fontWeight: 500, letterSpacing: -0.3,
-        }}>
-          {parts[0]}
-          <span style={{
-            display: 'inline-block', minWidth: 60, padding: '0 10px',
-            borderBottom: `2px solid ${blankColor}`, color: blankColor, fontWeight: 600,
-            margin: '0 2px', transition: `all 220ms ${DS.ease}`,
-          }}>{blank}</span>
-          {parts[1]}
-        </div>
-      </div>
+      <GapSentence sentence={ex.sentence} value={picked || '______'} color={blankColor} />
       <div className="stagger" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {opts.map((o, i) => {
           const isCorrect = answered && o === ex.answer;
@@ -185,31 +190,12 @@ function GapTypeExercise({ ex, answered, onAnswer, topic }) {
   };
   const isCorrect = answered && accepted.includes(norm(val));
 
-  const parts = ex.sentence.split('___');
-  const blank = (answered ? (val.trim() || '______') : (val.trim() || '______'));
   const blankColor = answered ? (isCorrect ? DS.correct : DS.wrong) : val.trim() ? DS.accent : DS.ink3;
 
   return (
     <div>
       <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('gaptype')} />
-      <div style={{
-        background: DS.paperCard, borderRadius: 18,
-        padding: '20px 20px', marginBottom: 18,
-        boxShadow: DS.shadowSm,
-      }}>
-        <div style={{
-          fontFamily: DS.display,
-          fontSize: 19, lineHeight: 1.5, color: DS.ink, fontWeight: 500, letterSpacing: -0.3,
-        }}>
-          {parts[0]}
-          <span style={{
-            display: 'inline-block', minWidth: 60, padding: '0 10px',
-            borderBottom: `2px solid ${blankColor}`, color: blankColor, fontWeight: 600,
-            margin: '0 2px', transition: `all 220ms ${DS.ease}`,
-          }}>{blank}</span>
-          {parts[1]}
-        </div>
-      </div>
+      <GapSentence sentence={ex.sentence} value={val.trim() || '______'} color={blankColor} />
       <input ref={inputRef} value={val} onChange={e => setVal(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && commit()} disabled={!!answered}
         placeholder="Type the missing word…"
