@@ -49,6 +49,7 @@
 <script type="text/babel" src="lesson-screen.jsx"></script>
 <script type="text/babel" src="review-screen.jsx"></script>
 <script type="text/babel" src="daily-screen.jsx"></script>
+<script type="text/babel" src="quicktest-screen.jsx"></script>
 
 <script type="text/babel">
 
@@ -249,6 +250,13 @@ function App() {
     }));
   };
 
+  const completeQuickTest = ({ total, correct }) => {
+    setState(s => ({
+      ...s,
+      activity: addActivity(s.activity, { exercises: total, correct }),
+    }));
+  };
+
   const openDaily = () => {
     setDaily(d => (d.date === todayKey() ? d : generateDailyMix()));
     go({ name: 'daily' });
@@ -275,6 +283,7 @@ function App() {
         onPickLesson={(topic) => go({ name: 'category', topicId: topic.id })}
         onOpenReview={() => go({ name: 'review' })}
         onOpenVocabTest={() => go({ name: 'vocabtest' })}
+        onOpenQuickTest={() => go({ name: 'quicktest' })}
         onOpenProfile={() => go({ name: 'profile' })}
         onOpenDaily={openDaily}
       />
@@ -334,6 +343,10 @@ function App() {
   } else if (screen.name === 'vocabtest') {
     content = (
       <VocabTestScreen onExit={() => go({ name: 'home' })} onComplete={completeVocabTest} />
+    );
+  } else if (screen.name === 'quicktest') {
+    content = (
+      <QuickTestScreen onExit={() => go({ name: 'home' })} onComplete={completeQuickTest} />
     );
   } else if (screen.name === 'profile') {
     content = (
