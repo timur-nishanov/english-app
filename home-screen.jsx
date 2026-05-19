@@ -1,6 +1,6 @@
 // ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
 
-function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenVocabTest, onOpenProfile, onOpenDaily }) {
+function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenVocabTest, onOpenQuickTest, onOpenProfile, onOpenDaily }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
@@ -160,7 +160,7 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
             borderRadius: 22, padding: '20px 20px',
             display: 'flex', alignItems: 'center', gap: 14,
             fontFamily: DS.sans, border: 'none',
-            marginBottom: 26, boxShadow: DS.shadowSm,
+            marginBottom: 10, boxShadow: DS.shadowSm,
           }}>
           <div style={{
             width: 46, height: 46, borderRadius: 99,
@@ -184,6 +184,49 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
             }}>Vocabulary test</div>
             <div style={{ fontSize: 13, marginTop: 3, color: DS.ink3, letterSpacing: -0.1 }}>
               10 questions · match the word
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 10 16">
+            <path d="M1 1l7 7-7 7" stroke={DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          </svg>
+        </button>
+
+        {/* Quick practice — all exercises, live category & shuffle controls */}
+        <button
+          onClick={onOpenQuickTest}
+          className="tap anim-slide-u"
+          style={{
+            width: '100%', textAlign: 'left', cursor: 'pointer',
+            background: DS.paperCard, color: DS.ink,
+            borderRadius: 22, padding: '20px 20px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            fontFamily: DS.sans, border: 'none',
+            marginBottom: 26, boxShadow: DS.shadowSm,
+          }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 99,
+            background: DS.sageSoft, color: DS.ink,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 5h3.2c1.6 0 2.7 .9 3.6 2.2l2.4 3.6c.9 1.3 2 2.2 3.6 2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 17h3.2c1.6 0 2.7-.9 3.6-2.2l2.4-3.6c.9-1.3 2-2.2 3.6-2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16.5 2.5L19.5 5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16.5 12L19.5 14.5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
+              color: DS.ink3, marginBottom: 2,
+            }}>Practice mix</div>
+            <div style={{
+              fontFamily: DS.display, fontSize: 19,
+              fontWeight: 600, letterSpacing: -0.4,
+            }}>Quick practice</div>
+            <div style={{ fontSize: 13, marginTop: 3, color: DS.ink3, letterSpacing: -0.1 }}>
+              Every exercise · filter & shuffle on the fly
             </div>
           </div>
           <svg width="14" height="14" viewBox="0 0 10 16">
