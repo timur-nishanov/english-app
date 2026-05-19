@@ -39,7 +39,6 @@ function QuickTestScreen({ onExit, onComplete }) {
   const groupedOrder = React.useMemo(() => pool.map((_, i) => i), [pool]);
 
   const [enabled, setEnabled] = React.useState(() => new Set(TOPICS.map(t => t.id)));
-  const [shuffled, setShuffled] = React.useState(false);
   const [order, setOrder] = React.useState(groupedOrder);
   const [seen, setSeen] = React.useState(() => new Set());
   const [activeId, setActiveId] = React.useState(() => (pool.length ? pool[0].id : null));
@@ -122,7 +121,6 @@ function QuickTestScreen({ onExit, onComplete }) {
     }
     if (nextId === null && !answered) nextId = activeId;
     setOrder(newOrder);
-    setShuffled(true);
     if (answered && activeId) setSeen(newSeen);
     setActiveId(nextId);
     setAnswered(null);
@@ -164,21 +162,10 @@ function QuickTestScreen({ onExit, onComplete }) {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
       <LessonTopBar pct={pct} onExit={onExit} label={`${doneCount}/${totalActive || 0}`} />
 
-      {/* Always-visible controls: shuffle + collapsible category chips */}
+      {/* Always-visible category chips + expander */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '2px 16px 10px', background: DS.paper }}>
-        <button onClick={doShuffle} className="tap" aria-label="Shuffle order"
-          style={{
-            flexShrink: 0, width: 38, height: 38, borderRadius: 12, cursor: 'pointer',
-            border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: shuffled ? DS.ink : DS.paperCard,
-            color: shuffled ? DS.paperCard : DS.ink3,
-            boxShadow: shuffled ? 'none' : DS.shadowSm,
-            transition: `all 200ms ${DS.ease}`,
-          }}>
-          <ShuffleIcon size={17} color="currentColor" strokeWidth={2.1} />
-        </button>
         <div style={{
-          flex: 1, display: 'flex', gap: 6,
+          flex: 1, minWidth: 0, display: 'flex', gap: 6,
           flexWrap: tagsOpen ? 'wrap' : 'nowrap',
           overflow: 'hidden',
         }}>
@@ -188,39 +175,31 @@ function QuickTestScreen({ onExit, onComplete }) {
             return (
               <button key={u.id} onClick={() => toggleUnit(u.id)} className="tap"
                 style={{
-                  flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '8px 11px', borderRadius: 999, cursor: 'pointer', border: 'none',
-                  fontFamily: DS.sans, fontSize: 12.5, fontWeight: 600, letterSpacing: -0.1,
+                  flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '7px 10px', borderRadius: 999, cursor: 'pointer',
+                  border: `1.5px solid ${on ? 'transparent' : DS.line}`,
+                  fontFamily: DS.sans, fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
                   background: on ? u.color.bg : DS.paperCard,
                   color: on ? u.color.fg : DS.ink4,
-                  boxShadow: on ? 'none' : DS.shadowSm,
-                  opacity: on ? 1 : 0.55,
+                  opacity: on ? 1 : 0.7,
                   transition: `all 180ms ${DS.ease}`,
                 }}>
-                <span style={{
-                  width: 14, height: 14, borderRadius: 99, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: on ? u.color.fg : 'transparent',
-                  border: `1.5px solid ${on ? u.color.fg : DS.ink5}`,
-                  color: u.color.bg, fontSize: 9, fontWeight: 700,
-                }}>{on ? '✓' : ''}</span>
                 {u.short}
-                <span style={{ opacity: 0.6, fontWeight: 500 }}>{cnt}</span>
+                <span style={{ opacity: 0.55, fontWeight: 500 }}>{cnt}</span>
               </button>
             );
           })}
-          <button onClick={() => setTagsOpen(o => !o)} className="tap"
-            aria-label={tagsOpen ? 'Collapse categories' : 'Show all categories'}
-            style={{
-              flexShrink: 0, display: 'inline-flex', alignItems: 'center',
-              padding: '8px 12px', borderRadius: 999, cursor: 'pointer',
-              border: `1.5px solid ${DS.line}`, background: DS.paper,
-              fontFamily: DS.sans, fontSize: 12.5, fontWeight: 700,
-              letterSpacing: -0.1, color: DS.ink2,
-            }}>
-            {tagsOpen ? 'Hide' : `+${units.length - 3}`}
-          </button>
         </div>
+        <button onClick={() => setTagsOpen(o => !o)} className="tap"
+          aria-label={tagsOpen ? 'Collapse categories' : 'Show all categories'}
+          style={{
+            flexShrink: 0, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
+            padding: '7px 11px', borderRadius: 999, cursor: 'pointer',
+            border: 'none', background: DS.ink, color: DS.paperCard,
+            fontFamily: DS.sans, fontSize: 12, fontWeight: 700, letterSpacing: -0.1,
+          }}>
+          {tagsOpen ? 'Hide' : `+${units.length - 3}`}
+        </button>
       </div>
 
       {active ? (
@@ -248,7 +227,22 @@ function QuickTestScreen({ onExit, onComplete }) {
         </div>
       )}
 
-      {active && <FeedbackBar answered={answered} ex={active.ex} onContinue={handleContinue} />}
+      {active && answered && <FeedbackBar answered={answered} ex={active.ex} onContinue={handleContinue} />}
+
+      {active && !answered && (
+        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
+          <button onClick={doShuffle} className="tap"
+            style={{
+              width: '100%', padding: '16px', borderRadius: 16, border: 'none',
+              cursor: 'pointer', background: DS.ink, color: DS.paperCard,
+              fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.3,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+            }}>
+            <ShuffleIcon size={19} color="currentColor" strokeWidth={2.2} />
+            Shuffle
+          </button>
+        </div>
+      )}
     </div>
   );
 }
