@@ -46,6 +46,7 @@ function QuickTestScreen({ onExit, onComplete }) {
   const [answered, setAnswered] = React.useState(null);
   const [mistakes, setMistakes] = React.useState(0);
   const [correctCount, setCorrectCount] = React.useState(0);
+  const [tagsOpen, setTagsOpen] = React.useState(false);
   const recorded = React.useRef(false);
 
   const pickNext = React.useCallback((excludeId) => {
@@ -106,12 +107,25 @@ function QuickTestScreen({ onExit, onComplete }) {
       return next;
     });
   };
-  const toggleShuffle = () => {
-    setShuffled(s => {
-      const ns = !s;
-      setOrder(ns ? qtShuffle(groupedOrder) : groupedOrder);
-      return ns;
-    });
+  // Shuffle is an action: each press re-randomises the remaining queue and
+  // jumps to a fresh exercise so the screen visibly changes every time.
+  const doShuffle = () => {
+    const newOrder = qtShuffle(groupedOrder);
+    const newSeen = answered && activeId ? new Set(seen).add(activeId) : seen;
+    let nextId = null;
+    for (const i of newOrder) {
+      const p = pool[i];
+      if (!answered && p.id === activeId) continue;
+      if (!enabled.has(p.unitId)) continue;
+      if (newSeen.has(p.id)) continue;
+      nextId = p.id; break;
+    }
+    if (nextId === null && !answered) nextId = activeId;
+    setOrder(newOrder);
+    setShuffled(true);
+    if (answered && activeId) setSeen(newSeen);
+    setActiveId(nextId);
+    setAnswered(null);
   };
 
   if (finished) {
@@ -150,9 +164,9 @@ function QuickTestScreen({ onExit, onComplete }) {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
       <LessonTopBar pct={pct} onExit={onExit} label={`${doneCount}/${totalActive || 0}`} />
 
-      {/* Always-visible controls: shuffle + category chips */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 16px 10px', background: DS.paper }}>
-        <button onClick={toggleShuffle} className="tap" aria-label="Shuffle order"
+      {/* Always-visible controls: shuffle + collapsible category chips */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '2px 16px 10px', background: DS.paper }}>
+        <button onClick={doShuffle} className="tap" aria-label="Shuffle order"
           style={{
             flexShrink: 0, width: 38, height: 38, borderRadius: 12, cursor: 'pointer',
             border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -161,15 +175,14 @@ function QuickTestScreen({ onExit, onComplete }) {
             boxShadow: shuffled ? 'none' : DS.shadowSm,
             transition: `all 200ms ${DS.ease}`,
           }}>
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-            <path d="M3 5h3.2c1.6 0 2.7 .9 3.6 2.2l2.4 3.6c.9 1.3 2 2.2 3.6 2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M3 17h3.2c1.6 0 2.7-.9 3.6-2.2l2.4-3.6c.9-1.3 2-2.2 3.6-2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M16.5 2.5L19.5 5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M16.5 12L19.5 14.5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <ShuffleIcon size={17} color="currentColor" strokeWidth={2.1} />
         </button>
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', flex: 1, paddingBottom: 2 }}>
-          {units.map(u => {
+        <div style={{
+          flex: 1, display: 'flex', gap: 6,
+          flexWrap: tagsOpen ? 'wrap' : 'nowrap',
+          overflow: 'hidden',
+        }}>
+          {(tagsOpen ? units : units.slice(0, 3)).map(u => {
             const on = enabled.has(u.id);
             const cnt = remainingOf(u.id);
             return (
@@ -196,6 +209,17 @@ function QuickTestScreen({ onExit, onComplete }) {
               </button>
             );
           })}
+          <button onClick={() => setTagsOpen(o => !o)} className="tap"
+            aria-label={tagsOpen ? 'Collapse categories' : 'Show all categories'}
+            style={{
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center',
+              padding: '8px 12px', borderRadius: 999, cursor: 'pointer',
+              border: `1.5px solid ${DS.line}`, background: DS.paper,
+              fontFamily: DS.sans, fontSize: 12.5, fontWeight: 700,
+              letterSpacing: -0.1, color: DS.ink2,
+            }}>
+            {tagsOpen ? 'Hide' : `+${units.length - 3}`}
+          </button>
         </div>
       </div>
 

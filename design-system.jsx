@@ -269,6 +269,20 @@ function Mark({ letter, color = DS.ink, bg = DS.paperCard, size = 44, border = D
   );
 }
 
+// Clean shuffle icon (Feather-style) — two crossing arrows
+function ShuffleIcon({ size = 22, color = 'currentColor', strokeWidth = 2 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 3h5v5" />
+      <path d="M4 20 21 3" />
+      <path d="M21 16v5h-5" />
+      <path d="M15 15l6 6" />
+      <path d="M4 4l5 5" />
+    </svg>
+  );
+}
+
 window.DS = DS;
 window.PrimaryButton = PrimaryButton;
 window.BackButton = BackButton;
@@ -279,6 +293,7 @@ window.SectionLabel = SectionLabel;
 window.Divider = Divider;
 window.Tick = Tick;
 window.Mark = Mark;
+window.ShuffleIcon = ShuffleIcon;
 window.BigButton = PrimaryButton;
 window.StreakIcon = () => null;
 window.XPIcon = () => null;

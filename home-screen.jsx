@@ -84,12 +84,7 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M3 5h3.2c1.6 0 2.7 .9 3.6 2.2l2.4 3.6c.9 1.3 2 2.2 3.6 2.2H19" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 17h3.2c1.6 0 2.7-.9 3.6-2.2l2.4-3.6c.9-1.3 2-2.2 3.6-2.2H19" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16.5 2.5L19.5 5l-3 2.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16.5 12L19.5 14.5l-3 2.5" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ShuffleIcon size={22} color="white" />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{
@@ -209,12 +204,7 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M3 5h3.2c1.6 0 2.7 .9 3.6 2.2l2.4 3.6c.9 1.3 2 2.2 3.6 2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 17h3.2c1.6 0 2.7-.9 3.6-2.2l2.4-3.6c.9-1.3 2-2.2 3.6-2.2H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16.5 2.5L19.5 5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16.5 12L19.5 14.5l-3 2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ShuffleIcon size={22} color={DS.ink} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{
