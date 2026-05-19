@@ -87,6 +87,23 @@ const LESSONS = {
       {"type":"gaptype","prompt":"Complete this binomial.","sentence":"She explained the rules loud and ___ so everyone understood.","answer":"clear","tag":"Binomials"},
       {"type":"gaptype","prompt":"Complete the idiom.","sentence":"Stop going round in ___ and give me a straight answer.","answer":"circles","tag":"Language idioms"},
       {"type":"gaptype","prompt":"Complete the common idiom.","sentence":"It is not rocket ___ — anyone can learn it.","answer":"science","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the body-part idiom.","sentence":"He is always annoying me — he is a real pain in the ___.","answer":"neck","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"Good luck in the exam! I will keep my ___ crossed for you.","answer":"fingers","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"Mind your own business and stop sticking your ___ in!","answer":"nose","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"Could you give me a ___ with the washing-up?","answer":"hand","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"Things are going badly, but keep your ___ up and stay cheerful.","answer":"chin","tag":"Common idioms"},
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"He really put his ___ in it when he insulted the boss.","answer":"foot","tag":"Common idioms"},
+      {"type":"choice","prompt":"If you \"give someone the cold shoulder\", you…","options":["deliberately ignore them","greet them warmly","ask them for help","apologise to them"],"answer":"deliberately ignore them","tag":"Common idioms"},
+      {"type":"choice","prompt":"\"Get something off your chest\" means…","options":["say something that has been worrying you","carry something heavy","keep a secret","relax after work"],"answer":"say something that has been worrying you","tag":"Common idioms"},
+      {"type":"match","prompt":"Match each body-part idiom with its meaning.","pairs":[["see eye to eye","agree completely"],["toe the line","obey the rules"],["keep an eye on","watch carefully"],["pull someone’s leg","tease someone playfully"]],"tag":"Common idioms"},
+      {"type":"match","prompt":"Match each \"thinking\" expression with its meaning.","pairs":[["I thought as much","that is exactly what I expected"],["on second thoughts","having reconsidered"],["think highly of someone","have a very good opinion of them"],["that’s a thought","that is a good idea"]],"tag":"Language idioms"},
+      {"type":"choice","prompt":"If you do something \"on second thoughts\", you…","options":["change your mind after reconsidering","do it without thinking","do it very quickly","refuse to do it"],"answer":"change your mind after reconsidering","tag":"Language idioms"},
+      {"type":"gaptype","prompt":"Complete the expression.","sentence":"I am not sure now — on second ___, perhaps I had better stay at home.","answer":"thoughts","tag":"Language idioms"},
+      {"type":"gaptype","prompt":"Type the missing verb (= understand).","sentence":"Sorry, I did not quite ___ you — could you say that again?","answer":"follow","tag":"Language idioms"},
+      {"type":"gaptype","prompt":"Type the missing verb (= give a wrong impression).","sentence":"Most of the clues in a detective story are there to ___ the reader.","answer":"mislead","tag":"Language idioms"},
+      {"type":"choice","prompt":"Which verb means \"to say or pronounce something\"?","options":["utter","wonder","spot","plead"],"answer":"utter","tag":"Language idioms"},
+      {"type":"choice","prompt":"\"To imply something\" means…","options":["to suggest it without saying it directly","to state it very clearly","to deny it completely","to shout it loudly"],"answer":"to suggest it without saying it directly","tag":"Language idioms"},
+      {"type":"type","prompt":"Complete: \"I would ___ it if you could help me with this job.\" (verb meaning \"be grateful for\")","answer":"appreciate","tag":"Language idioms"},
     ]
   },
   "work-money": {
@@ -397,6 +414,10 @@ const LESSONS = {
       {"type":"gaptype","prompt":"Type the missing auxiliary (future continuous).","sentence":"This time tomorrow I ___ be flying to Rome.","answer":"will","tag":"Future forms"},
       {"type":"gaptype","prompt":"Type the verb form (past passive).","sentence":"The bridge ___ in 1890. (build)","answer":"was built","tag":"Passive & stative"},
       {"type":"gaptype","prompt":"Type the structure for a past habit.","sentence":"When I was a child, I ___ play in the park every day.","answer":"used to","tag":"Habits"},
+      {"type":"gaptype","prompt":"Complete the passive structure.","sentence":"It has been ___ that the minister should resign. (suggest)","answer":"suggested","tag":"Passive & stative"},
+      {"type":"gaptype","prompt":"Complete the passive structure.","sentence":"Taking exercise is ___ to be good for your health. (know)","answer":"known","tag":"Passive & stative"},
+      {"type":"gaptype","prompt":"Complete the passive structure.","sentence":"Nothing has been ___ of Sue since she left for Glasgow. (see)","answer":"seen","tag":"Passive & stative"},
+      {"type":"choice","prompt":"Choose the correct passive form of \"They built the bridge in 1900.\"","options":["The bridge was built in 1900.","The bridge is built in 1900.","The bridge has built in 1900.","The bridge built in 1900."],"answer":"The bridge was built in 1900.","tag":"Passive & stative"},
     ]
   },
   "reported-speech": {
@@ -489,6 +510,10 @@ const LESSONS = {
       {"type":"gaptype","prompt":"Type the verb form (get something done).","sentence":"I need to get my car ___ before the trip. (service)","answer":"serviced","tag":"Causative"},
       {"type":"gaptype","prompt":"Type the verb form (decide + to-infinitive).","sentence":"She decided ___ to another city. (move)","answer":"to move","tag":"Gerund vs infinitive"},
       {"type":"gaptype","prompt":"Type the verb form (stop + -ing).","sentence":"He stopped ___ two years ago and feels much healthier. (smoke)","answer":"smoking","tag":"Change of meaning"},
+      {"type":"gaptype","prompt":"Complete the causative (have something done).","sentence":"I will have your trousers ___ immediately, sir. (press)","answer":"pressed","tag":"Causative"},
+      {"type":"gaptype","prompt":"Complete the causative (be made to do something).","sentence":"John is being ___ to sit his exams again. (make)","answer":"made","tag":"Causative"},
+      {"type":"choice","prompt":"Which sentence correctly uses the causative?","options":["I had my car repaired yesterday.","I had repaired my car yesterday.","I had my car repair yesterday.","I have my car repairing yesterday."],"answer":"I had my car repaired yesterday.","tag":"Causative"},
+      {"type":"bank","prompt":"Build the sentence.","answer":"I must get my hair cut","bank":["I","must","get","my","hair","cut","cutting","have"],"tag":"Causative"},
     ]
   },
   "phrasal-verbs": {
@@ -916,6 +941,26 @@ const VOCAB_CARDS = [
   {"en":"jeopardise","def":"put something at risk of being harmed or lost","ex":"Missing the deadline could jeopardise the deal."},
   {"en":"underestimate","def":"think something is smaller or less important than it is","ex":"Never underestimate the value of rest."},
   {"en":"thrive","def":"grow or develop well; flourish","ex":"The business thrived after the move."},
+
+  // Body-part idioms, communication verbs & expressions
+  {"en":"keep your fingers crossed","def":"hope for good luck","ex":"I’ll keep my fingers crossed for your interview."},
+  {"en":"give someone a hand","def":"help someone","ex":"Could you give me a hand with these bags?"},
+  {"en":"keep your chin up","def":"stay cheerful in a difficult situation","ex":"Keep your chin up — things will get better."},
+  {"en":"put your foot in it","def":"say something tactless or embarrassing","ex":"I really put my foot in it by mentioning her ex."},
+  {"en":"give someone the cold shoulder","def":"deliberately ignore someone","ex":"Ever since the argument she’s given me the cold shoulder."},
+  {"en":"see eye to eye","def":"agree completely with someone","ex":"We don’t always see eye to eye on politics."},
+  {"en":"toe the line","def":"obey the rules or accepted standards","ex":"New staff are expected to toe the line."},
+  {"en":"get it off your chest","def":"say something that has been worrying you","ex":"You’ll feel better if you get it off your chest."},
+  {"en":"keep an eye on","def":"watch something or someone carefully","ex":"Could you keep an eye on my bag for a minute?"},
+  {"en":"pull someone’s leg","def":"tease someone playfully","ex":"Don’t worry, I’m only pulling your leg."},
+  {"en":"look down your nose at","def":"regard someone or something with contempt","ex":"She looks down her nose at cheap restaurants."},
+  {"en":"think highly of","def":"have a very good opinion of someone","ex":"The manager thinks highly of her work."},
+  {"en":"I thought as much","def":"that is exactly what I expected","ex":"Late again? I thought as much."},
+  {"en":"mislead","def":"give someone a wrong idea or impression","ex":"The advert deliberately misled customers."},
+  {"en":"imply","def":"suggest something without saying it directly","ex":"Are you implying that I’m lazy?"},
+  {"en":"utter","def":"say or pronounce something","ex":"She was too shocked to utter a word."},
+  {"en":"plead ignorance","def":"claim you did not know about something","ex":"When asked about the damage, he pleaded ignorance."},
+  {"en":"appreciate","def":"be grateful for something","ex":"I’d really appreciate your help with this."},
 ];
 
 window.TOPICS = TOPICS;
