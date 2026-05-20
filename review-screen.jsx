@@ -4,7 +4,7 @@ function ReviewScreen({ onExit, onComplete }) {
   const [idx, setIdx] = React.useState(0);
   const [flipped, setFlipped] = React.useState(false);
   const [knownCount, setKnownCount] = React.useState(0);
-  const [deck] = React.useState(() => shuffleDeck(VOCAB_CARDS).slice(0, 20));
+  const [deck, setDeck] = React.useState(() => shuffleDeck(VOCAB_CARDS).slice(0, 20));
   const [swipeX, setSwipeX] = React.useState(0);
   const recorded = React.useRef(false);
 
@@ -59,6 +59,12 @@ function ReviewScreen({ onExit, onComplete }) {
     setTimeout(() => { setSwipeX(0); setIdx(i => i + 1); }, 260);
   };
 
+  // Shuffle current + remaining cards without recording an SRS result
+  const doShuffle = () => {
+    setFlipped(false);
+    setDeck(d => [...d.slice(0, idx), ...shuffleArray(d.slice(idx))]);
+  };
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
       <LessonTopBar pct={(idx / deck.length) * 100} onExit={onExit} label={`${idx + 1}/${deck.length}`} />
@@ -93,6 +99,9 @@ function ReviewScreen({ onExit, onComplete }) {
         }}>Tap card to {flipped ? 'hide' : 'reveal'} the definition</div>
       </div>
 
+      <div style={{ padding: '0 20px 10px' }}>
+        <ShuffleButton onClick={doShuffle} />
+      </div>
       <div style={{ padding: '0 20px 24px', display: 'flex', gap: 10 }}>
         <button onClick={() => next(false)} className="tap" style={secondaryBtnStyle(DS.wrong, DS.wrongSoft)}>
           Still learning
@@ -196,7 +205,7 @@ function buildVocabQuiz(n) {
 }
 
 function VocabTestScreen({ onExit, onComplete }) {
-  const [quiz] = React.useState(() => buildVocabQuiz(10));
+  const [quiz, setQuiz] = React.useState(() => buildVocabQuiz(10));
   const [idx, setIdx] = React.useState(0);
   const [picked, setPicked] = React.useState(null);
   const [correctCount, setCorrectCount] = React.useState(0);
@@ -248,6 +257,9 @@ function VocabTestScreen({ onExit, onComplete }) {
     if (o === q.card.en) setCorrectCount(c => c + 1);
   };
   const next = () => { setPicked(null); setIdx(i => i + 1); };
+  const doShuffle = () => {
+    setQuiz(qz => [...qz.slice(0, idx), ...shuffleArray(qz.slice(idx))]);
+  };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
@@ -305,6 +317,12 @@ function VocabTestScreen({ onExit, onComplete }) {
           })}
         </div>
       </div>
+
+      {!picked && idx + 1 < quiz.length && (
+        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
+          <ShuffleButton onClick={doShuffle} />
+        </div>
+      )}
 
       {picked && (
         <div className="anim-slide-u" style={{

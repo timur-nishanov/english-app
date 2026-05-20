@@ -2,7 +2,7 @@
 // No category filter, no shuffle — just work through the mistakes.
 
 function WeakSpotsScreen({ onExit }) {
-  const [pool] = React.useState(() => {
+  const [pool, setPool] = React.useState(() => {
     const state = SRS.getSrsState();
     const weakIds = new Set(SRS.getWeakSpots(state));
     if (!weakIds.size) return [];
@@ -35,6 +35,10 @@ function WeakSpotsScreen({ onExit }) {
   const handleContinue = () => {
     setAnswered(null);
     setIdx(i => i + 1);
+  };
+
+  const doShuffle = () => {
+    setPool(p => [...p.slice(0, idx), ...shuffleArray(p.slice(idx))]);
   };
 
   if (pool.length === 0) {
@@ -109,6 +113,11 @@ function WeakSpotsScreen({ onExit }) {
         </div>
       )}
       <FeedbackBar answered={answered} ex={ex} onContinue={handleContinue} />
+      {!answered && ex && idx + 1 < pool.length && (
+        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
+          <ShuffleButton onClick={doShuffle} />
+        </div>
+      )}
     </div>
   );
 }

@@ -306,8 +306,8 @@ function App() {
     setDaily(d => (d.date === todayKey() ? d : generateDailyMix()));
     go({ name: 'daily' });
   };
-  const advanceDaily = ({ doneIndex, mistakes, correct }) => {
-    setDaily(d => ({ ...d, doneIndex, mistakes, correct }));
+  const advanceDaily = ({ doneIndex, mistakes, correct, exercises }) => {
+    setDaily(d => ({ ...d, doneIndex, mistakes, correct, ...(exercises ? { exercises } : {}) }));
   };
   const completeDaily = ({ mistakes, correct, total }) => {
     const correctN = typeof correct === 'number' ? correct : Math.max(0, total - mistakes);

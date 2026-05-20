@@ -3,15 +3,6 @@
 // the category chips and the shuffle button live ON this screen and can be
 // changed at any moment while practising — not picked once before the start.
 
-function qtShuffle(a) {
-  const arr = a.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
 function QuickTestScreen({ onExit, onComplete }) {
   const pool = React.useMemo(() => {
     const arr = [];
@@ -130,7 +121,7 @@ function QuickTestScreen({ onExit, onComplete }) {
   // Shuffle is an action: each press re-randomises the remaining queue and
   // jumps to a fresh exercise so the screen visibly changes every time.
   const doShuffle = () => {
-    const newOrder = qtShuffle(groupedOrder);
+    const newOrder = shuffleArray(groupedOrder);
     const newSeen = answered && activeId ? new Set(seen).add(activeId) : seen;
     let nextId = null;
     for (const i of newOrder) {
@@ -252,16 +243,7 @@ function QuickTestScreen({ onExit, onComplete }) {
 
       {active && !answered && (
         <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
-          <button onClick={doShuffle} className="tap"
-            style={{
-              width: '100%', padding: '16px', borderRadius: 16, border: 'none',
-              cursor: 'pointer', background: DS.ink, color: DS.paperCard,
-              fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.3,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-            }}>
-            <ShuffleIcon size={19} color="currentColor" strokeWidth={2.2} />
-            Shuffle
-          </button>
+          <ShuffleButton onClick={doShuffle} />
         </div>
       )}
     </div>

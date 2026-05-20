@@ -283,6 +283,32 @@ function ShuffleIcon({ size = 22, color = 'currentColor', strokeWidth = 2 }) {
   );
 }
 
+// Fisher–Yates shuffle — returns a new shuffled array
+function shuffleArray(a) {
+  const arr = a.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Big dark Shuffle button — same visual everywhere
+function ShuffleButton({ onClick }) {
+  return (
+    <button onClick={onClick} className="tap"
+      style={{
+        width: '100%', padding: '16px', borderRadius: 16, border: 'none',
+        cursor: 'pointer', background: DS.ink, color: DS.paperCard,
+        fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.3,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+      }}>
+      <ShuffleIcon size={19} color="currentColor" strokeWidth={2.2} />
+      Shuffle
+    </button>
+  );
+}
+
 window.DS = DS;
 window.PrimaryButton = PrimaryButton;
 window.BackButton = BackButton;
@@ -294,6 +320,8 @@ window.Divider = Divider;
 window.Tick = Tick;
 window.Mark = Mark;
 window.ShuffleIcon = ShuffleIcon;
+window.ShuffleButton = ShuffleButton;
+window.shuffleArray = shuffleArray;
 window.BigButton = PrimaryButton;
 window.StreakIcon = () => null;
 window.XPIcon = () => null;
