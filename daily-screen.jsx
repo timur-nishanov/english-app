@@ -3,7 +3,7 @@
 // are the same components used by LessonScreen.
 
 function DailyScreen({ daily, onAdvance, onComplete, onExit }) {
-  const exercises = daily.exercises || [];
+  const [exercises, setExercises] = React.useState(daily.exercises || []);
   const total = exercises.length;
 
   const [idx, setIdx] = React.useState(Math.min(daily.doneIndex || 0, Math.max(0, total - 1)));
@@ -16,6 +16,12 @@ function DailyScreen({ daily, onAdvance, onComplete, onExit }) {
   const dailyTopic = { id: 'daily-mix', title: 'Daily mix' };
 
   const ex = exercises[idx];
+
+  const doShuffle = () => {
+    const shuffled = [...exercises.slice(0, idx), ...shuffleArray(exercises.slice(idx))];
+    setExercises(shuffled);
+    onAdvance({ doneIndex: idx, mistakes, correct: correctCount, exercises: shuffled });
+  };
 
   const handleAnswer = (correct) => {
     if (ex && ex._id && window.SRS) SRS.recordResult(ex._id, correct);
@@ -74,6 +80,11 @@ function DailyScreen({ daily, onAdvance, onComplete, onExit }) {
         <ExerciseView ex={ex} topic={dailyTopic} answered={answered} onAnswer={handleAnswer} />
       </div>
       <FeedbackBar answered={answered} ex={ex} onContinue={handleContinue} />
+      {!answered && !done && idx < total && (
+        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
+          <ShuffleButton onClick={doShuffle} />
+        </div>
+      )}
     </div>
   );
 }

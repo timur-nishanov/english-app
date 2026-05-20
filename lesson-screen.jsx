@@ -24,6 +24,13 @@ function LessonScreen({ lessonId, lesson, topic, onComplete, onExit }) {
     else setIdx(i => i + 1);
   };
 
+  // Re-shuffle the current exercise and everything still ahead.
+  // The not-yet-answered current item isn't reported to SRS — we just drop it
+  // in place of a random one from the remaining queue.
+  const doShuffle = () => {
+    setQueue(q => [...q.slice(0, idx), ...shuffleArray(q.slice(idx))]);
+  };
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
       <LessonTopBar pct={pct} onExit={onExit} label={`${idx + 1}/${total}`} />
@@ -31,6 +38,11 @@ function LessonScreen({ lessonId, lesson, topic, onComplete, onExit }) {
         <ExerciseView ex={ex} topic={topic} answered={answered} onAnswer={handleAnswer} />
       </div>
       <FeedbackBar answered={answered} ex={ex} onContinue={handleContinue} />
+      {!answered && idx + 1 < queue.length && (
+        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
+          <ShuffleButton onClick={doShuffle} />
+        </div>
+      )}
     </div>
   );
 }
