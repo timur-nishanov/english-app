@@ -976,24 +976,25 @@ window.VOCAB_CARDS = VOCAB_CARDS;
   });
 })();
 
-// Reverse: given a definition, pick the matching word (choice exercise)
+// Reverse: production-style gaptype — type the missing word from a real example
 function generateReverseExercises() {
-  return VOCAB_CARDS.map((card, i) => {
-    const opts = [card.en];
-    for (let j = 1; opts.length < 4; j++) {
-      const candidate = VOCAB_CARDS[(i + j * 97) % VOCAB_CARDS.length].en;
-      if (!opts.includes(candidate)) opts.push(candidate);
-    }
-    return {
+  const out = [];
+  VOCAB_CARDS.forEach(card => {
+    if (/\s/.test(card.en)) return; // skip multi-word phrases
+    const re = new RegExp('\\b' + card.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    if (!re.test(card.ex)) return;
+    const sentence = card.ex.replace(re, '___');
+    out.push({
       _id: 'rev#' + card.en.replace(/\s+/g, '_'),
       _topicId: null,
-      type: 'choice',
+      type: 'gaptype',
       tag: 'Vocabulary',
-      prompt: 'Which word or phrase means: "' + card.def + '"?',
+      prompt: 'Type the missing word (means: "' + card.def + '").',
+      sentence,
       answer: card.en,
-      options: opts,
-    };
+    });
   });
+  return out;
 }
 
 // Production: gap exercise → gaptype (no options — type the answer)
