@@ -966,3 +966,49 @@ const VOCAB_CARDS = [
 window.TOPICS = TOPICS;
 window.LESSONS = LESSONS;
 window.VOCAB_CARDS = VOCAB_CARDS;
+
+// Assign stable _id to every lesson exercise once on load
+(function assignExerciseIds() {
+  Object.entries(LESSONS).forEach(([topicId, lesson]) => {
+    lesson.exercises.forEach((ex, i) => {
+      if (!ex._id) ex._id = topicId + '#' + i;
+    });
+  });
+})();
+
+// Reverse: given a definition, pick the matching word (choice exercise)
+function generateReverseExercises() {
+  return VOCAB_CARDS.map((card, i) => {
+    const opts = [card.en];
+    for (let j = 1; opts.length < 4; j++) {
+      const candidate = VOCAB_CARDS[(i + j * 97) % VOCAB_CARDS.length].en;
+      if (!opts.includes(candidate)) opts.push(candidate);
+    }
+    return {
+      _id: 'rev#' + card.en.replace(/\s+/g, '_'),
+      _topicId: null,
+      type: 'choice',
+      tag: 'Vocabulary',
+      prompt: 'Which word or phrase means: "' + card.def + '"?',
+      answer: card.en,
+      options: opts,
+    };
+  });
+}
+
+// Production: gap exercise → gaptype (no options — type the answer)
+function toProductionVariant(ex, topicId, idx) {
+  if (ex.type !== 'gap') return null;
+  return {
+    _id: 'prod#' + topicId + '#' + idx,
+    _topicId: topicId,
+    type: 'gaptype',
+    tag: ex.tag,
+    prompt: ex.prompt,
+    sentence: ex.sentence,
+    answer: ex.answer,
+  };
+}
+
+window.generateReverseExercises = generateReverseExercises;
+window.toProductionVariant = toProductionVariant;

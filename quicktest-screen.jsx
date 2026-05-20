@@ -19,9 +19,14 @@ function QuickTestScreen({ onExit, onComplete }) {
       const lesson = LESSONS[t.id];
       if (!lesson) return;
       lesson.exercises.forEach((ex, i) => {
-        arr.push({ id: t.id + '#' + i, ex, unitId: t.id });
+        arr.push({ id: ex._id || (t.id + '#' + i), ex, unitId: t.id });
       });
     });
+    if (window.generateReverseExercises) {
+      generateReverseExercises().forEach(ex => {
+        arr.push({ id: ex._id, ex, unitId: '__vocab__' });
+      });
+    }
     return arr;
   }, []);
 
@@ -29,16 +34,31 @@ function QuickTestScreen({ onExit, onComplete }) {
     const m = {}; pool.forEach(p => { m[p.id] = p; }); return m;
   }, [pool]);
 
-  const units = React.useMemo(() => TOPICS.map(t => ({
-    id: t.id,
-    short: t.title.split(/[ &]/)[0],
-    topic: t,
-    color: (window.UNIT_COLORS && window.UNIT_COLORS[t.id]) || { bg: DS.paperDeep, fg: DS.ink },
-  })), []);
+  const units = React.useMemo(() => {
+    const base = TOPICS.map(t => ({
+      id: t.id,
+      short: t.title.split(/[ &]/)[0],
+      topic: t,
+      color: (window.UNIT_COLORS && window.UNIT_COLORS[t.id]) || { bg: DS.paperDeep, fg: DS.ink },
+    }));
+    if (pool.some(p => p.unitId === '__vocab__')) {
+      base.push({
+        id: '__vocab__',
+        short: 'Vocab',
+        topic: { id: '__vocab__', title: 'Vocabulary' },
+        color: { bg: '#E6EEFF', fg: '#1F4FCC' },
+      });
+    }
+    return base;
+  }, [pool]);
 
   const groupedOrder = React.useMemo(() => pool.map((_, i) => i), [pool]);
 
-  const [enabled, setEnabled] = React.useState(() => new Set(TOPICS.map(t => t.id)));
+  const [enabled, setEnabled] = React.useState(() => {
+    const ids = new Set(TOPICS.map(t => t.id));
+    if (pool.some(p => p.unitId === '__vocab__')) ids.add('__vocab__');
+    return ids;
+  });
   const [order, setOrder] = React.useState(groupedOrder);
   const [seen, setSeen] = React.useState(() => new Set());
   const [activeId, setActiveId] = React.useState(() => (pool.length ? pool[0].id : null));
@@ -90,6 +110,7 @@ function QuickTestScreen({ onExit, onComplete }) {
   }, [finished, doneCount, correctCount, onComplete]);
 
   const handleAnswer = (correct) => {
+    if (active && active.ex && active.ex._id && window.SRS) SRS.recordResult(active.ex._id, correct);
     if (correct) { setAnswered('correct'); setCorrectCount(c => c + 1); }
     else { setAnswered('wrong'); setMistakes(m => m + 1); }
   };

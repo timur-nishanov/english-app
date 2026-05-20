@@ -50,6 +50,8 @@
 <script type="text/babel" src="review-screen.jsx"></script>
 <script type="text/babel" src="daily-screen.jsx"></script>
 <script type="text/babel" src="quicktest-screen.jsx"></script>
+<script type="text/babel" src="srs.jsx"></script>
+<script type="text/babel" src="weakspots-screen.jsx"></script>
 
 <script type="text/babel">
 
@@ -119,10 +121,8 @@ window.lastNDays = lastNDays;
 window.activityTotals = activityTotals;
 
 // ─── Storage migration ──────────────────────────────────────────
-// v2: content restructured to 10 units with new ids — old per-topic
-// progress is meaningless, so reset it. The activity log is date-keyed
-// and stays valid, so the streak and stats are preserved.
-const APP_VERSION = 2;
+// v3: new unified exercise pool + SRS added — wipe daily and SRS caches
+const APP_VERSION = 3;
 (function migrate() {
   let ver = 0;
   try { ver = Number(localStorage.getItem('engapp-version')) || 0; } catch (e) {}
@@ -135,26 +135,67 @@ const APP_VERSION = 2;
     localStorage.removeItem('engapp-state');
   }
   localStorage.removeItem('engapp-daily');
+  localStorage.removeItem('engapp-srs');
   localStorage.removeItem('engapp-screen');
   try { localStorage.setItem('engapp-version', String(APP_VERSION)); } catch (e) {}
 })();
 
-// ─── Daily mix ──────────────────────────────────────────────────
+// ─── Unified exercise pool ──────────────────────────────────────
+// base exercises + production variants (gap→gaptype) + reverse (vocab→choice)
 function allExercises() {
   const out = [];
-  Object.values(LESSONS).forEach(l => l.exercises.forEach(ex => out.push(ex)));
+  TOPICS.forEach(t => {
+    const lesson = LESSONS[t.id];
+    if (!lesson) return;
+    lesson.exercises.forEach((ex, i) => {
+      out.push(ex);
+      if (window.toProductionVariant) {
+        const v = toProductionVariant(ex, t.id, i);
+        if (v) out.push(v);
+      }
+    });
+  });
+  if (window.generateReverseExercises) {
+    generateReverseExercises().forEach(ex => out.push(ex));
+  }
   return out;
 }
+window.allExercises = allExercises;
 
+// ─── Daily mix — SRS-driven, 8 exercises ────────────────────────
 function generateDailyMix() {
   const pool = allExercises();
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+  const byId = {};
+  pool.forEach(ex => { if (ex._id) byId[ex._id] = ex; });
+  const allIds = Object.keys(byId);
+
+  const state = window.SRS ? SRS.getSrsState() : { items: {} };
+  const prioritized = window.SRS ? SRS.getDueItems(allIds, state) : shuffleList(allIds);
+
+  const selected = [];
+  const used = new Set();
+  let freshCount = 0;
+
+  for (const id of prioritized) {
+    if (selected.length >= 8) break;
+    if (!byId[id] || used.has(id)) continue;
+    const isNew = !state.items[id];
+    if (isNew && freshCount >= 3) continue;
+    selected.push(byId[id]);
+    used.add(id);
+    if (isNew) freshCount++;
   }
+
+  const rest = shuffleList(pool.filter(ex => ex._id && !used.has(ex._id)));
+  for (const ex of rest) {
+    if (selected.length >= 8) break;
+    selected.push(ex);
+    used.add(ex._id);
+  }
+
   return {
     date: todayKey(),
-    exercises: pool.slice(0, 5),
+    exercises: shuffleList(selected),
     doneIndex: 0, mistakes: 0, correct: 0, completed: false,
   };
 }
@@ -214,6 +255,10 @@ function App() {
   }
 
   const streak = computeStreak(state.activity);
+  const weakCount = React.useMemo(() => {
+    if (!window.SRS) return 0;
+    return SRS.getWeakSpots(SRS.getSrsState()).length;
+  }, [screen]); // recompute whenever screen changes (after answering exercises)
 
   const go = (s) => setScreen(s);
 
@@ -280,10 +325,12 @@ function App() {
         progress={state.progress}
         streak={streak}
         daily={daily}
+        weakCount={weakCount}
         onPickLesson={(topic) => go({ name: 'category', topicId: topic.id })}
         onOpenReview={() => go({ name: 'review' })}
         onOpenVocabTest={() => go({ name: 'vocabtest' })}
         onOpenQuickTest={() => go({ name: 'quicktest' })}
+        onOpenWeakSpots={() => go({ name: 'weakspots' })}
         onOpenProfile={() => go({ name: 'profile' })}
         onOpenDaily={openDaily}
       />
@@ -348,9 +395,13 @@ function App() {
     content = (
       <QuickTestScreen onExit={() => go({ name: 'home' })} onComplete={completeQuickTest} />
     );
+  } else if (screen.name === 'weakspots') {
+    content = (
+      <WeakSpotsScreen onExit={() => go({ name: 'home' })} />
+    );
   } else if (screen.name === 'profile') {
     content = (
-      <ProfileScreen state={state} streak={streak} onBack={() => go({ name: 'home' })} />
+      <ProfileScreen state={state} streak={streak} weakCount={weakCount} onBack={() => go({ name: 'home' })} />
     );
   }
 
@@ -364,7 +415,7 @@ function App() {
 }
 
 // ─── Profile — clean cards, no italic serif ──────────────────────
-function ProfileScreen({ state, streak, onBack }) {
+function ProfileScreen({ state, streak, weakCount, onBack }) {
   const activity = state.activity || {};
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((state.progress[t.id] || 0) * t.lessons), 0);
@@ -425,6 +476,7 @@ function ProfileScreen({ state, streak, onBack }) {
           <StatBlock label="Units done" value={`${completedUnits}/${TOPICS.length}`} />
           <StatBlock label="Accuracy" value={totals.exercises ? `${accuracy}%` : '—'} />
           <StatBlock label="Words reviewed" value={totals.cards} />
+          <StatBlock label="Weak spots" value={weakCount || 0} />
         </div>
 
         <div style={{

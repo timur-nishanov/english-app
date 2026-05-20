@@ -12,6 +12,7 @@ function LessonScreen({ lessonId, lesson, topic, onComplete, onExit }) {
   const pct = (idx / total) * 100;
 
   const handleAnswer = (correct) => {
+    if (ex && ex._id && window.SRS) SRS.recordResult(ex._id, correct);
     if (correct) { setAnswered('correct'); setCorrectCount(c => c + 1); }
     else { setAnswered('wrong'); setMistakes(m => m + 1); }
   };

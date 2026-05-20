@@ -49,6 +49,10 @@ function ReviewScreen({ onExit, onComplete }) {
   }
 
   const next = (known) => {
+    if (window.SRS && card) {
+      const revId = 'rev#' + card.en.replace(/\s+/g, '_');
+      SRS.recordResult(revId, known);
+    }
     if (known) setKnownCount(c => c + 1);
     setFlipped(false);
     setSwipeX(known ? 360 : -360);

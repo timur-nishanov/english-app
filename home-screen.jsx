@@ -1,6 +1,6 @@
 // ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
 
-function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpenVocabTest, onOpenQuickTest, onOpenProfile, onOpenDaily }) {
+function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenReview, onOpenVocabTest, onOpenQuickTest, onOpenWeakSpots, onOpenProfile, onOpenDaily }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
@@ -183,6 +183,44 @@ function HomeScreen({ progress, streak, daily, onPickLesson, onOpenReview, onOpe
           </div>
           <svg width="14" height="14" viewBox="0 0 10 16">
             <path d="M1 1l7 7-7 7" stroke={DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          </svg>
+        </button>
+
+        {/* Weak spots — exercises the user has answered wrong and not yet mastered */}
+        <button
+          onClick={onOpenWeakSpots}
+          className="tap anim-slide-u"
+          style={{
+            width: '100%', textAlign: 'left', cursor: 'pointer',
+            background: (weakCount > 0) ? DS.wrongSoft : DS.paperCard, color: DS.ink,
+            borderRadius: 22, padding: '20px 20px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            fontFamily: DS.sans, border: 'none',
+            marginBottom: 10, boxShadow: DS.shadowSm,
+          }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 99,
+            background: (weakCount > 0) ? DS.wrong : DS.correctSoft,
+            color: (weakCount > 0) ? DS.paperCard : DS.correct,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            fontSize: 22,
+          }}>{weakCount > 0 ? '!' : '✓'}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
+              color: (weakCount > 0) ? DS.wrongDark : DS.ink3, marginBottom: 2,
+            }}>Review mistakes</div>
+            <div style={{
+              fontFamily: DS.display, fontSize: 19,
+              fontWeight: 600, letterSpacing: -0.4,
+            }}>Weak spots</div>
+            <div style={{ fontSize: 13, marginTop: 3, color: (weakCount > 0) ? DS.wrongDark : DS.ink3, letterSpacing: -0.1 }}>
+              {weakCount > 0 ? `${weakCount} item${weakCount === 1 ? '' : 's'} to fix` : 'Nothing to review — well done'}
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 10 16">
+            <path d="M1 1l7 7-7 7" stroke={(weakCount > 0) ? DS.wrongDark : DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           </svg>
         </button>
 
