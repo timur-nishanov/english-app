@@ -315,6 +315,7 @@ const UNIT_COLORS = {
   'verb-patterns':          { bg: '#FFF1C2', fg: '#9B7400' },
   'phrasal-verbs':          { bg: '#FFEAD1', fg: '#9C5818' },
   'word-formation':         { bg: '#E6EEFF', fg: '#1F4FCC' },
+  'words-phrases':          { bg: '#FFE6F0', fg: '#A6336F' },
 };
 
 function TopicRow({ topic, progress, totalLessons, onClick }) {
