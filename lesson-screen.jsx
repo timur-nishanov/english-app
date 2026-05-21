@@ -314,11 +314,13 @@ function TypeExercise({ ex, answered, onAnswer, topic }) {
   React.useEffect(() => { setVal(''); setTimeout(() => inputRef.current?.focus(), 50); }, [ex]);
   const commit = () => {
     if (answered || !val.trim()) return;
-    const v = val.trim().toLowerCase();
-    const a = ex.answer.toLowerCase();
-    onAnswer(v === a || a.includes(v) || v.includes(a));
+    const v = val.trim().toLowerCase().replace(/[.,!?;:]/g, '');
+    const a = ex.answer.toLowerCase().replace(/[.,!?;:]/g, '');
+    const isShort = a.split(/\s+/).length <= 2;
+    const ok = isShort ? (v === a || a.includes(v) || v.includes(a)) : v === a;
+    onAnswer(ok);
   };
-  const isCorrect = answered && val.trim().toLowerCase() === ex.answer.toLowerCase();
+  const isCorrect = answered && val.trim().toLowerCase().replace(/[.,!?;:]/g, '') === ex.answer.toLowerCase().replace(/[.,!?;:]/g, '');
 
   return (
     <div>
