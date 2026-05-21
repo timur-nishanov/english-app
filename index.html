@@ -141,18 +141,20 @@ const APP_VERSION = 3;
 })();
 
 // ─── Unified exercise pool ──────────────────────────────────────
-// base exercises + production variants (gap→gaptype) + reverse (vocab→choice)
+// base exercises + production variants (gap→gaptype, choice/bank→type) + reverse.
+// When choice/bank has a production variant, the base is replaced — both versions
+// are too similar to keep side-by-side. Gap stays alongside its gaptype variant
+// because picking vs typing the missing word are genuinely different drills.
 function allExercises() {
   const out = [];
   TOPICS.forEach(t => {
     const lesson = LESSONS[t.id];
     if (!lesson) return;
     lesson.exercises.forEach((ex, i) => {
-      out.push(ex);
-      if (window.toProductionVariant) {
-        const v = toProductionVariant(ex, t.id, i);
-        if (v) out.push(v);
-      }
+      const v = window.toProductionVariant ? toProductionVariant(ex, t.id, i) : null;
+      const replacedByProd = v && (ex.type === 'choice' || ex.type === 'bank');
+      if (!replacedByProd) out.push(ex);
+      if (v) out.push(v);
     });
   });
   if (window.generateReverseExercises) {
