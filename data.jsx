@@ -10,7 +10,8 @@ const TOPICS = [
   {id:"reported-speech",n:"07",title:"Reported Speech",subtitle:"Backshift, questions, reporting verbs",mark:"R",lessons:1},
   {id:"verb-patterns",n:"08",title:"Verb Patterns",subtitle:"Gerund / infinitive / causative",mark:"V",lessons:1},
   {id:"phrasal-verbs",n:"09",title:"Phrasal Verbs",subtitle:"Get, take, put, come, go and more",mark:"Ph",lessons:1},
-  {id:"word-formation",n:"10",title:"Word Formation",subtitle:"Prefixes, opposites, suffixes",mark:"W",lessons:1}
+  {id:"word-formation",n:"10",title:"Word Formation",subtitle:"Prefixes, opposites, suffixes",mark:"W",lessons:1},
+  {id:"words-phrases",n:"11",title:"Words & Phrases",subtitle:"See, memory, intentions, common expressions",mark:"Wp",lessons:1}
 ];
 
 // Exercise types: 'choice' | 'gap' | 'gaptype' | 'bank' | 'type' | 'match'  ·  each has a 'tag'
@@ -604,6 +605,43 @@ const LESSONS = {
       {"type":"gaptype","prompt":"Type the noun. (achieve)","sentence":"There was a real sense of ___ when the team finally won.","answer":"achievement","tag":"Suffixes"},
     ]
   },
+  "words-phrases": {
+    topicId:"words-phrases", title:"Words & Phrases", exercises:[
+      {"type":"gaptype","prompt":"Complete the idiom.","sentence":"I started this project, and I intend to see it ___.","answer":"through","tag":"See expressions"},
+      {"type":"choice","prompt":"She stormed out, red-faced and shouting. She had clearly…","options":["seen red","seen the light","seen things","seen the funny side"],"answer":"seen red","tag":"See expressions"},
+      {"type":"gap","prompt":"Complete the expression.","sentence":"When Brenda told me I had been dismissed, I saw ___.","options":["red","blue","things","stars"],"answer":"red","tag":"See expressions"},
+      {"type":"type","prompt":"Complete: \"At last, Rob has seen the ___ and come round to my way of thinking.\"","answer":"light","tag":"See expressions"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"Don't be silly! You're ___ things!","answer":"seeing","tag":"See expressions"},
+      {"type":"match","prompt":"Match each \"see\" expression with its meaning.","pairs":[["see it through","finish what you started"],["see red","become very angry"],["see the light","finally understand or accept"],["see eye to eye","agree completely"]],"tag":"See expressions"},
+      {"type":"bank","prompt":"Build the sentence.","answer":"I don't see eye to eye with him","bank":["I","don't","see","eye","to","eye","with","him","over","always"],"tag":"See expressions"},
+      {"type":"gap","prompt":"Complete the idiom.","sentence":"This restaurant has seen ___ days — the décor is very old.","options":["better","worse","longer","brighter"],"answer":"better","tag":"See expressions"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"Come on, laugh! Can't you see the ___ side?","answer":"funny","tag":"See expressions"},
+      {"type":"type","prompt":"Complete: \"I don't think I can see my ___ to lending you the money.\"","answer":"way","tag":"See expressions"},
+      {"type":"choice","prompt":"After working together for years, the two managers finally…","options":["saw eye to eye","saw red","saw things","saw the last"],"answer":"saw eye to eye","tag":"See expressions"},
+
+      {"type":"gaptype","prompt":"Complete the sentence.","sentence":"I'm sorry, but your name has ___ my mind.","answer":"slipped","tag":"Memory"},
+      {"type":"choice","prompt":"After three weeks of rehearsals, the actor knew his lines…","options":["by heart","by mind","in heart","with heart"],"answer":"by heart","tag":"Memory"},
+      {"type":"gaptype","prompt":"Complete with the missing word.","sentence":"Seeing Nureyev dance was an ___ experience.","answer":"unforgettable","tag":"Memory"},
+      {"type":"gap","prompt":"Complete the simile.","sentence":"I have a memory like a ___ these days.","options":["sieve","rock","drum","clock"],"answer":"sieve","tag":"Memory"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"That old song ___ back memories of summer.","answer":"brings","tag":"Memory"},
+      {"type":"match","prompt":"Match each memory expression with its meaning.","pairs":[["slip your mind","be forgotten"],["by heart","memorised perfectly"],["brings back","causes you to remember"],["a memory like a sieve","a very poor memory"]],"tag":"Memory"},
+      {"type":"type","prompt":"Complete: \"I am terribly ___ in my old age.\"","answer":"forgetful","tag":"Memory"},
+      {"type":"bank","prompt":"Build the sentence.","answer":"This house reminds me of my childhood","bank":["This","house","reminds","me","of","my","childhood","remember","forget"],"tag":"Memory"},
+
+      {"type":"choice","prompt":"When a bigger competitor decided to ___ his small project, he panicked.","options":["muscle in on","see through","slip up on","level off with"],"answer":"muscle in on","tag":"Intentions"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"A rival company tried to ___ in on the deal.","answer":"muscle","tag":"Intentions"},
+      {"type":"gap","prompt":"Complete the idiom.","sentence":"His patronising tone really gets my ___ up.","options":["back","nerves","blood","hopes"],"answer":"back","tag":"Intentions"},
+      {"type":"type","prompt":"Complete: \"It was never my ___ to upset her.\"","answer":"intention","tag":"Intentions"},
+      {"type":"gaptype","prompt":"Type the missing word.","sentence":"When the funding fell through, all our hopes were ___.","answer":"dashed","tag":"Intentions"},
+      {"type":"match","prompt":"Match each \"intentions\" expression with its meaning.","pairs":[["intend to","plan or mean to do something"],["muscle in on","force your way into a project"],["get one's back up","make someone annoyed or defensive"],["hopes are dashed","hopes are suddenly destroyed"]],"tag":"Intentions"},
+      {"type":"choice","prompt":"The new CEO is described as ___ — she never panics in a crisis.","options":["level-minded","light-hearted","short-tempered","far-fetched"],"answer":"level-minded","tag":"Intentions"},
+      {"type":"bank","prompt":"Build the sentence.","answer":"I never had any intention of hurting you","bank":["I","never","had","any","intention","of","hurting","you","plan","idea"],"tag":"Intentions"},
+
+      {"type":"match","prompt":"Match each sentence with a logical continuation by the same speaker.","pairs":[["Gosh, it's incredibly hot today.","I could really do with a cold drink."],["I feel that proof of Smith's guilt has now been established.","Beyond a shadow of doubt, in my opinion."],["Why didn't you phone me at all?","For all you know, I might be dead!"],["It's a good plan, I suppose.","As far as it goes, that is."]],"tag":"Common phrases"},
+      {"type":"match","prompt":"Match each sentence with its continuation by the same speaker.","pairs":[["I'm really terribly sorry about damaging your car.","All I can say is that it certainly won't happen again."],["The search has gone on now for three days.","And hope appears to be fading, I'm afraid."],["Haven't you heard about Gordon and Eileen then?","I thought it was common knowledge."],["Well, that's the last item we had to discuss.","So I think that covers everything."]],"tag":"Common phrases"},
+      {"type":"match","prompt":"Match each opener with the speaker's follow-up.","pairs":[["You may be the office manager…","but that doesn't give you the right to speak to me like that."],["Don't worry about the missing money.","Chances are it's just an administrative error."],["That presentation was hours long.","She does tend to be a bit long-winded."],["He clearly has no clue what's going on.","He got the wrong end of the stick again."]],"tag":"Common phrases"}
+    ]
+  },
 };
 
 // ─── VOCABULARY CARDS (flashcards) ───────────────────────────
@@ -961,6 +999,29 @@ const VOCAB_CARDS = [
   {"en":"utter","def":"say or pronounce something","ex":"She was too shocked to utter a word."},
   {"en":"plead ignorance","def":"claim you did not know about something","ex":"When asked about the damage, he pleaded ignorance."},
   {"en":"appreciate","def":"be grateful for something","ex":"I’d really appreciate your help with this."},
+
+  // Words & Phrases — see expressions, memory, intentions, common phrases
+  {"en":"see it through","def":"finish a project, film or commitment to the end","ex":"I started this project, and I intend to see it through."},
+  {"en":"the funny side","def":"the amusing aspect of something","ex":"Come on, laugh! Can't you see the funny side?"},
+  {"en":"better days","def":"a more prosperous or pleasant past","ex":"This restaurant has seen better days — the décor is very old."},
+  {"en":"the last of","def":"the final time you encounter someone or something","ex":"I think we've seen the last of him for a while."},
+  {"en":"see red","def":"become very angry","ex":"When Brenda told me I had been dismissed, I saw red."},
+  {"en":"see the light","def":"finally understand or accept something","ex":"At last, Rob has seen the light and come round to my way of thinking."},
+  {"en":"see things","def":"imagine things that are not really there","ex":"Don't be silly! You're seeing things!"},
+  {"en":"see your way to","def":"feel able or willing to do something","ex":"I don't think I can see my way to lending you the money."},
+  {"en":"the hopes are dashed","def":"hopes are suddenly destroyed","ex":"When the funding fell through, all our hopes were dashed."},
+  {"en":"intention","def":"a plan or aim to do something","ex":"It was never my intention to upset her."},
+  {"en":"intend","def":"to plan or mean to do something","ex":"I intend to finish this report by Friday."},
+  {"en":"level-minded","def":"mentally stable, calm, and balanced","ex":"She is a level-minded person who never panics."},
+  {"en":"muscle in on","def":"force your way into something to take a share, especially a project","ex":"A rival company tried to muscle in on the deal."},
+  {"en":"get my back up","def":"make me annoyed or defensive","ex":"His patronising tone really gets my back up."},
+  {"en":"remind me of","def":"make me think of someone or something else","ex":"This house reminds me of the place where I grew up."},
+  {"en":"slip my mind","def":"be forgotten","ex":"I'm sorry but your name has slipped my mind."},
+  {"en":"a memory like a sieve","def":"a very poor memory","ex":"I have a memory like a sieve these days."},
+  {"en":"unforgettable","def":"so remarkable you cannot forget it","ex":"Seeing Nureyev dance was an unforgettable experience."},
+  {"en":"forgetful","def":"tending to forget things","ex":"I am very forgetful in my old age."},
+  {"en":"brings back","def":"causes you to remember something","ex":"That song brings back memories of summer."},
+  {"en":"by heart","def":"memorised perfectly word for word","ex":"Brenda is very good at learning phone numbers by heart."},
 ];
 
 window.TOPICS = TOPICS;
