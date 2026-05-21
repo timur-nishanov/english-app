@@ -1058,18 +1058,54 @@ function generateReverseExercises() {
   return out;
 }
 
-// Production: gap exercise → gaptype (no options — type the answer)
+// Production: turn recognition-style exercises into typed-answer drills.
+// gap   → gaptype (fill the blank, typed)
+// choice→ type    (only when prompt isn't a pure recognition question and the
+//                  answer is short enough to be typeable)
+// bank  → type    (always — typing the full sentence)
 function toProductionVariant(ex, topicId, idx) {
-  if (ex.type !== 'gap') return null;
-  return {
-    _id: 'prod#' + topicId + '#' + idx,
-    _topicId: topicId,
-    type: 'gaptype',
-    tag: ex.tag,
-    prompt: ex.prompt,
-    sentence: ex.sentence,
-    answer: ex.answer,
-  };
+  if (ex.type === 'gap') {
+    return {
+      _id: 'prod#' + topicId + '#' + idx,
+      _topicId: topicId,
+      type: 'gaptype',
+      tag: ex.tag,
+      prompt: ex.prompt,
+      sentence: ex.sentence,
+      answer: ex.answer,
+    };
+  }
+  if (ex.type === 'choice') {
+    const a = ex.answer || '';
+    const tooLong = a.split(/\s+/).length > 3 || a.length > 25;
+    if (tooLong) return null;
+    const recognitionPatterns = [
+      /which (phrase|adjective|verb|word|expression|sentence|is correct|means)/i,
+      /what does .+ mean/i,
+      /most nearly means/i,
+      /refers to/i,
+    ];
+    if (recognitionPatterns.some(r => r.test(ex.prompt || ''))) return null;
+    return {
+      _id: 'prod-c#' + topicId + '#' + idx,
+      _topicId: topicId,
+      type: 'type',
+      tag: ex.tag,
+      prompt: ex.prompt,
+      answer: ex.answer,
+    };
+  }
+  if (ex.type === 'bank') {
+    return {
+      _id: 'prod-b#' + topicId + '#' + idx,
+      _topicId: topicId,
+      type: 'type',
+      tag: ex.tag,
+      prompt: ex.prompt + ' (type the full sentence)',
+      answer: ex.answer,
+    };
+  }
+  return null;
 }
 
 window.generateReverseExercises = generateReverseExercises;
