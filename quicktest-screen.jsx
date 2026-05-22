@@ -50,6 +50,7 @@ function QuickTestScreen({ onExit, onComplete }) {
     if (pool.some(p => p.unitId === '__vocab__')) ids.add('__vocab__');
     return ids;
   });
+  const [mode, setMode] = React.useState('mix'); // 'mix' | 'production' | 'recognition'
   const [order, setOrder] = React.useState(groupedOrder);
   const [seen, setSeen] = React.useState(() => new Set());
   const [activeId, setActiveId] = React.useState(() => (pool.length ? pool[0].id : null));
@@ -59,34 +60,42 @@ function QuickTestScreen({ onExit, onComplete }) {
   const [tagsOpen, setTagsOpen] = React.useState(false);
   const recorded = React.useRef(false);
 
+  const matchesMode = React.useCallback((ex) => {
+    if (mode === 'mix') return true;
+    const prod = window.isProduction ? window.isProduction(ex) : false;
+    return mode === 'production' ? prod : !prod;
+  }, [mode]);
+
   const pickNext = React.useCallback((excludeId) => {
     for (const i of order) {
       const p = pool[i];
       if (p.id === excludeId) continue;
       if (!enabled.has(p.unitId)) continue;
       if (seen.has(p.id)) continue;
+      if (!matchesMode(p.ex)) continue;
       return p.id;
     }
     return null;
-  }, [order, pool, enabled, seen]);
+  }, [order, pool, enabled, seen, matchesMode]);
 
-  // When the active exercise's category is switched off (and we're not in the
-  // middle of showing feedback), skip to the next still-enabled exercise.
+  // When the active exercise's category/mode is switched off (and we're not in
+  // the middle of showing feedback), skip to the next still-eligible exercise.
   React.useEffect(() => {
     if (answered) return;
-    if (activeId && !enabled.has(byId[activeId].unitId)) {
+    const cur = activeId ? byId[activeId] : null;
+    if (cur && (!enabled.has(cur.unitId) || !matchesMode(cur.ex))) {
       setActiveId(pickNext(activeId));
     } else if (!activeId) {
       const n = pickNext(null);
       if (n) setActiveId(n);
     }
-  }, [enabled, answered, activeId, byId, pickNext]);
+  }, [enabled, mode, answered, activeId, byId, pickNext, matchesMode]);
 
-  const remainingOf = (uid) => pool.filter(p => p.unitId === uid && !seen.has(p.id)).length;
+  const remainingOf = (uid) => pool.filter(p => p.unitId === uid && !seen.has(p.id) && matchesMode(p.ex)).length;
   const doneCount = seen.size;
   const remaining = order.filter(i => {
     const p = pool[i];
-    return enabled.has(p.unitId) && !seen.has(p.id);
+    return enabled.has(p.unitId) && !seen.has(p.id) && matchesMode(p.ex);
   }).length;
   const totalActive = doneCount + remaining;
 
@@ -212,6 +221,31 @@ function QuickTestScreen({ onExit, onComplete }) {
           }}>
           {tagsOpen ? 'Hide' : `+${units.length - 3}`}
         </button>
+      </div>
+
+      {/* Mode segmented control */}
+      <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px', background: DS.paper }}>
+        {[
+          { id: 'mix',         label: 'Mix',         icon: <span style={{ fontSize: 12 }}>⚡</span> },
+          { id: 'production',  label: 'Production',  icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+          { id: 'recognition', label: 'Recognition', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/></svg> },
+        ].map(opt => {
+          const on = mode === opt.id;
+          return (
+            <button key={opt.id} onClick={() => setMode(opt.id)} className="tap"
+              style={{
+                flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                padding: '7px 8px', borderRadius: 10, cursor: 'pointer',
+                border: 'none',
+                background: on ? DS.ink : DS.paperCard, color: on ? DS.paperCard : DS.ink3,
+                boxShadow: on ? 'none' : DS.shadowSm,
+                fontFamily: DS.sans, fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
+              }}>
+              {opt.icon}
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {active ? (

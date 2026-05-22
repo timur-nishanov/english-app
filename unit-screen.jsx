@@ -20,16 +20,57 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
     : allTags.slice();
   const [selected, setSelected] = React.useState(initialSel.length ? initialSel : allTags.slice());
   const [shuffle, setShuffle] = React.useState(prefs ? !!prefs.shuffle : false);
+  const [mode, setMode] = React.useState((prefs && prefs.mode) || 'mix');
 
   const toggleTag = (t) => {
     setSelected(s => s.includes(t) ? s.filter(x => x !== t) : [...s, t]);
   };
 
-  const count = exercises.filter(e => selected.includes(e.tag || 'Other')).length;
+  const matchesMode = (e) => {
+    if (mode === 'mix') return true;
+    const isProd = window.isProduction ? window.isProduction(e) : (e.type === 'gaptype' || e.type === 'type' || e.type === 'bank');
+    return mode === 'production' ? isProd : !isProd;
+  };
+  const count = exercises.filter(e => selected.includes(e.tag || 'Other') && matchesMode(e)).length;
 
   const start = () => {
-    onChangePrefs(topic.id, { tags: selected, shuffle });
-    onStart(topic.id, selected, shuffle);
+    onChangePrefs(topic.id, { tags: selected, shuffle, mode });
+    onStart(topic.id, selected, shuffle, mode);
+  };
+
+  const modeIcon = (m) => {
+    if (m === 'mix') return <span style={{ fontSize: 13 }}>⚡</span>;
+    if (m === 'production') return (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
+    return (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/>
+      </svg>
+    );
+  };
+  const modeLabels = { mix: 'Mix', production: 'Production only', recognition: 'Quick recognition' };
+  const renderModePill = (m) => {
+    const on = mode === m;
+    return (
+      <button key={m} onClick={() => setMode(m)} className="tap"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+          fontFamily: DS.sans, fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
+          background: on ? c.bg : DS.paperCard,
+          color: on ? c.fg : DS.ink3,
+          border: `1.5px solid ${on ? c.fg : 'transparent'}`,
+          boxShadow: on ? 'none' : DS.shadowSm,
+        }}>
+        {modeIcon(m)}
+        {modeLabels[m]}
+      </button>
+    );
   };
 
   return (
@@ -83,6 +124,13 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
               </button>
             );
           })}
+        </div>
+
+        <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '22px 4px 10px' }}>
+          Mode
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {['mix','production','recognition'].map(renderModePill)}
         </div>
 
         <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '22px 4px 10px' }}>
