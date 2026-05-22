@@ -54,6 +54,13 @@ function ExerciseView({ ex, topic, answered, onAnswer }) {
   if (ex.type === 'bank')   return <BankExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'type')   return <TypeExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'match')  return <MatchExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'dialogue') return <DialogueExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'replace')  return <ReplaceExercise  ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'simile')   return <SimileExercise   ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'explain')  return <ExplainExercise  ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'cloze' && window.ClozeExercise)         return <ClozeExercise     ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'transform' && window.TransformExercise) return <TransformExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'bankgroup' && window.BankgroupExercise) return <BankgroupExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   return null;
 }
 
@@ -82,6 +89,13 @@ function kindOf(type) {
     bank: 'Word bank',
     type: 'Type the answer',
     match: 'Match pairs',
+    dialogue: 'Dialogue',
+    replace: 'Replace the words',
+    simile: 'Simile',
+    explain: 'Explain the idiom',
+    cloze: 'Connected text',
+    transform: 'Rewrite the sentence',
+    bankgroup: 'Word bank · group',
   })[type] || '';
 }
 
@@ -431,6 +445,356 @@ function matchBtn({ done, picked, flash }) {
   };
 }
 
+// ─── DIALOGUE — fill the blank inside a chat-style exchange ─────
+function DialogueLine({ line, side, isBlank, value, blankColor }) {
+  const align = side === 'r' ? 'flex-end' : 'flex-start';
+  const parts = (line.text || '').split('___');
+  const bubbleBg = isBlank ? DS.accentSoft : DS.paperCard;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: align, marginBottom: 14 }}>
+      <div style={{
+        fontSize: 11, color: DS.ink3, fontWeight: 600, letterSpacing: 0.5,
+        textTransform: 'uppercase', margin: side === 'r' ? '0 16px 4px 0' : '0 0 4px 16px',
+      }}>{line.speaker}</div>
+      <div style={{
+        maxWidth: '80%', background: bubbleBg, color: DS.ink,
+        padding: '12px 16px', borderRadius: 18, boxShadow: DS.shadowSm,
+        fontFamily: DS.sans, fontSize: 15, lineHeight: 1.45, letterSpacing: -0.1,
+      }}>
+        {parts.length === 1 ? line.text : (
+          <>
+            {parts[0]}
+            <span style={{
+              display: 'inline-block', minWidth: 70, padding: '0 8px',
+              borderBottom: `2px solid ${blankColor}`, color: blankColor,
+              fontWeight: 600, margin: '0 2px',
+            }}>{value || '______'}</span>
+            {parts[1]}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DialogueExercise({ ex, topic, answered, onAnswer }) {
+  const isPick = ex.mode !== 'type';
+  const [picked, setPicked] = React.useState(null);
+  const [val, setVal] = React.useState('');
+  const inputRef = React.useRef(null);
+
+  const opts = React.useMemo(() => isPick ? shuffle(ex.options || []) : [], [ex]);
+  React.useEffect(() => {
+    setPicked(null); setVal('');
+    if (!isPick) setTimeout(() => inputRef.current && inputRef.current.focus(), 50);
+  }, [ex]);
+
+  const norm = s => s.trim().toLowerCase();
+  const accepted = [ex.answer, ...(ex.accept || [])].map(norm);
+
+  const commitPick = (o) => { if (answered) return; setPicked(o); onAnswer(o === ex.answer); };
+  const commitType = () => { if (answered || !val.trim()) return; onAnswer(accepted.includes(norm(val))); };
+
+  const typedCorrect = !isPick && answered && accepted.includes(norm(val));
+  const pickedCorrect = isPick && answered && picked === ex.answer;
+  const blankColor = isPick
+    ? (answered ? (pickedCorrect ? DS.correct : DS.wrong) : picked ? DS.accent : DS.ink3)
+    : (answered ? (typedCorrect ? DS.correct : DS.wrong) : val.trim() ? DS.accent : DS.ink3);
+  const blankValue = isPick ? picked : (val.trim() || null);
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('dialogue')} />
+      <div style={{ marginBottom: 16 }}>
+        {(ex.lines || []).map((line, i) => (
+          <DialogueLine key={i}
+            line={line}
+            side={i % 2 === 0 ? 'l' : 'r'}
+            isBlank={/___/.test(line.text || '')}
+            value={/___/.test(line.text || '') ? blankValue : null}
+            blankColor={blankColor}
+          />
+        ))}
+      </div>
+      {isPick ? (
+        <div className="stagger" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {opts.map((o, i) => {
+            const isCorrect = answered && o === ex.answer;
+            const isWrong = answered && picked === o && o !== ex.answer;
+            const isPicked = picked === o;
+            return (
+              <button key={i} onClick={() => commitPick(o)} disabled={!!answered}
+                className={`tap ${isWrong ? 'anim-shake' : ''}`}
+                style={{
+                  padding: '11px 16px', borderRadius: 999,
+                  background: isCorrect ? DS.correctSoft : isWrong ? DS.wrongSoft : isPicked ? DS.ink : DS.paperCard,
+                  border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : isPicked ? DS.ink : 'transparent'}`,
+                  boxShadow: !isPicked && !answered ? DS.shadowSm : 'none',
+                  fontSize: 15, fontWeight: 500, cursor: answered ? 'default' : 'pointer',
+                  color: isCorrect ? DS.correctDark : isWrong ? DS.wrongDark : isPicked ? DS.paperCard : DS.ink,
+                  fontFamily: DS.sans, letterSpacing: -0.2,
+                }}>{o}</button>
+            );
+          })}
+        </div>
+      ) : (
+        <>
+          <input ref={inputRef} value={val}
+            onChange={e => setVal(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && commitType()}
+            disabled={!!answered}
+            placeholder="Type the missing word…"
+            className={answered && !typedCorrect ? 'anim-shake' : ''}
+            style={{
+              width: '100%', padding: '17px 18px', borderRadius: 16,
+              border: `1.5px solid ${answered ? (typedCorrect ? DS.correct : DS.wrong) : 'transparent'}`,
+              fontSize: 17, fontWeight: 500, fontFamily: DS.sans,
+              background: DS.paperCard, color: DS.ink, outline: 'none', boxSizing: 'border-box',
+              boxShadow: DS.shadowSm, letterSpacing: -0.3,
+            }}/>
+          {!answered && (
+            <div style={{ marginTop: 18 }}>
+              <PrimaryButton onClick={commitType} color={val.trim() ? DS.ink : DS.ink5} disabled={!val.trim()}>
+                Check answer
+              </PrimaryButton>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── REPLACE — swap the *underlined* words for an idiom/phrasal ─────
+function ReplaceSentence({ sentence, replacement, color }) {
+  // *text* marks the underlined target; renders sageSoft chip-like span
+  const parts = (sentence || '').split(/(\*[^*]+\*)/g);
+  return (
+    <div style={{
+      background: DS.paperCard, borderRadius: 18,
+      padding: 20, marginBottom: 18, boxShadow: DS.shadowSm,
+    }}>
+      <div style={{
+        fontFamily: DS.display, fontSize: 18, lineHeight: 1.5,
+        color: DS.ink, letterSpacing: -0.2, fontWeight: 500,
+      }}>
+        {parts.map((p, i) => {
+          const m = /^\*([^*]+)\*$/.exec(p);
+          if (!m) return <React.Fragment key={i}>{p}</React.Fragment>;
+          if (replacement) {
+            return (
+              <span key={i} style={{
+                display: 'inline-block', background: DS.accentSoft, color: DS.accentDark,
+                borderRadius: 6, padding: '1px 8px', fontWeight: 600,
+                transition: 'all 300ms ease',
+              }}>{replacement}</span>
+            );
+          }
+          return (
+            <span key={i} style={{
+              display: 'inline-block', background: DS.sageSoft, color: DS.ink,
+              borderRadius: 6, padding: '1px 6px', fontWeight: 600,
+            }}>{m[1]}</span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ReplaceExercise({ ex, topic, answered, onAnswer }) {
+  const isPick = ex.mode !== 'type';
+  const [picked, setPicked] = React.useState(null);
+  const [val, setVal] = React.useState('');
+  const inputRef = React.useRef(null);
+
+  const opts = React.useMemo(() => isPick ? shuffle(ex.options || []) : [], [ex]);
+  React.useEffect(() => {
+    setPicked(null); setVal('');
+    if (!isPick) setTimeout(() => inputRef.current && inputRef.current.focus(), 50);
+  }, [ex]);
+
+  const norm = s => s.trim().toLowerCase();
+  const accepted = [ex.answer, ...(ex.accept || [])].map(norm);
+
+  const commitPick = (o) => { if (answered) return; setPicked(o); onAnswer(o === ex.answer); };
+  const commitType = () => { if (answered || !val.trim()) return; onAnswer(accepted.includes(norm(val))); };
+
+  const typedCorrect = !isPick && answered && accepted.includes(norm(val));
+  const pickedCorrect = isPick && answered && picked === ex.answer;
+  const replacement = answered
+    ? ex.answer
+    : (isPick ? (picked || null) : (val.trim() || null));
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('replace')} />
+      <ReplaceSentence sentence={ex.sentence}
+        replacement={(answered && (pickedCorrect || typedCorrect)) ? replacement : (answered ? ex.answer : null)} />
+      {isPick ? (
+        <div className="stagger" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {opts.map((o, i) => {
+            const isCorrect = answered && o === ex.answer;
+            const isWrong = answered && picked === o && o !== ex.answer;
+            const isPicked = picked === o;
+            return (
+              <button key={i} onClick={() => commitPick(o)} disabled={!!answered}
+                className={`tap ${isWrong ? 'anim-shake' : ''}`}
+                style={{
+                  padding: '11px 16px', borderRadius: 999,
+                  background: isCorrect ? DS.correctSoft : isWrong ? DS.wrongSoft : isPicked ? DS.ink : DS.paperCard,
+                  border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : isPicked ? DS.ink : 'transparent'}`,
+                  boxShadow: !isPicked && !answered ? DS.shadowSm : 'none',
+                  fontSize: 15, fontWeight: 500, cursor: answered ? 'default' : 'pointer',
+                  color: isCorrect ? DS.correctDark : isWrong ? DS.wrongDark : isPicked ? DS.paperCard : DS.ink,
+                  fontFamily: DS.sans, letterSpacing: -0.2,
+                }}>{o}</button>
+            );
+          })}
+        </div>
+      ) : (
+        <>
+          <input ref={inputRef} value={val}
+            onChange={e => setVal(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && commitType()}
+            disabled={!!answered}
+            placeholder="Type the replacement expression…"
+            className={answered && !typedCorrect ? 'anim-shake' : ''}
+            style={{
+              width: '100%', padding: '17px 18px', borderRadius: 16,
+              border: `1.5px solid ${answered ? (typedCorrect ? DS.correct : DS.wrong) : 'transparent'}`,
+              fontSize: 17, fontWeight: 500, fontFamily: DS.sans,
+              background: DS.paperCard, color: DS.ink, outline: 'none', boxSizing: 'border-box',
+              boxShadow: DS.shadowSm, letterSpacing: -0.3,
+            }}/>
+          {!answered && (
+            <div style={{ marginTop: 18 }}>
+              <PrimaryButton onClick={commitType} color={val.trim() ? DS.ink : DS.ink5} disabled={!val.trim()}>
+                Check answer
+              </PrimaryButton>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── SIMILE — "as ___ as a cucumber" ────────────────────────────
+function SimileExercise({ ex, topic, answered, onAnswer }) {
+  const [picked, setPicked] = React.useState(null);
+  const opts = React.useMemo(() => shuffle(ex.options || []), [ex]);
+  React.useEffect(() => { setPicked(null); }, [ex]);
+  const commit = (o) => { if (answered) return; setPicked(o); onAnswer(o === ex.answer); };
+
+  const blankColor = answered ? (picked === ex.answer ? DS.correct : DS.wrong) : picked ? DS.accent : DS.ink3;
+  const parts = (ex.template || '').split('___');
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('simile')} />
+      <div style={{
+        background: DS.paperCard, borderRadius: 20, padding: 30,
+        boxShadow: DS.shadowMd, marginBottom: 18, textAlign: 'center', minHeight: 140,
+      }}>
+        <div style={{
+          fontFamily: DS.display, fontSize: 28, fontWeight: 700,
+          letterSpacing: -0.8, lineHeight: 1.2, color: DS.ink,
+        }}>
+          {parts[0]}
+          <span style={{
+            display: 'inline-block', minWidth: 80, padding: '0 10px',
+            borderBottom: `3px solid ${blankColor}`, color: blankColor, fontWeight: 600,
+          }}>{picked || '______'}</span>
+          {parts[1]}
+        </div>
+        {ex.meaning && (
+          <div style={{
+            fontSize: 13, color: DS.ink3, marginTop: 14, fontWeight: 500, lineHeight: 1.4, letterSpacing: -0.1,
+          }}>means: {ex.meaning}</div>
+        )}
+      </div>
+      <div className="stagger" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {opts.map((o, i) => {
+          const isCorrect = answered && o === ex.answer;
+          const isWrong = answered && picked === o && o !== ex.answer;
+          const isPicked = picked === o;
+          return (
+            <button key={i} onClick={() => commit(o)} disabled={!!answered}
+              className={`tap ${isWrong ? 'anim-shake' : ''}`}
+              style={{
+                padding: '11px 16px', borderRadius: 999,
+                background: isCorrect ? DS.correctSoft : isWrong ? DS.wrongSoft : isPicked ? DS.ink : DS.paperCard,
+                border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : isPicked ? DS.ink : 'transparent'}`,
+                boxShadow: !isPicked && !answered ? DS.shadowSm : 'none',
+                fontSize: 15, fontWeight: 500, cursor: answered ? 'default' : 'pointer',
+                color: isCorrect ? DS.correctDark : isWrong ? DS.wrongDark : isPicked ? DS.paperCard : DS.ink,
+                fontFamily: DS.sans, letterSpacing: -0.2,
+              }}>{o}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── EXPLAIN — what does this idiom mean? ───────────────────────
+function ExplainExercise({ ex, topic, answered, onAnswer }) {
+  const [picked, setPicked] = React.useState(null);
+  const opts = React.useMemo(() => shuffle(ex.options || []), [ex]);
+  React.useEffect(() => { setPicked(null); }, [ex]);
+  const commit = (o) => { if (answered) return; setPicked(o); onAnswer(o === ex.answer); };
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('explain')} />
+      <div style={{
+        background: DS.sageSoft, borderRadius: 18, padding: 22, marginBottom: 18, textAlign: 'center',
+      }}>
+        <div style={{
+          fontSize: 12, color: DS.sageDark, fontWeight: 600,
+          textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8,
+        }}>{ex.prompt}</div>
+        <div style={{
+          fontFamily: DS.display, fontSize: 22, fontWeight: 700,
+          letterSpacing: -0.5, color: DS.ink, lineHeight: 1.25,
+        }}>“{ex.idiom}”</div>
+      </div>
+      <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {opts.map((o, i) => {
+          const isCorrect = answered && o === ex.answer;
+          const isWrong = answered && picked === o && o !== ex.answer;
+          const isPicked = picked === o;
+          return (
+            <button key={i} onClick={() => commit(o)} disabled={!!answered}
+              className={`tap ${isWrong ? 'anim-shake' : ''}`}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '15px 16px', borderRadius: 16,
+                background: isCorrect ? DS.correctSoft : isWrong ? DS.wrongSoft : DS.paperCard,
+                border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : isPicked ? DS.ink : 'transparent'}`,
+                boxShadow: !answered && !isPicked ? DS.shadowSm : 'none',
+                cursor: answered ? 'default' : 'pointer', textAlign: 'left', fontFamily: DS.sans,
+                color: isCorrect ? DS.correctDark : isWrong ? DS.wrongDark : DS.ink,
+                fontSize: 15, fontWeight: 500, lineHeight: 1.4, letterSpacing: -0.2,
+              }}>
+              <span style={{
+                width: 22, height: 22, borderRadius: 99,
+                background: isCorrect ? DS.correct : isWrong ? DS.wrong : 'transparent',
+                color: (isCorrect || isWrong) ? DS.paperCard : DS.ink3,
+                border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : DS.ink5}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, fontWeight: 700, flexShrink: 0,
+              }}>{isCorrect ? '✓' : isWrong ? '✕' : ''}</span>
+              <span style={{ flex: 1 }}>{o}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function FeedbackBar({ answered, ex, onContinue }) {
   if (!answered) return null;
   const correct = answered === 'correct';
@@ -457,8 +821,16 @@ function FeedbackBar({ answered, ex, onContinue }) {
               Correct answer: <b style={{ color: DS.ink }}>{ex.answer}</b>
             </div>
           )}
+          {!correct && ex.accept && ex.accept.length > 0 && (
+            <div style={{ fontSize: 12, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>
+              Also accepted: {ex.accept.join(', ')}
+            </div>
+          )}
           {ex.hint && (
             <div style={{ fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>Hint: {ex.hint}</div>
+          )}
+          {!correct && ex.why && (
+            <div style={{ fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>Why: {ex.why}</div>
           )}
         </div>
       </div>

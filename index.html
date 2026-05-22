@@ -47,6 +47,9 @@
 <script type="text/babel" src="home-screen.jsx"></script>
 <script type="text/babel" src="unit-screen.jsx"></script>
 <script type="text/babel" src="lesson-screen.jsx"></script>
+<script type="text/babel" src="cloze.jsx"></script>
+<script type="text/babel" src="transform.jsx"></script>
+<script type="text/babel" src="bankgroup.jsx"></script>
 <script type="text/babel" src="review-screen.jsx"></script>
 <script type="text/babel" src="daily-screen.jsx"></script>
 <script type="text/babel" src="quicktest-screen.jsx"></script>
@@ -121,8 +124,10 @@ window.lastNDays = lastNDays;
 window.activityTotals = activityTotals;
 
 // ─── Storage migration ──────────────────────────────────────────
-// v3: new unified exercise pool + SRS added — wipe daily and SRS caches
-const APP_VERSION = 3;
+// v4: new exercise types (dialogue, replace, transform, cloze, bankgroup,
+// simile, explain) + pool rebalancing — wipe the cached daily mix so the
+// next session draws from the rebuilt pool.
+const APP_VERSION = 4;
 (function migrate() {
   let ver = 0;
   try { ver = Number(localStorage.getItem('engapp-version')) || 0; } catch (e) {}
@@ -130,21 +135,65 @@ const APP_VERSION = 3;
   try {
     const s = JSON.parse(localStorage.getItem('engapp-state'));
     const activity = (s && s.activity) || {};
-    localStorage.setItem('engapp-state', JSON.stringify({ progress: {}, activity }));
+    const progress = (ver >= 3 && s && s.progress) ? s.progress : {};
+    localStorage.setItem('engapp-state', JSON.stringify({ progress, activity }));
   } catch (e) {
     localStorage.removeItem('engapp-state');
   }
   localStorage.removeItem('engapp-daily');
-  localStorage.removeItem('engapp-srs');
+  if (ver < 3) localStorage.removeItem('engapp-srs');
   localStorage.removeItem('engapp-screen');
   try { localStorage.setItem('engapp-version', String(APP_VERSION)); } catch (e) {}
 })();
 
 // ─── Unified exercise pool ──────────────────────────────────────
-// base exercises + production variants (gap→gaptype, choice/bank→type) + reverse.
-// When choice/bank has a production variant, the base is replaced — both versions
-// are too similar to keep side-by-side. Gap stays alongside its gaptype variant
-// because picking vs typing the missing word are genuinely different drills.
+// base + production variants + reverse-vocab drills. choice/bank get
+// replaced by their typed production variant when one exists; gap and
+// the new types (explain, simile, dialogue, …) stay alongside their
+// production siblings. The pool is then rebalanced to ≥80 % production.
+
+const PRODUCTION_TYPES = new Set([
+  'gaptype', 'type', 'bank', 'cloze', 'transform', 'replace', 'bankgroup',
+]);
+
+function isProduction(ex) {
+  if (!ex) return false;
+  if (ex.type === 'dialogue') return ex.mode !== 'pick';
+  if (ex.type === 'replace')  return ex.mode !== 'pick';
+  return PRODUCTION_TYPES.has(ex.type);
+}
+
+function getPoolStats(pool) {
+  let production = 0, recognition = 0;
+  pool.forEach(ex => { if (isProduction(ex)) production++; else recognition++; });
+  const total = production + recognition;
+  const ratio = total ? production / total : 0;
+  return { production, recognition, total, ratio };
+}
+
+function rebalancePool(pool) {
+  const start = getPoolStats(pool);
+  // target ≥80 % production → keep all production, sample recognition
+  // down to ≤ production / 4 (gives 80 / 20 split)
+  const maxRecognition = Math.floor(start.production / 4);
+  if (start.recognition <= maxRecognition) {
+    console.log(`Pool: ${start.production} prod / ${start.recognition} rec (ratio ${(start.ratio*100).toFixed(1)}%) — no rebalance needed`);
+    return pool;
+  }
+  const productionEx = [], recognitionEx = [];
+  pool.forEach(ex => { (isProduction(ex) ? productionEx : recognitionEx).push(ex); });
+  // sample recognition with the same Fisher-Yates we use elsewhere
+  const sampledRec = shuffleList(recognitionEx).slice(0, maxRecognition);
+  const out = [...productionEx, ...sampledRec];
+  const end = getPoolStats(out);
+  console.log(
+    `Pool rebalanced: started ${start.production}/${start.recognition} ` +
+    `(${(start.ratio*100).toFixed(1)}%), ended ${end.production}/${end.recognition} ` +
+    `(${(end.ratio*100).toFixed(1)}%)`
+  );
+  return out;
+}
+
 function allExercises() {
   const out = [];
   TOPICS.forEach(t => {
@@ -160,9 +209,12 @@ function allExercises() {
   if (window.generateReverseExercises) {
     generateReverseExercises().forEach(ex => out.push(ex));
   }
-  return out;
+  return rebalancePool(out);
 }
 window.allExercises = allExercises;
+window.isProduction = isProduction;
+window.getPoolStats = getPoolStats;
+window.rebalancePool = rebalancePool;
 
 // ─── Daily mix — SRS-driven, 8 exercises ────────────────────────
 function generateDailyMix() {
@@ -219,6 +271,17 @@ function shuffleList(a) {
   return arr;
 }
 
+// Log pool composition once at startup so the 80/20 target is visible.
+(function logPoolOnce() {
+  try {
+    const pool = allExercises();
+    const s = getPoolStats(pool);
+    console.log(`Pool: ${s.production} production / ${s.recognition} recognition (ratio: ${(s.ratio*100).toFixed(1)}%)`);
+  } catch (e) {
+    console.warn('Pool stat log failed:', e);
+  }
+})();
+
 function App() {
   const [screen, setScreen] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
@@ -264,8 +327,8 @@ function App() {
 
   const go = (s) => setScreen(s);
 
-  const startLesson = (topicId, tags, shuffle) => {
-    go({ name: 'lesson', lessonId: topicId, topicId, tags: tags || null, shuffle: !!shuffle });
+  const startLesson = (topicId, tags, shuffle, mode) => {
+    go({ name: 'lesson', lessonId: topicId, topicId, tags: tags || null, shuffle: !!shuffle, mode: mode || 'mix' });
   };
 
   const completeLesson = ({ mistakes, correct, total }) => {
@@ -355,6 +418,11 @@ function App() {
     let exs = base.exercises;
     if (screen.tags && screen.tags.length) {
       const filtered = exs.filter(e => screen.tags.includes(e.tag));
+      if (filtered.length) exs = filtered;
+    }
+    if (screen.mode && screen.mode !== 'mix') {
+      const wantProd = screen.mode === 'production';
+      const filtered = exs.filter(e => window.isProduction(e) === wantProd);
       if (filtered.length) exs = filtered;
     }
     if (screen.shuffle) exs = shuffleList(exs);
