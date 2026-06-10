@@ -36,8 +36,12 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
               width: 18, height: 18, borderRadius: 99,
               background: DS.sageSoft,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11,
-            }}>🔥</span>
+            }}>
+              <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+                <path d="M5 .5c1.2 1.8 1 3 .3 3.7-.7.7-1.8 1.1-1.8 2.4 0 1.1.9 2 2 2s2-.9 2-2c0-.7-.3-1.2-.7-1.6.9.5 2.2 1.7 2.2 3.7 0 1.9-1.6 3.3-4 3.3S1 10.6 1 8.5C1 5.3 4 3.5 5 .5z"
+                  fill={DS.sageDark}/>
+              </svg>
+            </span>
             <span className="tick" style={{
               fontSize: 14, color: DS.ink, fontWeight: 600, letterSpacing: -0.2,
             }}>{streak} day streak</span>
@@ -129,14 +133,10 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
           </div>
           <div style={{ flex: 1 }}>
             <div style={{
-              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-              opacity: 0.65, marginBottom: 2,
-            }}>Today's review</div>
-            <div style={{
               fontFamily: DS.display, fontSize: 19,
               fontWeight: 600, letterSpacing: -0.4,
             }}>Flashcard deck</div>
-            <div style={{ fontSize: 13, marginTop: 3, opacity: 0.7, letterSpacing: -0.1 }}>
+            <div style={{ fontSize: 13, marginTop: 4, opacity: 0.7, letterSpacing: -0.1 }}>
               {VOCAB_CARDS.length} words · tap to flip
             </div>
           </div>
@@ -170,14 +170,10 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
           </div>
           <div style={{ flex: 1 }}>
             <div style={{
-              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-              color: DS.ink3, marginBottom: 2,
-            }}>Check yourself</div>
-            <div style={{
               fontFamily: DS.display, fontSize: 19,
               fontWeight: 600, letterSpacing: -0.4,
             }}>Vocabulary test</div>
-            <div style={{ fontSize: 13, marginTop: 3, color: DS.ink3, letterSpacing: -0.1 }}>
+            <div style={{ fontSize: 13, marginTop: 4, color: DS.ink3, letterSpacing: -0.1 }}>
               10 questions · match the word
             </div>
           </div>
@@ -208,14 +204,10 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
           }}>{weakCount > 0 ? '!' : '✓'}</div>
           <div style={{ flex: 1 }}>
             <div style={{
-              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-              color: (weakCount > 0) ? DS.wrongDark : DS.ink3, marginBottom: 2,
-            }}>Review mistakes</div>
-            <div style={{
               fontFamily: DS.display, fontSize: 19,
               fontWeight: 600, letterSpacing: -0.4,
             }}>Weak spots</div>
-            <div style={{ fontSize: 13, marginTop: 3, color: (weakCount > 0) ? DS.wrongDark : DS.ink3, letterSpacing: -0.1 }}>
+            <div style={{ fontSize: 13, marginTop: 4, color: (weakCount > 0) ? DS.wrongDark : DS.ink3, letterSpacing: -0.1 }}>
               {weakCount > 0 ? `${weakCount} item${weakCount === 1 ? '' : 's'} to fix` : 'Nothing to review — well done'}
             </div>
           </div>
@@ -246,14 +238,10 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
           </div>
           <div style={{ flex: 1 }}>
             <div style={{
-              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-              color: DS.ink3, marginBottom: 2,
-            }}>Practice mix</div>
-            <div style={{
               fontFamily: DS.display, fontSize: 19,
               fontWeight: 600, letterSpacing: -0.4,
             }}>Quick practice</div>
-            <div style={{ fontSize: 13, marginTop: 3, color: DS.ink3, letterSpacing: -0.1 }}>
+            <div style={{ fontSize: 13, marginTop: 4, color: DS.ink3, letterSpacing: -0.1 }}>
               Every exercise · filter & shuffle on the fly
             </div>
           </div>
@@ -320,9 +308,7 @@ const UNIT_COLORS = {
 
 function TopicRow({ topic, progress, totalLessons, onClick }) {
   const done = Math.floor(progress * totalLessons);
-  const pct = Math.round(progress * 100);
   const isComplete = done >= totalLessons;
-  const isStarted = done > 0;
   const c = UNIT_COLORS[topic.id] || { bg: DS.paperDeep, fg: DS.ink };
 
   return (
@@ -375,21 +361,10 @@ function TopicRow({ topic, progress, totalLessons, onClick }) {
         }}>{topic.subtitle}</div>
       </div>
 
-      {/* Right: progress dots + count */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
-        <span className="tick" style={{
-          fontSize: 12, color: isStarted ? DS.ink : DS.ink4, fontWeight: 600, letterSpacing: -0.1,
-        }}>{done}/{totalLessons}</span>
-        <div style={{ display: 'flex', gap: 3 }}>
-          {Array.from({ length: totalLessons }).map((_, i) => (
-            <div key={i} style={{
-              width: 6, height: 6, borderRadius: 99,
-              background: i < done ? c.fg : DS.ink5,
-              transition: `background 300ms ${DS.ease}`,
-            }}/>
-          ))}
-        </div>
-      </div>
+      {/* Right: chevron — status is conveyed by the mark badge */}
+      <svg width="10" height="14" viewBox="0 0 10 16" style={{ flexShrink: 0 }}>
+        <path d="M1 1l7 7-7 7" stroke={DS.ink4} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      </svg>
     </button>
   );
 }
