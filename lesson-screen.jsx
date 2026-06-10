@@ -58,6 +58,7 @@ function ExerciseView({ ex, topic, answered, onAnswer }) {
   if (ex.type === 'replace')  return <ReplaceExercise  ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'simile')   return <SimileExercise   ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'explain')  return <ExplainExercise  ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
+  if (ex.type === 'extraword') return <ExtraWordExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'cloze' && window.ClozeExercise)         return <ClozeExercise     ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'transform' && window.TransformExercise) return <TransformExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
   if (ex.type === 'bankgroup' && window.BankgroupExercise) return <BankgroupExercise ex={ex} topic={topic} answered={answered} onAnswer={onAnswer} />;
@@ -68,9 +69,8 @@ function ExerciseTitle({ text, topic, kind }) {
   const c = (window.UNIT_COLORS && window.UNIT_COLORS[topic.id]) || { bg: DS.paperDeep, fg: DS.ink };
   return (
     <div style={{ marginBottom: 18 }}>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+      <div style={{ marginBottom: 12 }}>
         <Chip bg={c.bg} color={c.fg} style={{ fontWeight: 600 }}>{topic.title}</Chip>
-        <Chip>{kind}</Chip>
       </div>
       <h2 style={{
         fontFamily: DS.display,
@@ -96,6 +96,7 @@ function kindOf(type) {
     cloze: 'Connected text',
     transform: 'Rewrite the sentence',
     bankgroup: 'Word bank · group',
+    extraword: 'Find the extra word',
   })[type] || '';
 }
 
@@ -795,6 +796,77 @@ function ExplainExercise({ ex, topic, answered, onAnswer }) {
   );
 }
 
+// ─── EXTRA WORD — find the word that shouldn't be there ─────────
+// ex.extra is the extra word (must appear in the sentence), or null
+// when the sentence is correct. The user taps the extra word, or the
+// "Sentence is correct" button. Error correction = production skill.
+function ExtraWordExercise({ ex, topic, answered, onAnswer }) {
+  const [picked, setPicked] = React.useState(null); // word index or 'correct'
+  React.useEffect(() => { setPicked(null); }, [ex]);
+
+  const words = React.useMemo(() => (ex.sentence || '').split(/\s+/), [ex]);
+  const clean = w => w.replace(/[.,!?;:""'']/g, '').toLowerCase();
+  const extraIdx = React.useMemo(() => {
+    if (!ex.extra) return -1;
+    return words.findIndex(w => clean(w) === ex.extra.toLowerCase());
+  }, [words, ex]);
+
+  const commitWord = (i) => {
+    if (answered) return;
+    setPicked(i);
+    onAnswer(ex.extra ? i === extraIdx : false);
+  };
+  const commitCorrect = () => {
+    if (answered) return;
+    setPicked('correct');
+    onAnswer(!ex.extra);
+  };
+
+  return (
+    <div>
+      <ExerciseTitle text={ex.prompt} topic={topic} kind={kindOf('extraword')} />
+      <div style={{
+        background: DS.paperCard, borderRadius: 18, padding: 20,
+        marginBottom: 16, boxShadow: DS.shadowSm,
+        display: 'flex', flexWrap: 'wrap', gap: 6,
+      }}>
+        {words.map((w, i) => {
+          const isExtra = answered && i === extraIdx;
+          const isWrongPick = answered && picked === i && i !== extraIdx;
+          return (
+            <button key={i} onClick={() => commitWord(i)} disabled={!!answered}
+              className={`tap ${isWrongPick ? 'anim-shake' : ''}`}
+              style={{
+                padding: '7px 10px', borderRadius: 10, border: 'none',
+                background: isExtra ? DS.correctSoft : isWrongPick ? DS.wrongSoft : DS.paper,
+                color: isExtra ? DS.correctDark : isWrongPick ? DS.wrongDark : DS.ink,
+                textDecoration: isExtra ? 'line-through' : 'none',
+                fontFamily: DS.display, fontSize: 17, fontWeight: 500, letterSpacing: -0.2,
+                cursor: answered ? 'default' : 'pointer',
+              }}>{w}</button>
+          );
+        })}
+      </div>
+      {!answered && (
+        <button onClick={commitCorrect} className="tap"
+          style={{
+            width: '100%', padding: '14px 16px', borderRadius: 16,
+            border: `1.5px solid ${DS.line}`, background: DS.paperCard,
+            color: DS.ink2, fontFamily: DS.sans, fontSize: 15, fontWeight: 600,
+            letterSpacing: -0.2, cursor: 'pointer', boxShadow: DS.shadowSm,
+          }}>
+          Sentence is correct — no extra word
+        </button>
+      )}
+      {answered && !ex.extra && (
+        <div style={{
+          fontSize: 14, color: DS.ink3, letterSpacing: -0.1, padding: '0 4px',
+        }}>This sentence was correct as written.</div>
+      )}
+    </div>
+  );
+}
+
 function FeedbackBar({ answered, ex, onContinue }) {
   if (!answered) return null;
   const correct = answered === 'correct';
@@ -821,17 +893,18 @@ function FeedbackBar({ answered, ex, onContinue }) {
               Correct answer: <b style={{ color: DS.ink }}>{ex.answer}</b>
             </div>
           )}
-          {!correct && ex.accept && ex.accept.length > 0 && (
-            <div style={{ fontSize: 12, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>
-              Also accepted: {ex.accept.join(', ')}
-            </div>
-          )}
-          {ex.hint && (
-            <div style={{ fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>Hint: {ex.hint}</div>
-          )}
-          {!correct && ex.why && (
-            <div style={{ fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1 }}>Why: {ex.why}</div>
-          )}
+          {(() => {
+            const notes = [];
+            if (!correct && ex.why) notes.push(ex.why);
+            else if (ex.hint) notes.push(ex.hint);
+            if (!correct && ex.accept && ex.accept.length) notes.push('also accepted: ' + ex.accept.join(', '));
+            if (!notes.length) return null;
+            return (
+              <div style={{ fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1, lineHeight: 1.45 }}>
+                {notes.join(' · ')}
+              </div>
+            );
+          })()}
         </div>
       </div>
       <PrimaryButton onClick={onContinue} color={correct ? DS.correct : DS.ink}>
