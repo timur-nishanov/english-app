@@ -11,7 +11,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   return (
     <div style={{
       height: '100%', overflow: 'auto',
-      background: '#FFFFFF', color: DS.ink, fontFamily: DS.sans,
+      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
     }}>
       <div style={{ padding: `${DS.topSafe}px 20px 30px` }}>
         {/* Header — scrolls with the content */}
@@ -21,7 +21,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: DS.paper, padding: '7px 12px 7px 9px',
+            background: DS.paperCard, padding: '7px 12px 7px 9px',
             borderRadius: 999, border: 'none',
           }}>
             <span style={{
@@ -71,7 +71,6 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
             display: 'flex', alignItems: 'center', gap: 14,
             fontFamily: DS.sans, border: 'none',
             marginTop: 22, marginBottom: 12,
-            boxShadow: '0 8px 24px rgba(45, 107, 255, 0.25)',
           }}>
           <div style={{
             width: 46, height: 46, borderRadius: 99,
@@ -179,7 +178,7 @@ function HomeAction({ onClick, title, sub, icon, accent }) {
     <button onClick={onClick} className="tap"
       style={{
         textAlign: 'left', cursor: 'pointer',
-        background: DS.paper, color: DS.ink,
+        background: DS.paperCard, color: DS.ink,
         borderRadius: 20, padding: '16px 16px',
         display: 'flex', flexDirection: 'column', gap: 12,
         fontFamily: DS.sans, border: 'none',
@@ -241,7 +240,7 @@ function TopicRow({ topic, progress, totalLessons, isLast, onClick }) {
       {/* Grey monochrome mark */}
       <div style={{
         width: 38, height: 38, flexShrink: 0,
-        background: DS.paper,
+        background: DS.paperCard,
         color: DS.ink3,
         borderRadius: 11,
         fontFamily: DS.display, fontWeight: 700, fontSize: 16, letterSpacing: -0.3,

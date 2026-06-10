@@ -12,10 +12,10 @@ const DS = {
   ink4:  '#B5BAC1',
   ink5:  '#DFE2E6',
 
-  // SURFACES — Apple system grey (cool, not beige)
-  paper:      '#F5F5F7',   // app canvas (light grey)
+  // SURFACES — white canvas, grey cards (Joi style)
+  paper:      '#FFFFFF',   // app canvas (white)
   paperDeep:  '#EAEAEC',   // hover / pressed rows
-  paperCard:  '#FFFFFF',   // card / surface
+  paperCard:  '#F5F5F7',   // card / surface (light grey)
   paperWhite: '#FFFFFF',
 
   // ACCENT — iOS-style soft blue (single primary color)
@@ -44,10 +44,11 @@ const DS = {
   lineSoft:   '#EEEEF0',
   lineDark:   '#D5D5D7',
 
-  // Shadows — soft & soft-glassy
-  shadowSm: '0 1px 2px rgba(14, 16, 19, 0.04)',
-  shadowMd: '0 2px 10px rgba(14, 16, 19, 0.05), 0 1px 2px rgba(14, 16, 19, 0.03)',
-  shadowLg: '0 12px 28px rgba(14, 16, 19, 0.08), 0 2px 6px rgba(14, 16, 19, 0.04)',
+  // Shadows — flat look: grey fills carry the hierarchy, not shadows.
+  // shadowLg kept for genuinely floating elements (e.g. the shuffle pill).
+  shadowSm: 'none',
+  shadowMd: 'none',
+  shadowLg: '0 12px 28px rgba(14, 16, 19, 0.10), 0 2px 6px rgba(14, 16, 19, 0.05)',
 
   // backwards-compat aliases
   get bg()          { return this.paper; },
