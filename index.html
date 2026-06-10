@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#F4F2EC">
+<meta name="theme-color" content="#F5F5F7">
 <title>English Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; height: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Tight", "Inter", system-ui, sans-serif;
+    font-family: ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     background: #1C1F2A;
     display: flex; align-items: center; justify-content: center;
     min-height: 100vh; color: #0E1013;
@@ -29,7 +29,7 @@
 
   /* On phones, fill the whole screen instead of showing the device mockup */
   @media (max-width: 600px), (pointer: coarse) {
-    html, body { overflow: hidden; background: #F4F2EC; }
+    html, body { overflow: hidden; background: #F5F5F7; }
     #app-stage { padding: 0; gap: 0; width: 100%; }
   }
 </style>
@@ -523,12 +523,12 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
             fontFamily: DS.display, fontWeight: 700,
             fontSize: 26, letterSpacing: -0.5,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>A</div>
+          }}>T</div>
           <div>
             <h1 style={{
               fontFamily: DS.display, fontSize: 24, fontWeight: 700,
-              letterSpacing: -0.6, color: DS.ink, margin: 0, lineHeight: 1.1,
-            }}>Aleksey</h1>
+              letterSpacing: -0.4, color: DS.ink, margin: 0, lineHeight: 1.1,
+            }}>Timur</h1>
             <div style={{
               fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1,
             }}>B2–C1{since}</div>
