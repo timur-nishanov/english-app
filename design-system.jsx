@@ -5,17 +5,17 @@ const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
 
 const DS = {
-  // INK — neutral near-black
-  ink:   '#0E1013',
+  // INK — per the Figma mockup
+  ink:   '#161414',
   ink2:  '#2B2F36',
-  ink3:  '#7C828A',
+  ink3:  '#A5A5A5',
   ink4:  '#B5BAC1',
   ink5:  '#DFE2E6',
 
-  // SURFACES — white canvas, grey cards (Joi style)
-  paper:      '#FFFFFF',   // app canvas (white)
-  paperDeep:  '#EAEAEC',   // hover / pressed rows
-  paperCard:  '#F5F5F7',   // card / surface (light grey)
+  // SURFACES — grey canvas, white cards (Figma mockup)
+  paper:      '#E9E9E9',   // app canvas (grey)
+  paperDeep:  '#DDDDDD',   // hover / pressed rows
+  paperCard:  '#FFFFFF',   // card / surface (white)
   paperWhite: '#FFFFFF',
 
   // ACCENT — iOS-style soft blue (single primary color)
@@ -40,8 +40,8 @@ const DS = {
   streakSoft: '#FBE5D7',
 
   // Hairlines — very soft
-  line:       '#E5E5E7',
-  lineSoft:   '#EEEEF0',
+  line:       '#E9E9E9',
+  lineSoft:   '#F0F0F0',
   lineDark:   '#D5D5D7',
 
   // Shadows — flat look: grey fills carry the hierarchy, not shadows.
@@ -73,7 +73,7 @@ const DS = {
   if (typeof document === 'undefined' || document.getElementById('motion-css')) return;
   const css = `
     .tap { transition: transform 200ms ${EASE}, background 180ms ${EASE}, border-color 180ms ${EASE}, opacity 180ms ${EASE}, color 180ms ${EASE}, box-shadow 180ms ${EASE}; }
-    .tap:active:not(:disabled) { transform: scale(0.975); }
+    .tap:active:not(:disabled) { transform: scale(0.9); }
 
     @keyframes slideInRight { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes slideInUp    { from { opacity: 0; transform: translateY(10px); }  to { opacity: 1; transform: translateY(0); } }
@@ -116,8 +116,8 @@ const DS = {
     .stagger > *:nth-child(26) { animation-delay: 875ms; }
     .stagger > *:nth-child(27) { animation-delay: 910ms; }
 
-    .row-press { transition: background 160ms ${EASE}, transform 200ms ${EASE}; }
-    .row-press:active:not(:disabled) { background: ${DS.paperDeep} !important; transform: scale(0.992); }
+    .row-press { transition: transform 200ms ${EASE}; }
+    .row-press:active:not(:disabled) { transform: scale(0.96); }
 
     .tick  { font-variant-numeric: tabular-nums; }
 

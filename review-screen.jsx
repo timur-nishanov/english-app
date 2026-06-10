@@ -68,10 +68,6 @@ function ReviewScreen({ onExit, onComplete }) {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
       <LessonTopBar pct={(idx / deck.length) * 100} onExit={onExit} label={`${idx + 1}/${deck.length}`} />
-      <div style={{ padding: '2px 20px 6px', display: 'flex', gap: 6 }}>
-        <Chip bg={DS.accentSoft} color={DS.accentDark} style={{ fontWeight: 600 }}>Flashcards</Chip>
-        <Chip>{knownCount} known</Chip>
-      </div>
 
       <div style={{ flex: 1, padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{
@@ -93,10 +89,6 @@ function ReviewScreen({ onExit, onComplete }) {
             <FlashFace back={true} card={card} n={idx + 1} />
           </div>
         </div>
-        <div style={{
-          textAlign: 'center', marginTop: 18,
-          fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1,
-        }}>Tap card to {flipped ? 'hide' : 'reveal'} the definition</div>
       </div>
 
       <div style={{ padding: '0 20px 10px' }}>
