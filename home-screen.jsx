@@ -13,7 +13,7 @@ const UNIT_META = {
   'conditionals-inversions': { icon: 'majesticons_arrow-up-circle.svg', label: 'Conditionals & Inversions' },
   'tenses':                  { icon: 'majesticons_timer.svg',           label: 'Tenses' },
   'reported-speech':         { icon: 'majesticons_comment-2-text.svg',  label: 'Reported speech' },
-  'verb-patterns':           { icon: 'majesticons_skull.svg',           label: 'Gerund, infinitive, causative' },
+  'verb-patterns':           { icon: 'majesticons_skull-1.svg',         label: 'Gerund, infinitive, causative' },
   'phrasal-verbs':           { icon: 'majesticons_hand.svg',            label: 'Phrasal Verbs (Get, take, put, go and more)' },
   'word-formation':          { icon: 'majesticons_bug-2.svg',           label: 'Prefixes, opposites, suffixes' },
   'words-phrases':           { icon: 'majesticons_chat-2.svg',          label: 'Words: see, memory, intentions and more' },
