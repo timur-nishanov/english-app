@@ -108,147 +108,56 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
           </svg>
         </button>
 
-        {/* Featured — vocabulary review */}
-        <button
-          onClick={onOpenReview}
-          className="tap anim-slide-u"
-          style={{
-            width: '100%', textAlign: 'left', cursor: 'pointer',
-            background: DS.ink, color: DS.paperCard,
-            borderRadius: 22, padding: '20px 20px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            fontFamily: DS.sans, border: 'none',
-            marginBottom: 10, boxShadow: DS.shadowMd,
-          }}>
-          <div style={{
-            width: 46, height: 46, borderRadius: 99,
-            background: 'rgba(255,255,255,0.12)', color: DS.paperCard,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <rect x="3" y="5" width="14" height="13" rx="2.5" stroke="white" strokeWidth="1.6"/>
-              <rect x="6" y="2.5" width="14" height="13" rx="2.5" stroke="white" strokeWidth="1.6" fill="#0E1013"/>
-            </svg>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontFamily: DS.display, fontSize: 19,
-              fontWeight: 600, letterSpacing: -0.4,
-            }}>Flashcard deck</div>
-            <div style={{ fontSize: 13, marginTop: 4, opacity: 0.7, letterSpacing: -0.1 }}>
-              {VOCAB_CARDS.length} words · tap to flip
-            </div>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 10 16">
-            <path d="M1 1l7 7-7 7" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          </svg>
-        </button>
-
-        {/* Vocabulary test */}
-        <button
-          onClick={onOpenVocabTest}
-          className="tap anim-slide-u"
-          style={{
-            width: '100%', textAlign: 'left', cursor: 'pointer',
-            background: DS.paperCard, color: DS.ink,
-            borderRadius: 22, padding: '20px 20px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            fontFamily: DS.sans, border: 'none',
-            marginBottom: 10, boxShadow: DS.shadowSm,
-          }}>
-          <div style={{
-            width: 46, height: 46, borderRadius: 99,
-            background: DS.accentSoft, color: DS.accentDark,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M4 4.5h14M4 11h14M4 17.5h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              <path d="M14.5 16.5l2 2 3.5-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontFamily: DS.display, fontSize: 19,
-              fontWeight: 600, letterSpacing: -0.4,
-            }}>Vocabulary test</div>
-            <div style={{ fontSize: 13, marginTop: 4, color: DS.ink3, letterSpacing: -0.1 }}>
-              10 questions · match the word
-            </div>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 10 16">
-            <path d="M1 1l7 7-7 7" stroke={DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          </svg>
-        </button>
-
-        {/* Weak spots — exercises the user has answered wrong and not yet mastered */}
-        <button
-          onClick={onOpenWeakSpots}
-          className="tap anim-slide-u"
-          style={{
-            width: '100%', textAlign: 'left', cursor: 'pointer',
-            background: (weakCount > 0) ? DS.wrongSoft : DS.paperCard, color: DS.ink,
-            borderRadius: 22, padding: '20px 20px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            fontFamily: DS.sans, border: 'none',
-            marginBottom: 10, boxShadow: DS.shadowSm,
-          }}>
-          <div style={{
-            width: 46, height: 46, borderRadius: 99,
-            background: (weakCount > 0) ? DS.wrong : DS.correctSoft,
-            color: (weakCount > 0) ? DS.paperCard : DS.correct,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-            fontSize: 22,
-          }}>{weakCount > 0 ? '!' : '✓'}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontFamily: DS.display, fontSize: 19,
-              fontWeight: 600, letterSpacing: -0.4,
-            }}>Weak spots</div>
-            <div style={{ fontSize: 13, marginTop: 4, color: (weakCount > 0) ? DS.wrongDark : DS.ink3, letterSpacing: -0.1 }}>
-              {weakCount > 0 ? `${weakCount} item${weakCount === 1 ? '' : 's'} to fix` : 'Nothing to review — well done'}
-            </div>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 10 16">
-            <path d="M1 1l7 7-7 7" stroke={(weakCount > 0) ? DS.wrongDark : DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          </svg>
-        </button>
-
-        {/* Quick practice — all exercises, live category & shuffle controls */}
-        <button
-          onClick={onOpenQuickTest}
-          className="tap anim-slide-u"
-          style={{
-            width: '100%', textAlign: 'left', cursor: 'pointer',
-            background: DS.paperCard, color: DS.ink,
-            borderRadius: 22, padding: '20px 20px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            fontFamily: DS.sans, border: 'none',
-            marginBottom: 26, boxShadow: DS.shadowSm,
-          }}>
-          <div style={{
-            width: 46, height: 46, borderRadius: 99,
-            background: DS.sageSoft, color: DS.ink,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <ShuffleIcon size={22} color={DS.ink} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontFamily: DS.display, fontSize: 19,
-              fontWeight: 600, letterSpacing: -0.4,
-            }}>Quick practice</div>
-            <div style={{ fontSize: 13, marginTop: 4, color: DS.ink3, letterSpacing: -0.1 }}>
-              Every exercise · filter & shuffle on the fly
-            </div>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 10 16">
-            <path d="M1 1l7 7-7 7" stroke={DS.ink3} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          </svg>
-        </button>
+        {/* Practice actions — compact 2×2 grid, Apple Store style */}
+        <div className="anim-slide-u" style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
+          marginBottom: 26, marginTop: 4,
+        }}>
+          <HomeAction
+            onClick={onOpenQuickTest}
+            title="Quick practice"
+            sub="Filter & shuffle"
+            icon={<ShuffleIcon size={18} color={DS.ink} />}
+            iconBg={DS.sageSoft}
+          />
+          <HomeAction
+            onClick={onOpenReview}
+            title="Flashcards"
+            sub={`${VOCAB_CARDS.length} words`}
+            iconBg={DS.paperDeep}
+            icon={
+              <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+                <rect x="3" y="5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6"/>
+                <rect x="6" y="2.5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6" fill={DS.paperCard}/>
+              </svg>
+            }
+          />
+          <HomeAction
+            onClick={onOpenVocabTest}
+            title="Vocabulary test"
+            sub="10 questions"
+            iconBg={DS.accentSoft}
+            icon={
+              <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+                <path d="M4 4.5h14M4 11h14M4 17.5h9" stroke={DS.accentDark} strokeWidth="1.8" strokeLinecap="round"/>
+                <path d="M14.5 16.5l2 2 3.5-4" stroke={DS.accentDark} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            }
+          />
+          <HomeAction
+            onClick={onOpenWeakSpots}
+            title="Weak spots"
+            sub={weakCount > 0 ? `${weakCount} to fix` : 'All clear'}
+            iconBg={weakCount > 0 ? DS.wrongSoft : DS.correctSoft}
+            icon={
+              <span style={{
+                fontSize: 16, fontWeight: 700,
+                color: weakCount > 0 ? DS.wrongDark : DS.correctDark,
+              }}>{weakCount > 0 ? '!' : '✓'}</span>
+            }
+            accent={weakCount > 0 ? DS.wrongDark : null}
+          />
+        </div>
 
         {/* Section header */}
         <div style={{
@@ -288,6 +197,37 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
         </div>
       </div>
     </div>
+  );
+}
+
+// Compact grid tile for the four practice actions
+function HomeAction({ onClick, title, sub, icon, iconBg, accent }) {
+  return (
+    <button onClick={onClick} className="tap"
+      style={{
+        textAlign: 'left', cursor: 'pointer',
+        background: DS.paperCard, color: DS.ink,
+        borderRadius: 20, padding: '16px 16px',
+        display: 'flex', flexDirection: 'column', gap: 12,
+        fontFamily: DS.sans, border: 'none',
+        boxShadow: DS.shadowSm,
+      }}>
+      <span style={{
+        width: 36, height: 36, borderRadius: 99,
+        background: iconBg || DS.paperDeep,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      }}>{icon}</span>
+      <span>
+        <span style={{
+          display: 'block', fontFamily: DS.display, fontSize: 15,
+          fontWeight: 600, letterSpacing: -0.3, lineHeight: 1.2,
+        }}>{title}</span>
+        <span style={{
+          display: 'block', fontSize: 12, marginTop: 3,
+          color: accent || DS.ink3, letterSpacing: -0.1,
+        }}>{sub}</span>
+      </span>
+    </button>
   );
 }
 
