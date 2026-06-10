@@ -12,9 +12,9 @@ const DS = {
   ink4:  '#B5BAC1',
   ink5:  '#DFE2E6',
 
-  // SURFACES — warm light cream like Family, white cards
-  paper:      '#F4F2EC',   // app canvas (warm cream)
-  paperDeep:  '#EBE8E0',   // hover / pressed rows
+  // SURFACES — Apple system grey (cool, not beige)
+  paper:      '#F5F5F7',   // app canvas (light grey)
+  paperDeep:  '#EAEAEC',   // hover / pressed rows
   paperCard:  '#FFFFFF',   // card / surface
   paperWhite: '#FFFFFF',
 
@@ -40,9 +40,9 @@ const DS = {
   streakSoft: '#FBE5D7',
 
   // Hairlines — very soft
-  line:       '#ECE9E1',
-  lineSoft:   '#F2EFE8',
-  lineDark:   '#DBD7CD',
+  line:       '#E5E5E7',
+  lineSoft:   '#EEEEF0',
+  lineDark:   '#D5D5D7',
 
   // Shadows — soft & soft-glassy
   shadowSm: '0 1px 2px rgba(14, 16, 19, 0.04)',
@@ -60,11 +60,11 @@ const DS = {
   ease: EASE,
   easeOut: EASE_OUT,
 
-  // type — SF Pro on Apple, Inter Tight everywhere else
-  display: `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Tight", "Inter", system-ui, sans-serif`,
-  sans:    `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Tight", "Inter", system-ui, sans-serif`,
+  // type — SF Pro Rounded on Apple, Nunito everywhere else
+  display: `ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, BlinkMacSystemFont, system-ui, sans-serif`,
+  sans:    `ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, BlinkMacSystemFont, system-ui, sans-serif`,
   mono:    `ui-monospace, "SF Mono", Menlo, "JetBrains Mono", monospace`,
-  // alias kept for compat — points to the same sans family (no italic serif anywhere)
+  // alias kept for compat — points to the same rounded family
   get serif() { return this.display; },
 };
 

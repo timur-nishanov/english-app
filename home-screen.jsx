@@ -1,28 +1,17 @@
 // ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
 
-function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenReview, onOpenVocabTest, onOpenQuickTest, onOpenWeakSpots, onOpenProfile, onOpenDaily }) {
+function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, onOpenQuickTest, onOpenWeakSpots, onOpenProfile }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
 
-  const dailyTotal = (daily && daily.exercises ? daily.exercises.length : 5);
-  const dailyDone = daily ? (daily.doneIndex || 0) : 0;
-  const dailyCompleted = !!(daily && daily.completed);
-  const dailyTitle = dailyCompleted ? 'Done today ✓' : `${dailyTotal} quick exercises`;
-  const dailySub = dailyCompleted
-    ? 'Come back tomorrow for a new set'
-    : (dailyDone > 0 ? `${dailyDone}/${dailyTotal} done · keep going` : 'Mix of everything you’ve learned');
-
   return (
     <div style={{
-      height: '100%', display: 'flex', flexDirection: 'column',
+      height: '100%', overflow: 'auto',
       background: DS.paper, color: DS.ink, fontFamily: DS.sans,
     }}>
-      {/* Top header */}
-      <div style={{
-        padding: `${DS.topSafe}px 20px 12px`,
-        background: DS.paper,
-      }}>
+      <div style={{ padding: `${DS.topSafe}px 20px 30px` }}>
+        {/* Header — scrolls with the content */}
         <div className="anim-fade" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 18,
@@ -43,7 +32,7 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
               </svg>
             </span>
             <span className="tick" style={{
-              fontSize: 14, color: DS.ink, fontWeight: 600, letterSpacing: -0.2,
+              fontSize: 14, color: DS.ink, fontWeight: 600, letterSpacing: -0.1,
             }}>{streak} day streak</span>
           </div>
           <button onClick={onOpenProfile} className="tap" style={{
@@ -51,67 +40,26 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
             width: 38, height: 38, borderRadius: 99,
             color: DS.paperCard, cursor: 'pointer',
             fontFamily: DS.display, fontWeight: 600, fontSize: 15,
-            letterSpacing: -0.2,
+            letterSpacing: -0.1,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>A</button>
+          }}>T</button>
         </div>
 
         <div className="anim-fade">
           <h1 style={{
-            fontFamily: DS.display, fontSize: 34, fontWeight: 700,
-            margin: 0, letterSpacing: -1.1, color: DS.ink, lineHeight: 1.05,
-          }}>Hey, Aleksey 👋</h1>
+            fontFamily: DS.display, fontSize: 32, fontWeight: 700,
+            margin: 0, letterSpacing: -0.6, color: DS.ink, lineHeight: 1.1,
+          }}>Hey, Timur 👋</h1>
           <div style={{
             fontSize: 15, color: DS.ink3, marginTop: 6,
-            fontWeight: 400, letterSpacing: -0.1, lineHeight: 1.4,
+            fontWeight: 400, letterSpacing: 0, lineHeight: 1.4,
           }}>Pick up where you left off — {overallPct}% of the way through.</div>
         </div>
-      </div>
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '14px 20px 30px' }}>
-
-        {/* Daily mix — 5 random exercises, generated once a day */}
-        <button
-          onClick={onOpenDaily}
-          className="tap anim-slide-u"
-          style={{
-            width: '100%', textAlign: 'left', cursor: 'pointer',
-            background: DS.accent, color: DS.paperCard,
-            borderRadius: 22, padding: '20px 20px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            fontFamily: DS.sans, border: 'none',
-            marginBottom: 12, boxShadow: DS.shadowMd,
-          }}>
-          <div style={{
-            width: 46, height: 46, borderRadius: 99,
-            background: 'rgba(255,255,255,0.16)', color: DS.paperCard,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <ShuffleIcon size={22} color="white" />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-              opacity: 0.7, marginBottom: 2,
-            }}>Daily mix</div>
-            <div style={{
-              fontFamily: DS.display, fontSize: 19,
-              fontWeight: 600, letterSpacing: -0.4,
-            }}>{dailyTitle}</div>
-            <div style={{ fontSize: 13, marginTop: 3, opacity: 0.8, letterSpacing: -0.1 }}>
-              {dailySub}
-            </div>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 10 16">
-            <path d="M1 1l7 7-7 7" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-          </svg>
-        </button>
-
-        {/* Practice actions — compact 2×2 grid, Apple Store style */}
+        {/* Practice actions — 2×2 grid, Apple Store style */}
         <div className="anim-slide-u" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
-          marginBottom: 26, marginTop: 4,
+          marginBottom: 28, marginTop: 22,
         }}>
           <HomeAction
             onClick={onOpenQuickTest}
@@ -129,18 +77,6 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
               <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
                 <rect x="3" y="5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6"/>
                 <rect x="6" y="2.5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6" fill={DS.paperCard}/>
-              </svg>
-            }
-          />
-          <HomeAction
-            onClick={onOpenVocabTest}
-            title="Vocabulary test"
-            sub="10 questions"
-            iconBg={DS.accentSoft}
-            icon={
-              <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                <path d="M4 4.5h14M4 11h14M4 17.5h9" stroke={DS.accentDark} strokeWidth="1.8" strokeLinecap="round"/>
-                <path d="M14.5 16.5l2 2 3.5-4" stroke={DS.accentDark} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             }
           />
@@ -166,10 +102,10 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
         }}>
           <h2 style={{
             fontFamily: DS.display, fontSize: 22, fontWeight: 700,
-            margin: 0, letterSpacing: -0.6, color: DS.ink,
+            margin: 0, letterSpacing: -0.3, color: DS.ink,
           }}>Your units</h2>
           <span className="tick" style={{
-            fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1,
+            fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: 0,
           }}>{doneLessons}/{totalLessons} done</span>
         </div>
 
@@ -191,7 +127,7 @@ function HomeScreen({ progress, streak, daily, weakCount, onPickLesson, onOpenRe
         <div style={{
           marginTop: 28, padding: '0 8px',
           textAlign: 'center',
-          fontSize: 13, color: DS.ink4, letterSpacing: -0.1,
+          fontSize: 13, color: DS.ink4, letterSpacing: 0,
         }}>
           A little every day.
         </div>
