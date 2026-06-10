@@ -1,4 +1,7 @@
-// ─── HOME SCREEN — Family-style: clean rounded cards, bold sans ──
+// ─── HOME SCREEN — white canvas, accent hero, settings-style units ──
+// Layout after the Joi reference: one bright hero banner (Quick practice),
+// two quiet grey cards under it, then the units as a settings list with
+// grey monochrome icons and chevrons. Everything scrolls together.
 
 function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, onOpenQuickTest, onOpenWeakSpots, onOpenProfile }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
@@ -8,7 +11,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   return (
     <div style={{
       height: '100%', overflow: 'auto',
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      background: '#FFFFFF', color: DS.ink, fontFamily: DS.sans,
     }}>
       <div style={{ padding: `${DS.topSafe}px 20px 30px` }}>
         {/* Header — scrolls with the content */}
@@ -18,8 +21,8 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: DS.paperCard, padding: '7px 12px 7px 9px',
-            borderRadius: 999, border: `1px solid ${DS.line}`,
+            background: DS.paper, padding: '7px 12px 7px 9px',
+            borderRadius: 999, border: 'none',
           }}>
             <span style={{
               width: 18, height: 18, borderRadius: 99,
@@ -56,27 +59,63 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
           }}>Pick up where you left off — {overallPct}% of the way through.</div>
         </div>
 
-        {/* Practice actions — 2×2 grid, Apple Store style */}
+        {/* Hero — Quick practice, bright accent banner */}
+        <button
+          onClick={onOpenQuickTest}
+          className="tap anim-slide-u"
+          style={{
+            width: '100%', textAlign: 'left', cursor: 'pointer',
+            background: 'linear-gradient(135deg, #3D9BFF 0%, #2D6BFF 100%)',
+            color: '#FFFFFF',
+            borderRadius: 24, padding: '18px 18px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            fontFamily: DS.sans, border: 'none',
+            marginTop: 22, marginBottom: 12,
+            boxShadow: '0 8px 24px rgba(45, 107, 255, 0.25)',
+          }}>
+          <div style={{
+            width: 46, height: 46, borderRadius: 99,
+            background: 'rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <ShuffleIcon size={22} color="white" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              fontFamily: DS.display, fontSize: 18,
+              fontWeight: 700, letterSpacing: -0.3,
+            }}>Quick practice</div>
+            <div style={{ fontSize: 13, marginTop: 2, opacity: 0.85, letterSpacing: 0 }}>
+              Every exercise · filter & shuffle
+            </div>
+          </div>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,255,255,0.22)', color: '#FFFFFF',
+            padding: '9px 14px', borderRadius: 999, flexShrink: 0,
+            fontSize: 14, fontWeight: 700, letterSpacing: -0.1,
+          }}>
+            Start
+            <svg width="11" height="11" viewBox="0 0 10 16">
+              <path d="M1 1l7 7-7 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            </svg>
+          </span>
+        </button>
+
+        {/* Secondary cards — quiet grey */}
         <div className="anim-slide-u" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
-          marginBottom: 28, marginTop: 22,
+          marginBottom: 30,
         }}>
-          <HomeAction
-            onClick={onOpenQuickTest}
-            title="Quick practice"
-            sub="Filter & shuffle"
-            icon={<ShuffleIcon size={18} color={DS.ink} />}
-            iconBg={DS.sageSoft}
-          />
           <HomeAction
             onClick={onOpenReview}
             title="Flashcards"
             sub={`${VOCAB_CARDS.length} words`}
-            iconBg={DS.paperDeep}
             icon={
               <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                <rect x="3" y="5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6"/>
-                <rect x="6" y="2.5" width="14" height="13" rx="2.5" stroke={DS.ink} strokeWidth="1.6" fill={DS.paperCard}/>
+                <rect x="3" y="5" width="14" height="13" rx="2.5" stroke={DS.ink2} strokeWidth="1.6"/>
+                <rect x="6" y="2.5" width="14" height="13" rx="2.5" stroke={DS.ink2} strokeWidth="1.6" fill={DS.paper}/>
               </svg>
             }
           />
@@ -84,7 +123,6 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
             onClick={onOpenWeakSpots}
             title="Weak spots"
             sub={weakCount > 0 ? `${weakCount} to fix` : 'All clear'}
-            iconBg={weakCount > 0 ? DS.wrongSoft : DS.correctSoft}
             icon={
               <span style={{
                 fontSize: 16, fontWeight: 700,
@@ -98,7 +136,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         {/* Section header */}
         <div style={{
           display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-          marginBottom: 10, padding: '0 2px',
+          marginBottom: 4, padding: '0 2px',
         }}>
           <h2 style={{
             fontFamily: DS.display, fontSize: 22, fontWeight: 700,
@@ -109,16 +147,15 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
           }}>{doneLessons}/{totalLessons} done</span>
         </div>
 
-        {/* Topic list — clean cards */}
-        <div className="stagger" style={{
-          display: 'flex', flexDirection: 'column', gap: 8,
-        }}>
+        {/* Units — settings-style list: grey icon, title, chevron */}
+        <div className="stagger">
           {TOPICS.map((topic, i) => (
             <TopicRow
               key={topic.id}
               topic={topic}
               progress={progress[topic.id] || 0}
               totalLessons={topic.lessons}
+              isLast={i === TOPICS.length - 1}
               onClick={() => onPickLesson(topic)}
             />
           ))}
@@ -136,38 +173,38 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   );
 }
 
-// Compact grid tile for the four practice actions
-function HomeAction({ onClick, title, sub, icon, iconBg, accent }) {
+// Quiet grey tile for secondary actions (Joi settings style)
+function HomeAction({ onClick, title, sub, icon, accent }) {
   return (
     <button onClick={onClick} className="tap"
       style={{
         textAlign: 'left', cursor: 'pointer',
-        background: DS.paperCard, color: DS.ink,
+        background: DS.paper, color: DS.ink,
         borderRadius: 20, padding: '16px 16px',
         display: 'flex', flexDirection: 'column', gap: 12,
         fontFamily: DS.sans, border: 'none',
-        boxShadow: DS.shadowSm,
       }}>
       <span style={{
         width: 36, height: 36, borderRadius: 99,
-        background: iconBg || DS.paperDeep,
+        background: '#FFFFFF',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       }}>{icon}</span>
       <span>
         <span style={{
           display: 'block', fontFamily: DS.display, fontSize: 15,
-          fontWeight: 600, letterSpacing: -0.3, lineHeight: 1.2,
+          fontWeight: 600, letterSpacing: -0.2, lineHeight: 1.2,
         }}>{title}</span>
         <span style={{
           display: 'block', fontSize: 12, marginTop: 3,
-          color: accent || DS.ink3, letterSpacing: -0.1,
+          color: accent || DS.ink3, letterSpacing: 0,
         }}>{sub}</span>
       </span>
     </button>
   );
 }
 
-// Soft pastel color per unit — derived from the mark letter
+// Soft pastel color per unit — still used by CategoryScreen, lesson chips
+// and Quick practice category pills (not by the home list anymore).
 const UNIT_COLORS = {
   'idioms-expressions':      { bg: '#FFE8DC', fg: '#B5683F' },
   'work-money':             { bg: '#E2F4EA', fg: '#147542' },
@@ -182,32 +219,32 @@ const UNIT_COLORS = {
   'words-phrases':          { bg: '#FFE6F0', fg: '#A6336F' },
 };
 
-function TopicRow({ topic, progress, totalLessons, onClick }) {
+// Settings-style row: grey rounded-square icon, title + subtitle, chevron
+function TopicRow({ topic, progress, totalLessons, isLast, onClick }) {
   const done = Math.floor(progress * totalLessons);
   const isComplete = done >= totalLessons;
-  const c = UNIT_COLORS[topic.id] || { bg: DS.paperDeep, fg: DS.ink };
 
   return (
     <button
       onClick={onClick}
       className="row-press"
       style={{
-        width: '100%', border: 'none', padding: '14px 14px',
+        width: '100%', border: 'none', padding: '13px 2px',
         cursor: 'pointer',
-        background: DS.paperCard,
-        borderRadius: 18,
+        background: 'transparent',
         fontFamily: DS.sans,
         textAlign: 'left',
         display: 'flex', alignItems: 'center', gap: 14,
-        boxShadow: DS.shadowSm,
+        borderBottom: isLast ? 'none' : `1px solid ${DS.lineSoft}`,
+        borderRadius: 0,
       }}>
-      {/* Big square pastel mark */}
+      {/* Grey monochrome mark */}
       <div style={{
-        width: 48, height: 48, flexShrink: 0,
-        background: c.bg,
-        color: c.fg,
-        borderRadius: 14,
-        fontFamily: DS.display, fontWeight: 700, fontSize: 22, letterSpacing: -0.5,
+        width: 38, height: 38, flexShrink: 0,
+        background: DS.paper,
+        color: DS.ink3,
+        borderRadius: 11,
+        fontFamily: DS.display, fontWeight: 700, fontSize: 16, letterSpacing: -0.3,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
       }}>
@@ -215,11 +252,11 @@ function TopicRow({ topic, progress, totalLessons, onClick }) {
         {isComplete && (
           <div style={{
             position: 'absolute', bottom: -3, right: -3,
-            width: 18, height: 18, borderRadius: 99,
-            background: DS.correct, color: DS.paperCard,
-            fontSize: 10, fontWeight: 700,
+            width: 16, height: 16, borderRadius: 99,
+            background: DS.correct, color: '#FFFFFF',
+            fontSize: 9, fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: `2px solid ${DS.paperCard}`,
+            border: '2px solid #FFFFFF',
           }}>✓</div>
         )}
       </div>
@@ -228,17 +265,16 @@ function TopicRow({ topic, progress, totalLessons, onClick }) {
         <div style={{
           fontFamily: DS.display,
           fontSize: 16, fontWeight: 600, color: DS.ink,
-          letterSpacing: -0.3, lineHeight: 1.2,
+          letterSpacing: -0.2, lineHeight: 1.2,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{topic.title}</div>
         <div style={{
-          fontSize: 13, color: DS.ink3, marginTop: 3, fontWeight: 400, letterSpacing: -0.1,
+          fontSize: 13, color: DS.ink3, marginTop: 2, fontWeight: 400, letterSpacing: 0,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>{topic.subtitle}</div>
       </div>
 
-      {/* Right: chevron — status is conveyed by the mark badge */}
-      <svg width="10" height="14" viewBox="0 0 10 16" style={{ flexShrink: 0 }}>
+      <svg width="9" height="14" viewBox="0 0 10 16" style={{ flexShrink: 0 }}>
         <path d="M1 1l7 7-7 7" stroke={DS.ink4} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
       </svg>
     </button>
