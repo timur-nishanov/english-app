@@ -60,12 +60,11 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
       <button key={m} onClick={() => setMode(m)} className="tap"
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+          padding: '8px 12px', borderRadius: 999, cursor: 'pointer',
           fontFamily: DS.sans, fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
-          background: on ? c.bg : DS.paperCard,
+          background: on ? c.bg : 'transparent',
           color: on ? c.fg : DS.ink3,
-          border: `1.5px solid ${on ? c.fg : 'transparent'}`,
-          boxShadow: on ? 'none' : DS.shadowSm,
+          border: 'none',
         }}>
         {modeIcon(m)}
         {modeLabels[m]}
@@ -105,22 +104,14 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
               <button key={t} onClick={() => toggleTag(t)} className="tap"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+                  padding: '8px 12px', borderRadius: 999, cursor: 'pointer',
                   fontFamily: DS.sans, fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
-                  background: on ? c.bg : DS.paperCard,
+                  background: on ? c.bg : 'transparent',
                   color: on ? c.fg : DS.ink3,
-                  border: `1.5px solid ${on ? c.fg : 'transparent'}`,
-                  boxShadow: on ? 'none' : DS.shadowSm,
+                  border: 'none',
                 }}>
-                <span style={{
-                  width: 16, height: 16, borderRadius: 99, flexShrink: 0,
-                  background: on ? c.fg : 'transparent',
-                  border: `1.5px solid ${on ? c.fg : DS.ink5}`,
-                  color: c.bg, fontSize: 10, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>{on ? '✓' : ''}</span>
                 {t}
-                <span style={{ opacity: 0.6, fontWeight: 500 }}>{tagCounts[t]}</span>
+                <span style={{ opacity: 0.55, fontWeight: 500 }}>{tagCounts[t]}</span>
               </button>
             );
           })}

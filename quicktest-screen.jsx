@@ -179,12 +179,36 @@ function QuickTestScreen({ onExit, onComplete }) {
 
   const pct = totalActive ? (doneCount / totalActive) * 100 : 0;
 
-  return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
-      <LessonTopBar pct={pct} onExit={onExit} label={`${doneCount}/${totalActive || 0}`} />
+  // Compact mode toggle that lives in the top bar — single icon button
+  // that cycles Mix → Production → Recognition → Mix, with a label.
+  const modeMeta = {
+    mix:         { label: 'Mix', icon: <span style={{ fontSize: 11, lineHeight: 1 }}>⚡</span> },
+    production:  { label: 'Prod', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+    recognition: { label: 'Rec',  icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/></svg> },
+  };
+  const cycleMode = () => setMode(m => m === 'mix' ? 'production' : m === 'production' ? 'recognition' : 'mix');
+  const modeOn = mode !== 'mix';
+  const modePill = (
+    <button onClick={cycleMode} className="tap"
+      aria-label={`Mode: ${modeMeta[mode].label} — tap to change`}
+      style={{
+        flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
+        padding: '6px 10px', borderRadius: 999, cursor: 'pointer',
+        border: 'none', background: modeOn ? DS.ink : 'transparent',
+        color: modeOn ? DS.paperCard : DS.ink3,
+        fontFamily: DS.sans, fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
+      }}>
+      {modeMeta[mode].icon}
+      {modeMeta[mode].label}
+    </button>
+  );
 
-      {/* Always-visible category chips + expander */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '2px 16px 10px', background: DS.paper }}>
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans, position: 'relative' }}>
+      <LessonTopBar pct={pct} onExit={onExit} label={`${doneCount}/${totalActive || 0}`} trailing={modePill} />
+
+      {/* Single row of flat category chips + expander */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, padding: '2px 16px 14px', background: DS.paper }}>
         <div style={{
           flex: 1, minWidth: 0, display: 'flex', gap: 6,
           flexWrap: tagsOpen ? 'wrap' : 'nowrap',
@@ -197,13 +221,12 @@ function QuickTestScreen({ onExit, onComplete }) {
               <button key={u.id} onClick={() => toggleUnit(u.id)} className="tap"
                 style={{
                   flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
-                  padding: '7px 10px', borderRadius: 999, cursor: 'pointer',
-                  border: `1.5px solid ${on ? 'transparent' : DS.line}`,
+                  padding: '6px 10px', borderRadius: 999, cursor: 'pointer',
+                  border: 'none',
                   fontFamily: DS.sans, fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
-                  background: on ? u.color.bg : DS.paperCard,
+                  background: on ? u.color.bg : 'transparent',
                   color: on ? u.color.fg : DS.ink4,
-                  opacity: on ? 1 : 0.7,
-                  transition: `all 180ms ${DS.ease}`,
+                  transition: `background 180ms ${DS.ease}, color 180ms ${DS.ease}`,
                 }}>
                 {u.short}
                 <span style={{ opacity: 0.55, fontWeight: 500 }}>{cnt}</span>
@@ -215,7 +238,7 @@ function QuickTestScreen({ onExit, onComplete }) {
           aria-label={tagsOpen ? 'Collapse categories' : 'Show all categories'}
           style={{
             flexShrink: 0, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
-            padding: '7px 11px', borderRadius: 999, cursor: 'pointer',
+            padding: '6px 10px', borderRadius: 999, cursor: 'pointer',
             border: 'none', background: DS.ink, color: DS.paperCard,
             fontFamily: DS.sans, fontSize: 12, fontWeight: 700, letterSpacing: -0.1,
           }}>
@@ -223,33 +246,8 @@ function QuickTestScreen({ onExit, onComplete }) {
         </button>
       </div>
 
-      {/* Mode segmented control */}
-      <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px', background: DS.paper }}>
-        {[
-          { id: 'mix',         label: 'Mix',         icon: <span style={{ fontSize: 12 }}>⚡</span> },
-          { id: 'production',  label: 'Production',  icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
-          { id: 'recognition', label: 'Recognition', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/></svg> },
-        ].map(opt => {
-          const on = mode === opt.id;
-          return (
-            <button key={opt.id} onClick={() => setMode(opt.id)} className="tap"
-              style={{
-                flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                padding: '7px 8px', borderRadius: 10, cursor: 'pointer',
-                border: 'none',
-                background: on ? DS.ink : DS.paperCard, color: on ? DS.paperCard : DS.ink3,
-                boxShadow: on ? 'none' : DS.shadowSm,
-                fontFamily: DS.sans, fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
-              }}>
-              {opt.icon}
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
-
       {active ? (
-        <div key={active.id} className="anim-slide-r" style={{ flex: 1, overflow: 'auto', padding: '8px 20px 20px' }}>
+        <div key={active.id} className="anim-slide-r" style={{ flex: 1, overflow: 'auto', padding: '4px 20px 20px' }}>
           <ExerciseView
             ex={active.ex}
             topic={units.find(u => u.id === active.unitId).topic}
@@ -266,19 +264,31 @@ function QuickTestScreen({ onExit, onComplete }) {
           <div style={{
             fontFamily: DS.display, fontSize: 20, fontWeight: 700,
             color: DS.ink, letterSpacing: -0.5, marginBottom: 6,
-          }}>No categories selected</div>
+          }}>Nothing to practise here</div>
           <div style={{ fontSize: 14, letterSpacing: -0.1, lineHeight: 1.4 }}>
-            Turn on a category tag above to keep practising.
+            Turn on a category, change the mode, or shuffle the deck.
           </div>
         </div>
       )}
 
       {active && answered && <FeedbackBar answered={answered} ex={active.ex} onContinue={handleContinue} />}
 
-      {active && !answered && (
-        <div style={{ padding: '8px 20px 24px', background: DS.paper }}>
-          <ShuffleButton onClick={doShuffle} />
-        </div>
+      {/* Floating Shuffle pill — sits above content, doesn't take a full row */}
+      {!answered && (
+        <button onClick={doShuffle} className="tap"
+          aria-label="Shuffle"
+          style={{
+            position: 'absolute', bottom: 20, right: 20, zIndex: 5,
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '12px 16px 12px 14px', borderRadius: 999,
+            border: 'none', cursor: 'pointer',
+            background: DS.ink, color: DS.paperCard,
+            fontFamily: DS.sans, fontSize: 14, fontWeight: 600, letterSpacing: -0.1,
+            boxShadow: DS.shadowLg,
+          }}>
+          <ShuffleIcon size={16} color="currentColor" strokeWidth={2.2} />
+          Shuffle
+        </button>
       )}
     </div>
   );
