@@ -201,7 +201,7 @@ function ProgressBar({ pct, color = DS.ink, height = 6, bg = DS.ink5, style }) {
   );
 }
 
-function LessonTopBar({ pct, onExit, label }) {
+function LessonTopBar({ pct, onExit, label, trailing }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 14,
@@ -221,6 +221,7 @@ function LessonTopBar({ pct, onExit, label }) {
       {label && (
         <span className="tick" style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1 }}>{label}</span>
       )}
+      {trailing}
     </div>
   );
 }
