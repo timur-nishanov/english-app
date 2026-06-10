@@ -153,7 +153,7 @@ const APP_VERSION = 4;
 // production siblings. The pool is then rebalanced to ≥80 % production.
 
 const PRODUCTION_TYPES = new Set([
-  'gaptype', 'type', 'bank', 'cloze', 'transform', 'replace', 'bankgroup',
+  'gaptype', 'type', 'bank', 'cloze', 'transform', 'replace', 'bankgroup', 'extraword',
 ]);
 
 function isProduction(ex) {
@@ -489,8 +489,6 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
   const activity = state.activity || {};
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((state.progress[t.id] || 0) * t.lessons), 0);
-  const totalProgress = doneLessons / totalLessons;
-  const completedUnits = TOPICS.filter(t => (state.progress[t.id] || 0) >= 1).length;
 
   const totals = activityTotals(activity);
   const accuracy = totals.exercises ? Math.round((totals.correct / totals.exercises) * 100) : 0;
@@ -541,11 +539,8 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
       <div style={{ flex: 1, overflow: 'auto', padding: '8px 20px 30px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 22 }}>
           <StatBlock label="Day streak" value={streak} />
-          <StatBlock label="Overall" value={`${Math.round(totalProgress * 100)}%`} />
-          <StatBlock label="Lessons done" value={`${doneLessons}/${totalLessons}`} />
-          <StatBlock label="Units done" value={`${completedUnits}/${TOPICS.length}`} />
           <StatBlock label="Accuracy" value={totals.exercises ? `${accuracy}%` : '—'} />
-          <StatBlock label="Words reviewed" value={totals.cards} />
+          <StatBlock label="Lessons done" value={`${doneLessons}/${totalLessons}`} />
           <StatBlock label="Weak spots" value={weakCount || 0} />
         </div>
 
