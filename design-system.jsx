@@ -12,10 +12,12 @@ const DS = {
   ink4:  '#B5BAC1',
   ink5:  '#DFE2E6',
 
-  // SURFACES — grey canvas, white cards (Figma mockup)
-  paper:      '#E9E9E9',   // app canvas (grey)
-  paperDeep:  '#DDDDDD',   // hover / pressed rows
-  paperCard:  '#FFFFFF',   // card / surface (white)
+  // SURFACES — white canvas, grey cards on practice/flashcard screens.
+  // Home overrides these with its own hardcoded colours (grey canvas,
+  // white sheet) to match the Figma mockup.
+  paper:      '#FFFFFF',   // app canvas (white)
+  paperDeep:  '#E2E2E4',   // hover / pressed rows
+  paperCard:  '#F5F5F7',   // card / surface (light grey)
   paperWhite: '#FFFFFF',
 
   // ACCENT — iOS-style soft blue (single primary color)
@@ -40,8 +42,8 @@ const DS = {
   streakSoft: '#FBE5D7',
 
   // Hairlines — very soft
-  line:       '#E9E9E9',
-  lineSoft:   '#F0F0F0',
+  line:       '#E5E5E7',
+  lineSoft:   '#EEEEF0',
   lineDark:   '#D5D5D7',
 
   // Shadows — flat look: grey fills carry the hierarchy, not shadows.

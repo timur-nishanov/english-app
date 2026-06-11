@@ -3,6 +3,13 @@
 // then a white sheet with rounded top corners holding the unit list
 // (24px majesticons icon + label, dashed separators). Everything
 // scrolls together — nothing is pinned.
+//
+// Home is the only screen on the grey-canvas / white-cards pairing;
+// it hardcodes its surfaces here so the global DS.paper / DS.paperCard
+// can stay on the inverted scheme used by practice and flashcard
+// screens.
+const HOME_CANVAS = '#E9E9E9';
+const HOME_SURFACE = '#FFFFFF';
 
 // icon file + display label per unit (matches the mockup)
 const UNIT_META = {
@@ -27,7 +34,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   return (
     <div style={{
       height: '100%', overflow: 'auto',
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      background: HOME_CANVAS, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
       {/* Top — header, greeting, CTA row */}
@@ -72,7 +79,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
               fontFamily: DS.display, fontSize: 32, fontWeight: 700,
               margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: 0,
             }}>Hey, Timur</h1>
-            <img src="icons/majesticons_shooting-star.svg" alt="" width="28" height="28" />
+            <img src="icons/majesticons_star.svg" alt="" width="28" height="28" />
           </div>
           <p style={{
             fontSize: 16, color: DS.ink3, margin: 0,
@@ -94,7 +101,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
 
       {/* White sheet with the unit list */}
       <div className="anim-slide-u" style={{
-        background: DS.paperCard,
+        background: HOME_SURFACE,
         borderTopLeftRadius: 32, borderTopRightRadius: 32,
         paddingTop: 8, width: '100%', flex: 1,
       }}>
@@ -137,7 +144,7 @@ function CtaButton({ onClick, icon, label }) {
     <button onClick={onClick} className="tap"
       style={{
         flex: 1, minWidth: 0, cursor: 'pointer',
-        background: DS.paperCard, color: DS.ink,
+        background: HOME_SURFACE, color: DS.ink,
         border: 'none', borderRadius: 20,
         padding: '14px 8px 12px',
         display: 'flex', flexDirection: 'column', gap: 4,
