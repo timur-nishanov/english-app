@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#E9E9E9">
+<meta name="theme-color" content="#FFFFFF">
 <title>English Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
 
   /* On phones, fill the whole screen instead of showing the device mockup */
   @media (max-width: 600px), (pointer: coarse) {
-    html, body { overflow: hidden; background: #E9E9E9; }
+    html, body { overflow: hidden; background: #FFFFFF; }
     #app-stage { padding: 0; gap: 0; width: 100%; }
   }
 </style>
@@ -302,6 +302,14 @@ function App() {
 
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
+    // Match the safe-area tint to the current screen so there's no
+    // visible band where the iOS status bar / home indicator meets the
+    // canvas. Home is the only screen on a grey canvas; everything else
+    // is white.
+    const tint = screen.name === 'home' ? '#E9E9E9' : '#FFFFFF';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', tint);
+    document.body.style.background = tint;
   }, [screen]);
   React.useEffect(() => {
     localStorage.setItem('engapp-state', JSON.stringify(state));

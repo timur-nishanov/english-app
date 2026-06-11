@@ -34,6 +34,7 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   return (
     <div style={{
       height: '100%', overflow: 'auto',
+      overscrollBehavior: 'contain',
       background: HOME_CANVAS, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
