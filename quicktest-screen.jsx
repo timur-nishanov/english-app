@@ -155,7 +155,7 @@ function QuickTestScreen({ onExit, onComplete }) {
 
   // Compact mode toggle in the top bar — cycles Mix → Production → Recognition.
   const modeMeta = {
-    mix:         { label: 'Mix', icon: <span style={{ fontSize: 11, lineHeight: 1 }}>⚡</span> },
+    mix:         { label: 'Mix', icon: <BoltIcon size={12} /> },
     production:  { label: 'Prod', icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
     recognition: { label: 'Rec',  icon: <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/></svg> },
   };

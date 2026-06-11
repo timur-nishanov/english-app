@@ -277,6 +277,43 @@ function Mark({ letter, color = DS.ink, bg = DS.paperCard, size = 44, border = D
   );
 }
 
+// Crisp check / cross marks — used instead of text glyphs everywhere
+function CheckIcon({ size = 12, color = 'currentColor', strokeWidth = 2.4 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M2.5 7.5l3 3 6-7" stroke={color} strokeWidth={strokeWidth}
+        strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function CrossIcon({ size = 12, color = 'currentColor', strokeWidth = 2.4 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke={color} strokeWidth={strokeWidth}
+        strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function BoltIcon({ size = 13, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M7.8 1.2L2.8 8h3.4l-.9 4.8 5-6.8H6.9l.9-4.8z"
+        fill={color} stroke={color} strokeWidth="0.6" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ size = 14, color = 'currentColor', strokeWidth = 2 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+      <path d="M5 3l4 4-4 4" stroke={color} strokeWidth={strokeWidth}
+        strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 // Clean shuffle icon (Feather-style) — two crossing arrows
 function ShuffleIcon({ size = 22, color = 'currentColor', strokeWidth = 2 }) {
   return (
@@ -328,6 +365,10 @@ window.Divider = Divider;
 window.Tick = Tick;
 window.Mark = Mark;
 window.ShuffleIcon = ShuffleIcon;
+window.CheckIcon = CheckIcon;
+window.CrossIcon = CrossIcon;
+window.BoltIcon = BoltIcon;
+window.ChevronRightIcon = ChevronRightIcon;
 window.ShuffleButton = ShuffleButton;
 window.shuffleArray = shuffleArray;
 window.BigButton = PrimaryButton;
