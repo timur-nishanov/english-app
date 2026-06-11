@@ -104,7 +104,13 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
       <div className="anim-slide-u" style={{
         background: HOME_SURFACE,
         borderTopLeftRadius: 32, borderTopRightRadius: 32,
-        paddingTop: 8, width: '100%', flex: 1,
+        paddingTop: 8,
+        // Long padding-bottom so the sheet always extends past the
+        // bottom of the viewport, even on overscroll. Removes the grey
+        // band that used to peek out under the last unit.
+        paddingBottom: 'calc(240px + env(safe-area-inset-bottom, 0px))',
+        width: '100%', flex: 1,
+        minHeight: 480,
       }}>
         {TOPICS.map((topic, i) => {
           const meta = UNIT_META[topic.id] || { icon: 'majesticons_skull.svg', label: topic.title };
