@@ -208,7 +208,11 @@ function LessonTopBar({ pct, onExit, label, trailing }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 14,
-      padding: `${IOS_TOP_SAFE}px 20px 14px`,
+      // Cover the iOS status-bar safe-area with the bar's own white
+      // background so the top edge can't peek through as grey when the
+      // dynamic theme-color update is throttled by Safari.
+      paddingTop: `max(${IOS_TOP_SAFE}px, env(safe-area-inset-top, 60px))`,
+      paddingRight: 20, paddingBottom: 14, paddingLeft: 20,
       background: DS.paper,
     }}>
       <button onClick={onExit} className="tap" style={{
