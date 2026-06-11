@@ -302,14 +302,11 @@ function App() {
 
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
-    // Match the safe-area tint to the current screen so there's no
-    // visible band where the iOS status bar / home indicator meets the
-    // canvas. Home is the only screen on a grey canvas; everything else
-    // is white.
-    const tint = screen.name === 'home' ? '#E9E9E9' : '#FFFFFF';
+    // Every screen sits on the same white canvas now, so the safe-area
+    // tint never has to change — set it once and forget the banding.
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', tint);
-    document.body.style.background = tint;
+    if (meta) meta.setAttribute('content', '#FFFFFF');
+    document.body.style.background = '#FFFFFF';
   }, [screen]);
   React.useEffect(() => {
     localStorage.setItem('engapp-state', JSON.stringify(state));

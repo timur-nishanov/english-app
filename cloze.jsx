@@ -37,8 +37,8 @@ function ClozeBlank({ n, value, status, active, onClick }) {
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
       }}>
       {filled ? value : `{${n}}`}
-      {status === 'right' && <span style={{ fontSize: 11, opacity: 0.85 }}>✓</span>}
-      {status === 'wrong' && <span style={{ fontSize: 11, opacity: 0.85 }}>✕</span>}
+      {status === 'right' && <span style={{ opacity: 0.85, display: 'inline-flex' }}><CheckIcon size={11} /></span>}
+      {status === 'wrong' && <span style={{ opacity: 0.85, display: 'inline-flex' }}><CrossIcon size={11} /></span>}
     </button>
   );
 }

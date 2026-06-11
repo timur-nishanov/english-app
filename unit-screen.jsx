@@ -24,7 +24,7 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
   };
 
   const modeIcon = (m) => {
-    if (m === 'mix') return <span style={{ fontSize: 13 }}>⚡</span>;
+    if (m === 'mix') return <BoltIcon size={13} />;
     if (m === 'production') return (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/>

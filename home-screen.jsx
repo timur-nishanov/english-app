@@ -1,17 +1,9 @@
-// ─── HOME SCREEN — from the Figma mockup ─────────────────────────
-// Grey canvas (#E9E9E9). Centered greeting, three white CTA buttons,
-// then a white sheet with rounded top corners holding the unit list
-// (24px majesticons icon + label, dashed separators). Everything
-// scrolls together — nothing is pinned.
-//
-// Home is the only screen on the grey-canvas / white-cards pairing;
-// it hardcodes its surfaces here so the global DS.paper / DS.paperCard
-// can stay on the inverted scheme used by practice and flashcard
-// screens.
-const HOME_CANVAS = '#E9E9E9';
-const HOME_SURFACE = '#FFFFFF';
+// ─── HOME SCREEN — Anything / Apple Store direction ──────────────
+// White canvas everywhere. Left-aligned large title, quiet streak pill,
+// three soft-grey CTA cards, then the unit list as rows with rounded
+// icon tiles — no separators, hierarchy comes from spacing alone.
 
-// icon file + display label per unit (matches the mockup)
+// icon file + display label per unit
 const UNIT_META = {
   'idioms-expressions':      { icon: 'majesticons_skull.svg',           label: 'Idioms & Expressions' },
   'work-money':              { icon: 'majesticons_cash.svg',            label: 'Work & Money' },
@@ -35,134 +27,127 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      background: HOME_CANVAS, color: DS.ink, fontFamily: DS.sans,
-      display: 'flex', flexDirection: 'column',
+      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
     }}>
-      {/* Top — header, greeting, CTA row */}
-      <div style={{
-        padding: `${DS.topSafe}px 20px 40px`,
-        display: 'flex', flexDirection: 'column', gap: 40, alignItems: 'center',
-        flexShrink: 0,
+      {/* Header — streak pill left, avatar right */}
+      <div className="anim-fade" style={{
+        padding: `${DS.topSafe}px 20px 0`,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <div className="anim-fade" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          width: '100%',
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          background: DS.paperCard, borderRadius: 999, padding: '7px 12px 7px 9px',
         }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <img src="icons/majesticons_fire.svg" alt="" width="20" height="20" />
-            <span className="tick" style={{
-              fontSize: 14, color: DS.ink3, fontWeight: 500, letterSpacing: 0.28,
-            }}>{streak} day</span>
-          </div>
-          <button onClick={onOpenProfile} className="tap" style={{
-            border: 'none', background: DS.ink,
-            width: 32, height: 32, borderRadius: 999, padding: 0,
-            color: '#FFFFFF', cursor: 'pointer', overflow: 'hidden',
-            fontFamily: DS.display, fontWeight: 600, fontSize: 13,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            position: 'relative',
-          }}>
-            T
-            <img src="icons/ava.png" alt=""
-              onError={e => { e.target.style.display = 'none'; }}
-              style={{
-                position: 'absolute', inset: 0, width: '100%', height: '100%',
-                objectFit: 'cover', borderRadius: 999,
-              }} />
-          </button>
+          <img src="icons/majesticons_fire.svg" alt="" width="16" height="16" />
+          <span className="tick" style={{
+            fontSize: 13, color: DS.ink2, fontWeight: 600, letterSpacing: -0.1,
+          }}>{streak} day{streak === 1 ? '' : 's'}</span>
         </div>
-
-        <div className="anim-fade" style={{
-          display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center',
+        <button onClick={onOpenProfile} className="tap" style={{
+          border: 'none', background: DS.ink,
+          width: 34, height: 34, borderRadius: 999, padding: 0,
+          color: '#FFFFFF', cursor: 'pointer', overflow: 'hidden',
+          fontFamily: DS.display, fontWeight: 600, fontSize: 13,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-            <h1 style={{
-              fontFamily: DS.display, fontSize: 32, fontWeight: 700,
-              margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: 0,
-            }}>Hey, Timur</h1>
-            <img src="icons/majesticons_star.svg" alt="" width="28" height="28" />
-          </div>
-          <p style={{
-            fontSize: 16, color: DS.ink3, margin: 0,
-            fontWeight: 500, letterSpacing: 0.32, lineHeight: '24px',
-            textAlign: 'center', maxWidth: 252,
-          }}>Pick up where you left off — {overallPct}% of the way through</p>
-        </div>
-
-        {/* CTA row — three white buttons */}
-        <div className="anim-slide-u" style={{
-          display: 'flex', gap: 8, width: '100%',
-        }}>
-          <CtaButton onClick={onOpenQuickTest} icon="majesticons_compass-2.svg" label="Practice" />
-          <CtaButton onClick={onOpenReview} icon="majesticons_lightbulb-shine.svg" label="Flashcards" />
-          <CtaButton onClick={onOpenWeakSpots} icon="majesticons_info-circle.svg"
-            label={weakCount > 0 ? `Weak spots · ${weakCount}` : 'Weak spots'} />
-        </div>
+          T
+          <img src="icons/ava.png" alt=""
+            onError={e => { e.target.style.display = 'none'; }}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', borderRadius: 999,
+            }} />
+        </button>
       </div>
 
-      {/* White sheet with the unit list */}
+      {/* Large title — left-aligned, App Store style */}
+      <div className="anim-fade" style={{ padding: '28px 20px 0' }}>
+        <h1 style={{
+          fontFamily: DS.display, fontSize: 34, fontWeight: 700,
+          margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: -0.6,
+        }}>Hey, Timur</h1>
+        <p style={{
+          fontSize: 16, color: DS.ink3, margin: '8px 0 0',
+          fontWeight: 500, letterSpacing: -0.2, lineHeight: 1.45,
+        }}>Pick up where you left off — {overallPct}% of the way through</p>
+      </div>
+
+      {/* CTA row — three soft-grey cards */}
       <div className="anim-slide-u" style={{
-        background: HOME_SURFACE,
-        borderTopLeftRadius: 32, borderTopRightRadius: 32,
-        paddingTop: 8,
-        // Long padding-bottom so the sheet always extends past the
-        // bottom of the viewport, even on overscroll. Removes the grey
-        // band that used to peek out under the last unit.
-        paddingBottom: 'calc(240px + env(safe-area-inset-bottom, 0px))',
-        width: '100%', flex: 1,
-        minHeight: 480,
+        display: 'flex', gap: 10, padding: '24px 20px 0',
       }}>
-        {TOPICS.map((topic, i) => {
+        <CtaButton onClick={onOpenQuickTest} icon="majesticons_compass-2.svg" label="Practice" />
+        <CtaButton onClick={onOpenReview} icon="majesticons_lightbulb-shine.svg" label="Flashcards" />
+        <CtaButton onClick={onOpenWeakSpots} icon="majesticons_info-circle.svg"
+          label="Weak spots" badge={weakCount > 0 ? weakCount : null} />
+      </div>
+
+      {/* Unit list — rounded icon tiles, no separators */}
+      <div className="anim-slide-u" style={{
+        padding: `28px 20px calc(40px + env(safe-area-inset-bottom, 0px))`,
+      }}>
+        <div style={{
+          fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1,
+          margin: '0 4px 6px',
+        }}>Units</div>
+        {TOPICS.map((topic) => {
           const meta = UNIT_META[topic.id] || { icon: 'majesticons_skull.svg', label: topic.title };
           return (
             <button key={topic.id} onClick={() => onPickLesson(topic)} className="row-press"
               style={{
                 width: '100%', border: 'none', background: 'transparent',
                 cursor: 'pointer', textAlign: 'left', fontFamily: DS.sans,
-                display: 'block', padding: 0,
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '9px 4px',
               }}>
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 8, padding: 20,
+                width: 44, height: 44, borderRadius: 14, flexShrink: 0,
+                background: DS.paperCard,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <img src={`icons/${meta.icon}`} alt="" width="24" height="24" style={{ flexShrink: 0 }} />
-                <span style={{
-                  flex: 1, fontSize: 16, fontWeight: 500, color: DS.ink,
-                  letterSpacing: 0.32, lineHeight: '20px',
-                }}>{meta.label}</span>
+                <img src={`icons/${meta.icon}`} alt="" width="22" height="22" />
               </div>
-              {i < TOPICS.length - 1 && (
-                <div style={{
-                  margin: '0 20px',
-                  borderTop: `1.5px dashed ${DS.line}`,
-                }} />
-              )}
+              <span style={{
+                flex: 1, fontSize: 16, fontWeight: 500, color: DS.ink,
+                letterSpacing: -0.2, lineHeight: 1.3,
+              }}>{meta.label}</span>
+              <ChevronRightIcon size={14} color={DS.ink4} />
             </button>
           );
         })}
-        <div style={{ height: 24 }} />
       </div>
     </div>
   );
 }
 
-// White CTA button: icon on top, label under it
-function CtaButton({ onClick, icon, label }) {
+// Soft-grey CTA card: icon on top, label under it
+function CtaButton({ onClick, icon, label, badge }) {
   return (
     <button onClick={onClick} className="tap"
       style={{
         flex: 1, minWidth: 0, cursor: 'pointer',
-        background: HOME_SURFACE, color: DS.ink,
-        border: 'none', borderRadius: 20,
-        padding: '14px 8px 12px',
-        display: 'flex', flexDirection: 'column', gap: 4,
+        background: DS.paperCard, color: DS.ink,
+        border: 'none', borderRadius: 18,
+        padding: '16px 8px 14px',
+        display: 'flex', flexDirection: 'column', gap: 7,
         alignItems: 'center', justifyContent: 'center',
-        fontFamily: DS.sans,
+        fontFamily: DS.sans, position: 'relative',
       }}>
       <img src={`icons/${icon}`} alt="" width="20" height="20" />
       <span style={{
-        fontSize: 14, fontWeight: 500, letterSpacing: 0.28, lineHeight: 1.4,
+        fontSize: 13, fontWeight: 600, letterSpacing: -0.1, lineHeight: 1.3,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%',
       }}>{label}</span>
+      {badge != null && (
+        <span className="tick" style={{
+          position: 'absolute', top: 8, right: 8,
+          minWidth: 18, height: 18, borderRadius: 999, padding: '0 5px',
+          background: DS.ink, color: '#FFFFFF',
+          fontSize: 11, fontWeight: 700,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>{badge}</span>
+      )}
     </button>
   );
 }

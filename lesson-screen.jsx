@@ -135,7 +135,7 @@ function ChoiceExercise({ ex, answered, onAnswer, topic }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 11, fontWeight: 700, flexShrink: 0, letterSpacing: 0,
                 transition: `all 200ms ${DS.ease}`,
-              }}>{isCorrect ? '✓' : isWrong ? '✕' : ''}</span>
+              }}>{isCorrect ? <CheckIcon /> : isWrong ? <CrossIcon /> : null}</span>
               <span style={{ flex: 1 }}>{o}</span>
             </button>
           );
@@ -786,7 +786,7 @@ function ExplainExercise({ ex, topic, answered, onAnswer }) {
                 border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : DS.ink5}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 11, fontWeight: 700, flexShrink: 0,
-              }}>{isCorrect ? '✓' : isWrong ? '✕' : ''}</span>
+              }}>{isCorrect ? <CheckIcon /> : isWrong ? <CrossIcon /> : null}</span>
               <span style={{ flex: 1 }}>{o}</span>
             </button>
           );
@@ -882,7 +882,7 @@ function FeedbackBar({ answered, ex, onContinue }) {
           background: correct ? DS.correct : DS.wrong, color: DS.paperCard,
           fontSize: 14, fontWeight: 700,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>{correct ? '✓' : '✕'}</div>
+        }}>{correct ? <CheckIcon size={13} /> : <CrossIcon size={13} />}</div>
         <div style={{ flex: 1 }}>
           <div style={{
             fontFamily: DS.display, fontSize: 18, fontWeight: 700,

@@ -57,8 +57,8 @@ function WeakSpotsScreen({ onExit }) {
             width: 80, height: 80, borderRadius: 99,
             background: DS.correctSoft, color: DS.correct,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 36, marginBottom: 20,
-          }}>✓</div>
+            marginBottom: 20,
+          }}><CheckIcon size={32} strokeWidth={2.2} /></div>
           <h1 className="anim-slide-u" style={{
             fontFamily: DS.display, fontSize: 26, fontWeight: 700,
             letterSpacing: -0.7, margin: '0 0 8px',

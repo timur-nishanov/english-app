@@ -130,10 +130,6 @@ function FlashFace({ back, card, n }) {
     }}>
       {back ? (
         <>
-          <div className="tick" style={{
-            position: 'absolute', top: 18, left: 18,
-            fontSize: 12, letterSpacing: -0.1, opacity: 0.5, fontWeight: 500,
-          }}>№ {String(n).padStart(3, '0')}</div>
           <div style={{
             fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
             opacity: 0.6, marginBottom: 10,
@@ -151,10 +147,6 @@ function FlashFace({ back, card, n }) {
         </>
       ) : (
         <>
-          <div className="tick" style={{
-            position: 'absolute', top: 18, left: 18,
-            fontSize: 12, color: DS.ink3, letterSpacing: -0.1, fontWeight: 500,
-          }}>№ {String(n).padStart(3, '0')}</div>
           <div style={{
             fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
             color: DS.accent, marginBottom: 6,
@@ -302,7 +294,7 @@ function VocabTestScreen({ onExit, onComplete }) {
                   border: `1.5px solid ${isCorrect ? DS.correct : isWrong ? DS.wrong : DS.ink5}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700, flexShrink: 0,
-                }}>{isCorrect ? '✓' : isWrong ? '✕' : ''}</span>
+                }}>{isCorrect ? <CheckIcon /> : isWrong ? <CrossIcon /> : null}</span>
                 <span style={{ flex: 1 }}>{o}</span>
               </button>
             );
@@ -328,7 +320,7 @@ function VocabTestScreen({ onExit, onComplete }) {
               background: picked === q.card.en ? DS.correct : DS.wrong, color: DS.paperCard,
               fontSize: 14, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>{picked === q.card.en ? '✓' : '✕'}</div>
+            }}>{picked === q.card.en ? <CheckIcon size={13} /> : <CrossIcon size={13} />}</div>
             <div style={{ flex: 1 }}>
               <div style={{
                 fontFamily: DS.display, fontSize: 18, fontWeight: 700,
