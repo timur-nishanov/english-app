@@ -191,5 +191,6 @@ const UNIT_COLORS = {
 };
 
 window.HOME_HERO = HOME_HERO;
+window.UNIT_META = UNIT_META;
 window.HomeScreen = HomeScreen;
 window.UNIT_COLORS = UNIT_COLORS;
