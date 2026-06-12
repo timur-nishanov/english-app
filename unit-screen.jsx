@@ -24,35 +24,19 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
     onStart(topic.id, null, shuffle, mode);
   };
 
-  const modeIcon = (m) => {
-    if (m === 'mix') return <BoltIcon size={13} />;
-    if (m === 'production') return (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M4.5 7l1.7 1.7L9.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    );
-    return (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M7 1.5a5.5 5.5 0 010 11z" fill="currentColor"/>
-      </svg>
-    );
-  };
   const modeLabels = { mix: 'Mix', production: 'Production only', recognition: 'Quick recognition' };
   const renderModePill = (m) => {
     const on = mode === m;
     return (
       <button key={m} onClick={() => setMode(m)} className="tap"
         style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+          display: 'inline-flex', alignItems: 'center', flexShrink: 0,
+          padding: '10px 16px', borderRadius: 999, cursor: 'pointer',
           fontFamily: DS.sans, fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
           background: on ? DS.ink : DS.paperCard,
           color: on ? '#FFFFFF' : DS.ink3,
-          border: 'none',
+          border: 'none', whiteSpace: 'nowrap',
         }}>
-        {modeIcon(m)}
         {modeLabels[m]}
       </button>
     );
@@ -91,10 +75,12 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
         }}>
           <div style={{
             width: 64, height: 64, borderRadius: 999, background: '#FFFFFF',
-            color: c.fg, fontFamily: DS.display, fontWeight: 700,
-            fontSize: 30, letterSpacing: -1,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>{topic.mark}</div>
+          }}>
+            <img
+              src={`icons/${((window.UNIT_META && window.UNIT_META[topic.id]) || {}).icon || 'majesticons_skull.svg'}`}
+              alt="" width="30" height="30" />
+          </div>
           <div style={{
             fontSize: 13, color: c.fg, fontWeight: 600, letterSpacing: -0.1,
             marginTop: 16, opacity: 0.8,
@@ -121,7 +107,11 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
           <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1, margin: '0 4px 10px' }}>
             Mode
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {/* One row, horizontal scroll, full-bleed to the screen edges */}
+          <div className="scroll" style={{
+            display: 'flex', gap: 8, overflowX: 'auto',
+            margin: '0 -20px', padding: '0 20px',
+          }}>
             {['mix','production','recognition'].map(renderModePill)}
           </div>
 
@@ -135,14 +125,6 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
               display: 'flex', alignItems: 'center', gap: 12,
               fontFamily: DS.sans,
             }}>
-            <div style={{
-              width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-              background: shuffle ? c.bg : DS.paper, color: shuffle ? c.fg : DS.ink3,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: `all 200ms ${DS.ease}`,
-            }}>
-              <ShuffleIcon size={19} color="currentColor" />
-            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontFamily: DS.display, fontSize: 15, fontWeight: 600, color: DS.ink, letterSpacing: -0.2 }}>
                 Shuffle the order
