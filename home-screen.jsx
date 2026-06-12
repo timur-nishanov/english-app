@@ -30,16 +30,18 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
+      // Base canvas is white, so overscrolling past the unit list at the
+      // bottom only ever rubber-bands white — never the hero colour.
+      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
-      {/* Hero — header row, centered greeting, CTA cards.
-          Covers the iOS safe-area with its own background so the status
-          bar always sits on the hero colour, even when Safari throttles
-          dynamic theme-color updates. */}
+      {/* Hero — header row, centered greeting, CTA cards. Owns the blue
+          background and covers the iOS safe-area itself, so the status
+          bar always sits on the hero colour. The extra bottom padding
+          lets the blue run under the sheet's arc. */}
       <div style={{
-        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 0`,
-        flexShrink: 0,
+        background: HOME_HERO, flexShrink: 0,
+        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 46px`,
       }}>
         <div className="anim-fade" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -99,15 +101,15 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         </div>
       </div>
 
-      {/* White sheet — convex arc, unit list. flex-basis must stay auto
-          so the sheet's box grows with the list instead of clipping its
-          background at viewport height. */}
+      {/* White sheet — convex arc rising over the hero, then the unit
+          list. flex 1 0 auto keeps the sheet at least full height so
+          short lists still fill the screen; a small bottom padding gives
+          a gentle spring at the end instead of a big empty band. */}
       <div className="anim-slide-u" style={{
-        flex: '1 0 auto', marginTop: 30,
+        flex: '1 0 auto', marginTop: -34,
         background: DS.paper,
         borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
-        padding: `30px 20px calc(240px + env(safe-area-inset-bottom, 0px))`,
-        minHeight: 480,
+        padding: `34px 20px calc(36px + env(safe-area-inset-bottom, 0px))`,
       }}>
         <div style={{
           fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1,
