@@ -300,22 +300,30 @@ function App() {
     catch { return {}; }
   });
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
-    // Match the safe-area tint to the screen's hero colour so the iOS
-    // status bar blends in: soft blue on Home, the unit's pastel on the
-    // category preview, white everywhere else.
+    // The status bar has no colour of its own — it takes the screen's
+    // top colour so it reads as transparent: soft blue on Home, the
+    // unit's pastel on the category preview, white everywhere else.
     let tint = '#FFFFFF';
     if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
     else if (screen.name === 'category') {
       const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
       if (c) tint = c.bg;
     }
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', tint);
-    // Paint html as well as body — Safari samples either for the bars.
-    document.documentElement.style.background = tint;
-    document.body.style.background = tint;
+    const apply = () => {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', tint);
+    };
+    // Apply before paint, then again next frame — iOS coalesces rapid
+    // theme-color writes and otherwise keeps the previous screen's colour.
+    apply();
+    const raf = requestAnimationFrame(apply);
+    // Each screen paints its own background; keep the page itself white so
+    // overscroll never flashes a stale tint.
+    document.documentElement.style.background = '#FFFFFF';
+    document.body.style.background = '#FFFFFF';
+    return () => cancelAnimationFrame(raf);
   }, [screen]);
   React.useEffect(() => {
     localStorage.setItem('engapp-state', JSON.stringify(state));
