@@ -4,7 +4,7 @@
 // rises into the hero with a convex arc (same move as the unit preview).
 // Rows keep the rounded icon tiles — no separators, spacing only.
 
-const HOME_HERO = '#F6EDE2';
+const HOME_HERO = '#DEEAFF';
 
 // icon file + display label per unit
 const UNIT_META = {
@@ -33,8 +33,14 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
       background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
-      {/* Hero — header row, centered greeting, CTA cards */}
-      <div style={{ padding: `${DS.topSafe}px 20px 0`, flexShrink: 0 }}>
+      {/* Hero — header row, centered greeting, CTA cards.
+          Covers the iOS safe-area with its own background so the status
+          bar always sits on the hero colour, even when Safari throttles
+          dynamic theme-color updates. */}
+      <div style={{
+        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 0`,
+        flexShrink: 0,
+      }}>
         <div className="anim-fade" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -93,9 +99,11 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         </div>
       </div>
 
-      {/* White sheet — convex arc, unit list */}
+      {/* White sheet — convex arc, unit list. flex-basis must stay auto
+          so the sheet's box grows with the list instead of clipping its
+          background at viewport height. */}
       <div className="anim-slide-u" style={{
-        flex: 1, marginTop: 30,
+        flex: '1 0 auto', marginTop: 30,
         background: DS.paper,
         borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
         padding: `30px 20px calc(240px + env(safe-area-inset-bottom, 0px))`,
