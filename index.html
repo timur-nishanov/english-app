@@ -303,7 +303,7 @@ function App() {
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
     // Match the safe-area tint to the screen's hero colour so the iOS
-    // status bar blends in: cream on Home, the unit's pastel on the
+    // status bar blends in: soft blue on Home, the unit's pastel on the
     // category preview, white everywhere else.
     let tint = '#FFFFFF';
     if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
@@ -312,8 +312,10 @@ function App() {
       if (c) tint = c.bg;
     }
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', '#FFFFFF');
-    document.body.style.background = '#FFFFFF';
+    if (meta) meta.setAttribute('content', tint);
+    // Paint html as well as body — Safari samples either for the bars.
+    document.documentElement.style.background = tint;
+    document.body.style.background = tint;
   }, [screen]);
   React.useEffect(() => {
     localStorage.setItem('engapp-state', JSON.stringify(state));

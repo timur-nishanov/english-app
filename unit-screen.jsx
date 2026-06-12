@@ -63,13 +63,18 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
       height: '100%', display: 'flex', flexDirection: 'column',
       background: c.bg, color: DS.ink, fontFamily: DS.sans,
     }}>
-      {/* Hero — unit colour, centered title */}
+      {/* Hero — unit colour, centered title. Covers the iOS safe-area
+          with its own background (same trick as LessonTopBar) so the
+          status bar sits on the unit colour even when Safari throttles
+          dynamic theme-color updates. */}
       <div className="anim-fade" style={{
-        padding: `${DS.topSafe}px 20px 0`, flexShrink: 0, position: 'relative',
+        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 0`,
+        flexShrink: 0, position: 'relative',
       }}>
         <button onClick={onBack} className="tap" aria-label="Back to units"
           style={{
-            position: 'absolute', left: 16, top: DS.topSafe - 4,
+            position: 'absolute', left: 16,
+            top: `max(${DS.topSafe - 4}px, calc(env(safe-area-inset-top, ${DS.topSafe}px) - 4px))`,
             width: 38, height: 38, borderRadius: 999, border: 'none',
             background: '#FFFFFF', color: c.fg, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
