@@ -1,7 +1,10 @@
-// ─── HOME SCREEN — Anything / Apple Store direction ──────────────
-// White canvas everywhere. Left-aligned large title, quiet streak pill,
-// three soft-grey CTA cards, then the unit list as rows with rounded
-// icon tiles — no separators, hierarchy comes from spacing alone.
+// ─── HOME SCREEN — warm hero on top, white sheet with the unit list ──
+// Soft cream hero: streak pill + avatar, centered greeting with the
+// star, three white CTA cards. The unit list sits on a white sheet that
+// rises into the hero with a convex arc (same move as the unit preview).
+// Rows keep the rounded icon tiles — no separators, spacing only.
+
+const HOME_HERO = '#F6EDE2';
 
 // icon file + display label per unit
 const UNIT_META = {
@@ -27,65 +30,76 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
+      display: 'flex', flexDirection: 'column',
     }}>
-      {/* Header — streak pill left, avatar right */}
-      <div className="anim-fade" style={{
-        padding: `${DS.topSafe}px 20px 0`,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          background: DS.paperCard, borderRadius: 999, padding: '7px 12px 7px 9px',
+      {/* Hero — header row, centered greeting, CTA cards */}
+      <div style={{ padding: `${DS.topSafe}px 20px 0`, flexShrink: 0 }}>
+        <div className="anim-fade" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <img src="icons/majesticons_fire.svg" alt="" width="16" height="16" />
-          <span className="tick" style={{
-            fontSize: 13, color: DS.ink2, fontWeight: 600, letterSpacing: -0.1,
-          }}>{streak} day{streak === 1 ? '' : 's'}</span>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#FFFFFF', borderRadius: 999, padding: '7px 12px 7px 9px',
+          }}>
+            <img src="icons/majesticons_fire.svg" alt="" width="16" height="16" />
+            <span className="tick" style={{
+              fontSize: 13, color: DS.ink2, fontWeight: 600, letterSpacing: -0.1,
+            }}>{streak} day{streak === 1 ? '' : 's'}</span>
+          </div>
+          <button onClick={onOpenProfile} className="tap" style={{
+            border: 'none', background: DS.ink,
+            width: 34, height: 34, borderRadius: 999, padding: 0,
+            color: '#FFFFFF', cursor: 'pointer', overflow: 'hidden',
+            fontFamily: DS.display, fontWeight: 600, fontSize: 13,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative',
+          }}>
+            T
+            <img src="icons/ava.png" alt=""
+              onError={e => { e.target.style.display = 'none'; }}
+              style={{
+                position: 'absolute', inset: 0, width: '100%', height: '100%',
+                objectFit: 'cover', borderRadius: 999,
+              }} />
+          </button>
         </div>
-        <button onClick={onOpenProfile} className="tap" style={{
-          border: 'none', background: DS.ink,
-          width: 34, height: 34, borderRadius: 999, padding: 0,
-          color: '#FFFFFF', cursor: 'pointer', overflow: 'hidden',
-          fontFamily: DS.display, fontWeight: 600, fontSize: 13,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative',
+
+        <div className="anim-fade" style={{
+          display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center',
+          textAlign: 'center', padding: '30px 0 0',
         }}>
-          T
-          <img src="icons/ava.png" alt=""
-            onError={e => { e.target.style.display = 'none'; }}
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', borderRadius: 999,
-            }} />
-        </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <h1 style={{
+              fontFamily: DS.display, fontSize: 32, fontWeight: 700,
+              margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: -0.5,
+            }}>Hey, Timur</h1>
+            <img src="icons/majesticons_star.svg" alt="" width="26" height="26" />
+          </div>
+          <p style={{
+            fontSize: 15, color: DS.ink3, margin: 0,
+            fontWeight: 500, letterSpacing: -0.1, lineHeight: 1.45,
+            maxWidth: 260,
+          }}>Pick up where you left off — {overallPct}% of the way through</p>
+        </div>
+
+        <div className="anim-slide-u" style={{
+          display: 'flex', gap: 10, padding: '26px 0 0',
+        }}>
+          <CtaButton onClick={onOpenQuickTest} icon="majesticons_compass-2.svg" label="Practice" />
+          <CtaButton onClick={onOpenReview} icon="majesticons_lightbulb-shine.svg" label="Flashcards" />
+          <CtaButton onClick={onOpenWeakSpots} icon="majesticons_info-circle.svg"
+            label="Weak spots" badge={weakCount > 0 ? weakCount : null} />
+        </div>
       </div>
 
-      {/* Large title — left-aligned, App Store style */}
-      <div className="anim-fade" style={{ padding: '28px 20px 0' }}>
-        <h1 style={{
-          fontFamily: DS.display, fontSize: 34, fontWeight: 700,
-          margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: -0.6,
-        }}>Hey, Timur</h1>
-        <p style={{
-          fontSize: 16, color: DS.ink3, margin: '8px 0 0',
-          fontWeight: 500, letterSpacing: -0.2, lineHeight: 1.45,
-        }}>Pick up where you left off — {overallPct}% of the way through</p>
-      </div>
-
-      {/* CTA row — three soft-grey cards */}
+      {/* White sheet — convex arc, unit list */}
       <div className="anim-slide-u" style={{
-        display: 'flex', gap: 10, padding: '24px 20px 0',
-      }}>
-        <CtaButton onClick={onOpenQuickTest} icon="majesticons_compass-2.svg" label="Practice" />
-        <CtaButton onClick={onOpenReview} icon="majesticons_lightbulb-shine.svg" label="Flashcards" />
-        <CtaButton onClick={onOpenWeakSpots} icon="majesticons_info-circle.svg"
-          label="Weak spots" badge={weakCount > 0 ? weakCount : null} />
-      </div>
-
-      {/* Unit list — rounded icon tiles, no separators */}
-      <div className="anim-slide-u" style={{
-        padding: `28px 20px calc(40px + env(safe-area-inset-bottom, 0px))`,
+        flex: 1, marginTop: 30,
+        background: DS.paper,
+        borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
+        padding: `30px 20px calc(240px + env(safe-area-inset-bottom, 0px))`,
+        minHeight: 480,
       }}>
         <div style={{
           fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1,
@@ -121,13 +135,13 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
   );
 }
 
-// Soft-grey CTA card: icon on top, label under it
+// White CTA card on the hero: icon on top, label under it
 function CtaButton({ onClick, icon, label, badge }) {
   return (
     <button onClick={onClick} className="tap"
       style={{
         flex: 1, minWidth: 0, cursor: 'pointer',
-        background: DS.paperCard, color: DS.ink,
+        background: '#FFFFFF', color: DS.ink,
         border: 'none', borderRadius: 18,
         padding: '16px 8px 14px',
         display: 'flex', flexDirection: 'column', gap: 7,
@@ -152,7 +166,7 @@ function CtaButton({ onClick, icon, label, badge }) {
   );
 }
 
-// Soft pastel color per unit — still used by CategoryScreen, lesson chips
+// Soft pastel color per unit — used by CategoryScreen hero, lesson chips
 // and Quick practice pills.
 const UNIT_COLORS = {
   'idioms-expressions':      { bg: '#FFE8DC', fg: '#B5683F' },
@@ -168,5 +182,6 @@ const UNIT_COLORS = {
   'words-phrases':          { bg: '#FFE6F0', fg: '#A6336F' },
 };
 
+window.HOME_HERO = HOME_HERO;
 window.HomeScreen = HomeScreen;
 window.UNIT_COLORS = UNIT_COLORS;

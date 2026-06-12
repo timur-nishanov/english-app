@@ -302,8 +302,15 @@ function App() {
 
   React.useEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
-    // Every screen sits on the same white canvas now, so the safe-area
-    // tint never has to change — set it once and forget the banding.
+    // Match the safe-area tint to the screen's hero colour so the iOS
+    // status bar blends in: cream on Home, the unit's pastel on the
+    // category preview, white everywhere else.
+    let tint = '#FFFFFF';
+    if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
+    else if (screen.name === 'category') {
+      const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
+      if (c) tint = c.bg;
+    }
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', '#FFFFFF');
     document.body.style.background = '#FFFFFF';

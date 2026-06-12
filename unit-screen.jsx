@@ -1,7 +1,8 @@
-// ─── CATEGORY SCREEN — mode + shuffle, before the lesson ────────
-// Grey canvas, white cards (Figma mockup). No tag picking — the whole
-// unit is always in play; the only choices are the practice mode and
-// whether to shuffle the order.
+// ─── CATEGORY SCREEN — Headspace-style hero, settings on a white sheet ──
+// Bright pastel hero in the unit's colour: centered mark, unit label and
+// title. The white sheet below rises into the hero with a convex arc
+// (elliptical top corners). Settings stay minimal: mode pills + shuffle
+// toggle, Start pinned at the bottom.
 
 function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }) {
   const c = (window.UNIT_COLORS && window.UNIT_COLORS[topic.id]) || { bg: DS.paperDeep, fg: DS.ink };
@@ -58,78 +59,112 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, color: DS.ink, fontFamily: DS.sans }}>
-      <div className="anim-fade" style={{ padding: `${DS.topSafe}px 20px 18px` }}>
-        <BackButton onClick={onBack} label="Units" color={DS.ink} />
-        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{
-            width: 72, height: 72, background: c.bg, color: c.fg, borderRadius: 20,
-            fontFamily: DS.display, fontWeight: 700, fontSize: 34, letterSpacing: -1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>{topic.mark}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, color: DS.ink3, fontWeight: 500, letterSpacing: 0 }}>Unit {topic.n}</div>
-            <h1 style={{
-              fontFamily: DS.display, fontSize: 25, fontWeight: 700,
-              letterSpacing: -0.4, margin: '2px 0 4px', lineHeight: 1.1, color: DS.ink,
-            }}>{topic.title}</h1>
-            <div style={{ fontSize: 13, color: DS.ink3, lineHeight: 1.4, letterSpacing: 0 }}>{topic.subtitle}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, overflow: 'auto', padding: '4px 20px 20px' }}>
-        <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: 0, margin: '8px 4px 10px' }}>
-          Mode
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {['mix','production','recognition'].map(renderModePill)}
-        </div>
-
-        <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: 0, margin: '22px 4px 10px' }}>
-          Order
-        </div>
-        <button onClick={() => setShuffle(s => !s)} className="row-press"
+    <div style={{
+      height: '100%', display: 'flex', flexDirection: 'column',
+      background: c.bg, color: DS.ink, fontFamily: DS.sans,
+    }}>
+      {/* Hero — unit colour, centered title */}
+      <div className="anim-fade" style={{
+        padding: `${DS.topSafe}px 20px 0`, flexShrink: 0, position: 'relative',
+      }}>
+        <button onClick={onBack} className="tap" aria-label="Back to units"
           style={{
-            width: '100%', border: 'none', cursor: 'pointer', textAlign: 'left',
-            background: DS.paperCard, borderRadius: 16, padding: '14px 14px',
-            display: 'flex', alignItems: 'center', gap: 12,
-            fontFamily: DS.sans,
-          }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-            background: shuffle ? c.bg : DS.paper, color: shuffle ? c.fg : DS.ink3,
+            position: 'absolute', left: 16, top: DS.topSafe - 4,
+            width: 38, height: 38, borderRadius: 999, border: 'none',
+            background: '#FFFFFF', color: c.fg, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: `all 200ms ${DS.ease}`,
+            padding: 0,
           }}>
-            <ShuffleIcon size={19} color="currentColor" />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: DS.display, fontSize: 15, fontWeight: 600, color: DS.ink, letterSpacing: -0.2 }}>
-              Shuffle the order
-            </div>
-            <div style={{ fontSize: 13, color: DS.ink3, marginTop: 2, letterSpacing: 0 }}>
-              Don’t always start from the same exercise
-            </div>
-          </div>
-          <div style={{
-            width: 46, height: 28, borderRadius: 99, flexShrink: 0,
-            background: shuffle ? c.fg : DS.ink5, position: 'relative',
-            transition: `background 200ms ${DS.ease}`,
-          }}>
-            <div style={{
-              width: 22, height: 22, borderRadius: 99, background: '#FFFFFF',
-              position: 'absolute', top: 3, left: shuffle ? 21 : 3,
-              transition: `left 200ms ${DS.ease}`,
-            }} />
-          </div>
+          <svg width="18" height="18" viewBox="0 0 16 16">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" fill="none"
+              strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          textAlign: 'center', padding: '10px 28px 0',
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 999, background: '#FFFFFF',
+            color: c.fg, fontFamily: DS.display, fontWeight: 700,
+            fontSize: 30, letterSpacing: -1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>{topic.mark}</div>
+          <div style={{
+            fontSize: 13, color: c.fg, fontWeight: 600, letterSpacing: -0.1,
+            marginTop: 16, opacity: 0.8,
+          }}>Unit {topic.n}</div>
+          <h1 style={{
+            fontFamily: DS.display, fontSize: 28, fontWeight: 700,
+            letterSpacing: -0.6, margin: '4px 0 0', lineHeight: 1.15, color: DS.ink,
+          }}>{topic.title}</h1>
+          <div style={{
+            fontSize: 14, color: DS.ink2, lineHeight: 1.45, letterSpacing: -0.1,
+            marginTop: 8, opacity: 0.75, maxWidth: 280,
+          }}>{topic.subtitle}</div>
+        </div>
       </div>
 
-      <div style={{ padding: '8px 20px 24px' }}>
-        <PrimaryButton onClick={start} color={count ? DS.ink : DS.ink5} disabled={!count}>
-          {count ? `Start · ${count} exercise${count === 1 ? '' : 's'}` : 'Nothing to practise in this mode'}
-        </PrimaryButton>
+      {/* White sheet — convex arc top edge, settings + Start */}
+      <div className="anim-slide-u" style={{
+        flex: 1, minHeight: 0, marginTop: 28,
+        background: DS.paper,
+        borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '34px 20px 12px' }}>
+          <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1, margin: '0 4px 10px' }}>
+            Mode
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {['mix','production','recognition'].map(renderModePill)}
+          </div>
+
+          <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1, margin: '24px 4px 10px' }}>
+            Order
+          </div>
+          <button onClick={() => setShuffle(s => !s)} className="row-press"
+            style={{
+              width: '100%', border: 'none', cursor: 'pointer', textAlign: 'left',
+              background: DS.paperCard, borderRadius: 16, padding: '14px 14px',
+              display: 'flex', alignItems: 'center', gap: 12,
+              fontFamily: DS.sans,
+            }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 11, flexShrink: 0,
+              background: shuffle ? c.bg : DS.paper, color: shuffle ? c.fg : DS.ink3,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: `all 200ms ${DS.ease}`,
+            }}>
+              <ShuffleIcon size={19} color="currentColor" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: DS.display, fontSize: 15, fontWeight: 600, color: DS.ink, letterSpacing: -0.2 }}>
+                Shuffle the order
+              </div>
+              <div style={{ fontSize: 13, color: DS.ink3, marginTop: 2, letterSpacing: 0 }}>
+                Don’t always start from the same exercise
+              </div>
+            </div>
+            <div style={{
+              width: 46, height: 28, borderRadius: 99, flexShrink: 0,
+              background: shuffle ? c.fg : DS.ink5, position: 'relative',
+              transition: `background 200ms ${DS.ease}`,
+            }}>
+              <div style={{
+                width: 22, height: 22, borderRadius: 99, background: '#FFFFFF',
+                position: 'absolute', top: 3, left: shuffle ? 21 : 3,
+                transition: `left 200ms ${DS.ease}`,
+              }} />
+            </div>
+          </button>
+        </div>
+
+        <div style={{ padding: '8px 20px 24px' }}>
+          <PrimaryButton onClick={start} color={count ? DS.ink : DS.ink5} disabled={!count}>
+            {count ? `Start · ${count} exercise${count === 1 ? '' : 's'}` : 'Nothing to practise in this mode'}
+          </PrimaryButton>
+        </div>
       </div>
     </div>
   );
