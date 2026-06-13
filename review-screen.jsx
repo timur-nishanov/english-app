@@ -31,7 +31,10 @@ function ReviewScreen({ onExit, onComplete }) {
   }, [done, knownCount, deck.length, onComplete]);
 
   if (done) {
-    return <VocabSuccess known={knownCount} total={total} onExit={onExit} />;
+    return (
+      <SuccessScreen value={knownCount} total={total}
+        subtitle="See you tomorrow for the next deck" onDone={onExit} />
+    );
   }
 
   const next = (known) => {
@@ -186,42 +189,6 @@ function vocabAnswerBtn(bg) {
   };
 }
 
-// ─── Deck-complete success — big green circle drops in with a bounce ──
-function VocabSuccess({ known, total, onExit }) {
-  return (
-    <div style={{
-      height: '100%', background: DS.paper, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', fontFamily: DS.sans, color: DS.ink, textAlign: 'center',
-      padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
-    }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-        <div className="anim-drop" style={{
-          width: 216, height: 216, borderRadius: 999, background: VOCAB.success,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 56,
-        }}>
-          <MaskIcon src="icons/check.svg" size={100} color="#FFFFFF" />
-        </div>
-        <h1 style={{
-          fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-          letterSpacing: -0.5, margin: 0, color: DS.ink,
-        }}>Well done!</h1>
-        <p style={{
-          fontSize: 16, color: DS.ink3, margin: '12px 0 0', fontWeight: 500,
-          letterSpacing: -0.1, lineHeight: 1.5,
-        }}>See you tomorrow for the next deck</p>
-        <div className="tick" style={{
-          fontSize: 14, fontWeight: 600, color: DS.ink, letterSpacing: 0.28, marginTop: 14,
-        }}>{known}/{total}</div>
-      </div>
-      <button onClick={onExit} className="tap" style={{
-        width: '100%', border: 'none', borderRadius: 999, padding: '17px 20px',
-        background: '#1B77E7', color: '#FFFFFF', cursor: 'pointer',
-        fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.2,
-      }}>Back to home</button>
-    </div>
-  );
-}
-
 function shuffleDeck(a) {
   const arr = [...a];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -261,32 +228,9 @@ function VocabTestScreen({ onExit, onComplete }) {
   }, [done, correctCount, quiz.length, onComplete]);
 
   if (done) {
-    const acc = Math.round((correctCount / quiz.length) * 100);
     return (
-      <div style={{
-        height: '100%', background: DS.paper,
-        display: 'flex', flexDirection: 'column',
-        padding: `${DS.topSafe}px 24px 24px`, fontFamily: DS.sans,
-        color: DS.ink, textAlign: 'center',
-      }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="anim-pop" style={{
-            width: 130, height: 130, borderRadius: 99,
-            background: DS.ink, color: DS.paperCard,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: DS.display, fontWeight: 700,
-            fontSize: 38, letterSpacing: -1.2, marginBottom: 20,
-          }}>{acc}<span style={{ fontSize: 20, opacity: 0.5 }}>%</span></div>
-          <h1 className="anim-slide-u" style={{
-            fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-            letterSpacing: -0.7, margin: '4px 0 6px',
-          }}>Test complete</h1>
-          <p style={{ color: DS.ink3, fontSize: 15, marginBottom: 28, letterSpacing: -0.1 }}>
-            {correctCount}/{quiz.length} words correct.
-          </p>
-        </div>
-        <PrimaryButton onClick={onExit} color={DS.ink}>Back to home</PrimaryButton>
-      </div>
+      <SuccessScreen value={correctCount} total={quiz.length}
+        subtitle="Test complete — nicely done" onDone={onExit} />
     );
   }
 

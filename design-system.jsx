@@ -48,6 +48,9 @@ const DS = {
   // iOS system green — used by the unit-preview toggles
   toggleOn:   '#34C759',
 
+  // success green — the deck/lesson completion circle
+  success:    '#15A35E',
+
   // Hairlines — very soft
   line:       '#E5E5E7',
   lineSoft:   '#EEEEF0',
@@ -369,7 +372,48 @@ function ShuffleButton({ onClick }) {
   );
 }
 
+// ─── Shared success screen — shown after any completed activity ──
+// Green circle drops in with a bounce, then title / subtitle / score and
+// a primary action. Reused by the deck, lessons, quick practice, etc.
+function SuccessScreen({ value, total, title = 'Well done!', subtitle = 'Great work — keep it up', onDone, doneLabel = 'Back to home' }) {
+  return (
+    <div style={{
+      height: '100%', background: DS.paper, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', fontFamily: DS.sans, color: DS.ink, textAlign: 'center',
+      padding: `max(${IOS_TOP_SAFE}px, env(safe-area-inset-top, ${IOS_TOP_SAFE}px)) 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
+    }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+        <div className="anim-drop" style={{
+          width: 216, height: 216, borderRadius: 999, background: DS.success,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 56,
+        }}>
+          <MaskIcon src="icons/check.svg" size={100} color="#FFFFFF" />
+        </div>
+        <h1 style={{
+          fontFamily: DS.display, fontSize: 28, fontWeight: 700,
+          letterSpacing: -0.5, margin: 0, color: DS.ink,
+        }}>{title}</h1>
+        <p style={{
+          fontSize: 16, color: DS.ink3, margin: '12px 0 0', fontWeight: 500,
+          letterSpacing: -0.1, lineHeight: 1.5,
+        }}>{subtitle}</p>
+        {value != null && total != null && (
+          <div className="tick" style={{
+            fontSize: 14, fontWeight: 600, color: DS.ink, letterSpacing: 0.28, marginTop: 14,
+          }}>{value}/{total}</div>
+        )}
+      </div>
+      <button onClick={onDone} className="tap" style={{
+        width: '100%', border: 'none', borderRadius: 999, padding: '17px 20px',
+        background: '#1B77E7', color: '#FFFFFF', cursor: 'pointer',
+        fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.2,
+      }}>{doneLabel}</button>
+    </div>
+  );
+}
+
 window.DS = DS;
+window.SuccessScreen = SuccessScreen;
 window.PrimaryButton = PrimaryButton;
 window.BackButton = BackButton;
 window.Chip = Chip;

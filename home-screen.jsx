@@ -22,7 +22,7 @@ const UNIT_META = {
   'words-phrases':           { icon: 'majesticons_chat-2.svg',          label: 'Words: see, memory, intentions and more' },
 };
 
-function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, onOpenQuickTest, onOpenWeakSpots, onOpenProfile }) {
+function HomeScreen({ progress, streak, onPickLesson, onOpenReview, onOpenQuickTest, onOpenLastThemes, onOpenProfile }) {
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
   const doneLessons = TOPICS.reduce((s, t) => s + Math.floor((progress[t.id] || 0) * t.lessons), 0);
   const overallPct = Math.round((doneLessons / totalLessons) * 100);
@@ -93,8 +93,8 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
         }}>
           <CtaButton onClick={onOpenQuickTest} icon="majesticons_compass-2.svg" label="Practice" />
           <CtaButton onClick={onOpenReview} icon="majesticons_lightbulb-shine.svg" label="Flashcards" />
-          <CtaButton onClick={onOpenWeakSpots} icon="majesticons_info-circle.svg"
-            label="Weak spots" badge={weakCount > 0 ? weakCount : null} />
+          <CtaButton onClick={onOpenLastThemes} icon="majesticons_list-box.svg"
+            label="Last themes" />
         </div>
       </div>
 

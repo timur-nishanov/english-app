@@ -289,7 +289,7 @@ function shuffleList(a) {
 // shallower = pop (old slides off right, revealing the screen beneath).
 const SCREEN_DEPTH = {
   home: 0, category: 1, profile: 1, review: 1, vocabtest: 1,
-  quicktest: 1, weakspots: 1, daily: 1, lesson: 2, results: 3,
+  quicktest: 1, weakspots: 1, lastthemes: 1, daily: 1, lesson: 2, results: 3,
 };
 const depthOf = (name) => (SCREEN_DEPTH[name] != null ? SCREEN_DEPTH[name] : 1);
 
@@ -509,12 +509,11 @@ function App() {
         progress={state.progress}
         streak={streak}
         daily={daily}
-        weakCount={weakCount}
         onPickLesson={(topic) => go({ name: 'category', topicId: topic.id })}
         onOpenReview={() => go({ name: 'review' })}
         onOpenVocabTest={() => go({ name: 'vocabtest' })}
         onOpenQuickTest={() => go({ name: 'quicktest' })}
-        onOpenWeakSpots={() => go({ name: 'weakspots' })}
+        onOpenLastThemes={() => go({ name: 'lastthemes' })}
         onOpenProfile={() => go({ name: 'profile' })}
         onOpenDaily={openDaily}
       />
@@ -584,9 +583,9 @@ function App() {
     content = (
       <QuickTestScreen onExit={() => go({ name: 'home' })} onComplete={completeQuickTest} />
     );
-  } else if (screen.name === 'weakspots') {
+  } else if (screen.name === 'lastthemes' || screen.name === 'weakspots') {
     content = (
-      <WeakSpotsScreen onExit={() => go({ name: 'home' })} />
+      <LastThemesScreen onExit={() => go({ name: 'home' })} />
     );
   } else if (screen.name === 'profile') {
     content = (
@@ -697,9 +696,9 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
       }}>
         {/* Avatar — straddles the arc, white ring */}
         <div style={{
-          position: 'absolute', top: -45, left: '50%', transform: 'translateX(-50%)',
-          width: 90, height: 90, borderRadius: 999, boxSizing: 'border-box',
-          border: '5px solid #FFFFFF', overflow: 'hidden', background: DS.ink,
+          position: 'absolute', top: -48, left: '50%', transform: 'translateX(-50%)',
+          width: 96, height: 96, borderRadius: 999, boxSizing: 'border-box',
+          border: '12px solid #FFFFFF', overflow: 'hidden', background: DS.ink,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <span style={{ color: '#FFFFFF', fontFamily: DS.display, fontWeight: 700, fontSize: 30 }}>T</span>
