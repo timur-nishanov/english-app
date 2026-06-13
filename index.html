@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#DEEAFF">
+<meta name="theme-color" content="#1B77E7">
 <title>English Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +309,7 @@ function App() {
     if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
     else if (screen.name === 'category') {
       const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
-      if (c) tint = c.bg;
+      if (c) tint = c.solid || c.bg;
     }
     const apply = () => {
       const meta = document.querySelector('meta[name="theme-color"]');
