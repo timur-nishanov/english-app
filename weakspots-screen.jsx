@@ -1,18 +1,26 @@
-// ─── LAST THEMES — practise the 3 most recently added units ─────
-// Pool is drawn from TOPICS.slice(-3): the last three units in the data.
-// When new units are appended later, this automatically follows them.
+// ─── LAST THEMES — practise the most recently uploaded material ─────
+// Pulls the exercises whose `tag` matches the 3 newest entries in
+// RECENT_THEMES (data.jsx), so the theme AND the tasks track what was
+// actually added last. Falls back to the last three units by position.
 
 function LastThemesScreen({ onExit }) {
   const [pool, setPool] = React.useState(() => {
-    const lastTopics = TOPICS.slice(-3);
     const out = [];
-    lastTopics.forEach(t => {
-      const lesson = LESSONS[t.id];
+    const recent = (window.RECENT_THEMES || []).slice(0, 3);
+    recent.forEach(({ tag, topicId }) => {
+      const lesson = LESSONS[topicId];
       if (!lesson) return;
       lesson.exercises.forEach((ex, i) => {
-        out.push({ ...ex, _topicId: t.id, _id: ex._id || `lt#${t.id}#${i}` });
+        if (ex.tag === tag) out.push({ ...ex, _topicId: topicId, _id: ex._id || `lt#${topicId}#${i}` });
       });
     });
+    if (!out.length) {
+      TOPICS.slice(-3).forEach(t => {
+        const lesson = LESSONS[t.id];
+        if (!lesson) return;
+        lesson.exercises.forEach((ex, i) => out.push({ ...ex, _topicId: t.id, _id: ex._id || `lt#${t.id}#${i}` }));
+      });
+    }
     return shuffleArray(out).slice(0, 20);
   });
 

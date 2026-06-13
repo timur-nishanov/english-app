@@ -14,6 +14,17 @@ const TOPICS = [
   {id:"words-phrases",n:"11",title:"Words & Phrases",subtitle:"See, memory, intentions, common expressions",mark:"Wp",lessons:1}
 ];
 
+// ─── RECENTLY ADDED THEMES — most recent first ──────────────────
+// Drives the Home "Last themes" button. These are the thematic sections
+// (by exercise `tag`) added most recently, newest at the top. When new
+// material is uploaded, prepend its { tag, topicId } here and the button
+// will surface it automatically — the top 3 are practised.
+const RECENT_THEMES = [
+  { tag: 'Service & quality', topicId: 'work-money' },     // added latest
+  { tag: 'Signs & Notices',   topicId: 'words-phrases' },
+  { tag: 'Proverbs',          topicId: 'words-phrases' },
+];
+
 // Exercise types: 'choice' | 'gap' | 'gaptype' | 'bank' | 'type' | 'match'  ·  each has a 'tag'
 
 const LESSONS = {
@@ -1252,6 +1263,7 @@ const VOCAB_CARDS = [
 
 window.TOPICS = TOPICS;
 window.LESSONS = LESSONS;
+window.RECENT_THEMES = RECENT_THEMES;
 window.VOCAB_CARDS = VOCAB_CARDS;
 
 // Assign stable _id to every lesson exercise once on load
