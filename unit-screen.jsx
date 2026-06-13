@@ -103,9 +103,9 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
       }}>
         {/* Unit glyph — white, on a vivid circle with a white ring, on the arc */}
         <div style={{
-          position: 'absolute', top: -45, left: '50%', transform: 'translateX(-50%)',
-          width: 90, height: 90, borderRadius: 999, boxSizing: 'border-box',
-          background: vivid, border: '6px solid #FFFFFF',
+          position: 'absolute', top: -48, left: '50%', transform: 'translateX(-50%)',
+          width: 96, height: 96, borderRadius: 999, boxSizing: 'border-box',
+          background: vivid, border: '12px solid #FFFFFF',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <MaskIcon src={`icons/${meta.icon}`} size={38} color="#FFFFFF" />
