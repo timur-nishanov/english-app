@@ -31,10 +31,10 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      // White base so the bottom (below the list / on overscroll) blends
-      // with the white sheet — no band. The light blue-grey only lives in
-      // the hero, which paints the safe-area and matches the status bar.
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      // The scroll canvas is the screen theme colour, so bounce-scroll at
+      // either end shows the blue-grey top tone (never white). The white
+      // unit sheet sits on top and fills the rest at rest.
+      background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
       {/* Hero — same blue-grey as the canvas, covers the iOS safe-area.
