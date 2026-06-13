@@ -1,11 +1,11 @@
-// ─── HOME SCREEN — blue hero with white text, plain unit list ────
-// Vivid blue hero (status bar matches it). White greeting + star, quiet
-// streak (flame + white text, no pill), ringed avatar, white CTA cards.
-// The unit list sits on a white sheet that rises into the hero with a
-// convex arc; rows are icon + label + chevron with dashed separators —
-// no tile behind the icon.
+// ─── HOME SCREEN — soft blue-grey canvas, dark navy text ─────────
+// Light blue-grey canvas (#E8F1FC) with dark navy text. Quiet streak
+// (flame + dark text), centred greeting with the star, ringed avatar,
+// white CTA cards. The unit list sits on a white sheet that rises into
+// the canvas with a convex arc; rows are icon + label + chevron with
+// dashed separators — no tile behind the icon.
 
-const HOME_HERO = '#1B77E7';
+const HOME_HERO = '#E8F1FC';
 
 // icon file + display label per unit
 const UNIT_META = {
@@ -31,14 +31,14 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      // White base canvas — overscrolling past the list at the bottom
-      // only ever rubber-bands white, never the hero colour.
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      // Soft blue-grey canvas — the hero, the page background and the
+      // status-bar tint all share this colour, so the top is seamless and
+      // overscrolling at the bottom only springs the same light tone.
+      background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
-      {/* Hero — owns the blue background and covers the iOS safe-area so
-          the status bar sits on blue. Extra bottom padding lets the blue
-          run under the sheet's arc. */}
+      {/* Hero — same blue-grey as the canvas, covers the iOS safe-area.
+          Extra bottom padding lets the canvas run under the sheet's arc. */}
       <div style={{
         background: HOME_HERO, flexShrink: 0,
         padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 48px`,
@@ -49,16 +49,16 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <img src="icons/majesticons_fire.svg" alt="" width="20" height="20" />
             <span className="tick" style={{
-              fontSize: 14, color: '#FFFFFF', fontWeight: 600, letterSpacing: -0.1,
+              fontSize: 14, color: DS.ink, fontWeight: 600, letterSpacing: -0.1,
             }}>{streak} day{streak === 1 ? '' : 's'}</span>
           </div>
           <button onClick={onOpenProfile} className="tap" style={{
-            border: 'none', background: 'rgba(255,255,255,0.2)',
+            border: 'none', background: DS.ink,
             width: 34, height: 34, borderRadius: 999, padding: 0,
             color: '#FFFFFF', cursor: 'pointer', overflow: 'hidden',
             fontFamily: DS.display, fontWeight: 600, fontSize: 13,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            position: 'relative', boxShadow: '0 0 0 2px rgba(255,255,255,0.9)',
+            position: 'relative', boxShadow: '0 0 0 2px #FFFFFF',
           }}>
             T
             <img src="icons/ava.png" alt=""
@@ -77,12 +77,12 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <h1 style={{
               fontFamily: DS.display, fontSize: 32, fontWeight: 700,
-              margin: 0, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: -0.5,
+              margin: 0, color: DS.ink, lineHeight: 1.1, letterSpacing: -0.5,
             }}>Hey, Timur</h1>
             <img src="icons/majesticons_star.svg" alt="" width="28" height="28" />
           </div>
           <p style={{
-            fontSize: 15, color: 'rgba(255,255,255,0.78)', margin: 0,
+            fontSize: 15, color: DS.ink3, margin: 0,
             fontWeight: 500, letterSpacing: -0.1, lineHeight: 1.45,
             maxWidth: 264,
           }}>Pick up where you left off — {overallPct}% of the way through</p>

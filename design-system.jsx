@@ -5,12 +5,12 @@ const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
 
 const DS = {
-  // INK — per the Figma mockup
-  ink:   '#161414',
-  ink2:  '#2B2F36',
-  ink3:  '#A5A5A5',
-  ink4:  '#B5BAC1',
-  ink5:  '#DFE2E6',
+  // INK — navy-blue palette
+  ink:   '#04162D',   // primary text everywhere
+  ink2:  '#3A4A60',   // secondary text
+  ink3:  '#ACB3BC',   // muted text
+  ink4:  '#C2C8D0',
+  ink5:  '#E1E6EC',
 
   // SURFACES — white canvas, grey cards on practice/flashcard screens.
   // Home overrides these with its own hardcoded colours (grey canvas,
