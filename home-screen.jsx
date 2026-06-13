@@ -31,10 +31,10 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
     <div style={{
       height: '100%', overflow: 'auto',
       overscrollBehavior: 'contain',
-      // Soft blue-grey canvas — the hero, the page background and the
-      // status-bar tint all share this colour, so the top is seamless and
-      // overscrolling at the bottom only springs the same light tone.
-      background: HOME_HERO, color: DS.ink, fontFamily: DS.sans,
+      // White base so the bottom (below the list / on overscroll) blends
+      // with the white sheet — no band. The light blue-grey only lives in
+      // the hero, which paints the safe-area and matches the status bar.
+      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
       {/* Hero — same blue-grey as the canvas, covers the iOS safe-area.
@@ -99,13 +99,13 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
       </div>
 
       {/* White sheet — convex arc rising over the hero, then the unit
-          list. flex 1 0 auto keeps the sheet at least full height; small
-          bottom padding gives a gentle spring instead of a big band. */}
+          list. flex 1 0 auto keeps it at least full height; the white
+          base behind it means any trailing space / overscroll is white. */}
       <div className="anim-slide-u" style={{
         flex: '1 0 auto', marginTop: -34,
         background: DS.paper,
         borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
-        padding: `30px 20px calc(36px + env(safe-area-inset-bottom, 0px))`,
+        padding: `30px 20px calc(20px + env(safe-area-inset-bottom, 0px))`,
       }}>
         {TOPICS.map((topic, i) => {
           const meta = UNIT_META[topic.id] || { icon: 'majesticons_skull.svg', label: topic.title };
@@ -119,7 +119,9 @@ function HomeScreen({ progress, streak, weakCount, onPickLesson, onOpenReview, o
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 12, padding: '20px 4px',
               }}>
-                <img src={`icons/${meta.icon}`} alt="" width="24" height="24" style={{ flexShrink: 0 }} />
+                {/* mask to a flat grey so per-icon source colours (e.g. the
+                    green timer) don't leak into the list */}
+                <MaskIcon src={`icons/${meta.icon}`} size={24} color="#9AA0A8" style={{ flexShrink: 0 }} />
                 <span style={{
                   flex: 1, fontSize: 16, fontWeight: 500, color: DS.ink,
                   letterSpacing: -0.2, lineHeight: '20px',

@@ -3,6 +3,10 @@
 const IOS_TOP_SAFE = 60;
 const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+// Smooth deceleration for entrances (easeOutQuint-ish) and a gentle spring
+// with a touch of overshoot for pops — keeps motion fluid, not abrupt.
+const EASE_SOFT = 'cubic-bezier(0.22, 1, 0.36, 1)';
+const EASE_SPRING = 'cubic-bezier(0.34, 1.42, 0.64, 1)';
 
 const DS = {
   // INK — navy-blue palette
@@ -77,52 +81,30 @@ const DS = {
 (function injectMotionCSS() {
   if (typeof document === 'undefined' || document.getElementById('motion-css')) return;
   const css = `
-    .tap { transition: transform 200ms ${EASE}, background 180ms ${EASE}, border-color 180ms ${EASE}, opacity 180ms ${EASE}, color 180ms ${EASE}, box-shadow 180ms ${EASE}; }
-    .tap:active:not(:disabled) { transform: scale(0.9); }
+    /* No grey tap flash anywhere — press feedback is the scale only */
+    #root, #root * { -webkit-tap-highlight-color: transparent; }
 
-    @keyframes slideInRight { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes slideInUp    { from { opacity: 0; transform: translateY(10px); }  to { opacity: 1; transform: translateY(0); } }
+    .tap { transition: transform 220ms ${EASE_SOFT}, background 200ms ${EASE}, border-color 200ms ${EASE}, opacity 200ms ${EASE}, color 200ms ${EASE}, box-shadow 200ms ${EASE}; }
+    .tap:active:not(:disabled) { transform: scale(0.94); }
+
+    @keyframes slideInRight { from { opacity: 0; transform: translate3d(18px,0,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+    @keyframes slideInUp    { from { opacity: 0; transform: translate3d(0,18px,0); }  to { opacity: 1; transform: translate3d(0,0,0); } }
     @keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn        { 0% { transform: scale(0.75); opacity: 0; } 60% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); } }
+    @keyframes popIn        { 0% { transform: scale(0.82); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes shake        { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
 
-    .anim-slide-r { animation: slideInRight 380ms ${EASE} both; }
-    .anim-slide-u { animation: slideInUp 340ms ${EASE} both; }
-    .anim-fade    { animation: fadeIn 280ms ${EASE} both; }
-    .anim-pop     { animation: popIn 460ms ${EASE} both; }
+    .anim-slide-r { animation: slideInRight 480ms ${EASE_SOFT} both; }
+    .anim-slide-u { animation: slideInUp 520ms ${EASE_SOFT} both; }
+    .anim-fade    { animation: fadeIn 420ms ${EASE_SOFT} both; }
+    .anim-pop     { animation: popIn 540ms ${EASE_SPRING} both; }
     .anim-shake   { animation: shake 360ms ${EASE}; }
 
-    .stagger > * { animation: slideInUp 340ms ${EASE} both; }
-    .stagger > *:nth-child(1)  { animation-delay: 0ms; }
-    .stagger > *:nth-child(2)  { animation-delay: 35ms; }
-    .stagger > *:nth-child(3)  { animation-delay: 70ms; }
-    .stagger > *:nth-child(4)  { animation-delay: 105ms; }
-    .stagger > *:nth-child(5)  { animation-delay: 140ms; }
-    .stagger > *:nth-child(6)  { animation-delay: 175ms; }
-    .stagger > *:nth-child(7)  { animation-delay: 210ms; }
-    .stagger > *:nth-child(8)  { animation-delay: 245ms; }
-    .stagger > *:nth-child(9)  { animation-delay: 280ms; }
-    .stagger > *:nth-child(10) { animation-delay: 315ms; }
-    .stagger > *:nth-child(11) { animation-delay: 350ms; }
-    .stagger > *:nth-child(12) { animation-delay: 385ms; }
-    .stagger > *:nth-child(13) { animation-delay: 420ms; }
-    .stagger > *:nth-child(14) { animation-delay: 455ms; }
-    .stagger > *:nth-child(15) { animation-delay: 490ms; }
-    .stagger > *:nth-child(16) { animation-delay: 525ms; }
-    .stagger > *:nth-child(17) { animation-delay: 560ms; }
-    .stagger > *:nth-child(18) { animation-delay: 595ms; }
-    .stagger > *:nth-child(19) { animation-delay: 630ms; }
-    .stagger > *:nth-child(20) { animation-delay: 665ms; }
-    .stagger > *:nth-child(21) { animation-delay: 700ms; }
-    .stagger > *:nth-child(22) { animation-delay: 735ms; }
-    .stagger > *:nth-child(23) { animation-delay: 770ms; }
-    .stagger > *:nth-child(24) { animation-delay: 805ms; }
-    .stagger > *:nth-child(25) { animation-delay: 840ms; }
-    .stagger > *:nth-child(26) { animation-delay: 875ms; }
-    .stagger > *:nth-child(27) { animation-delay: 910ms; }
-
-    .row-press { transition: transform 200ms ${EASE}; }
-    .row-press:active:not(:disabled) { transform: scale(0.96); }
+    .stagger > * { animation: slideInUp 480ms ${EASE_SOFT} both; }`;
+  const staggerDelays = Array.from({ length: 27 }, (_, i) =>
+    `.stagger > *:nth-child(${i + 1}) { animation-delay: ${i * 48}ms; }`).join('\n');
+  const cssTail = `
+    .row-press { transition: transform 240ms ${EASE_SOFT}; }
+    .row-press:active:not(:disabled) { transform: scale(0.975); }
 
     .tick  { font-variant-numeric: tabular-nums; }
 
@@ -134,7 +116,7 @@ const DS = {
   `;
   const s = document.createElement('style');
   s.id = 'motion-css';
-  s.textContent = css;
+  s.textContent = css + '\n' + staggerDelays + '\n' + cssTail;
   document.head.appendChild(s);
 })();
 
