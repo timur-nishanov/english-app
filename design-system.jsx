@@ -93,20 +93,25 @@ const DS = {
     @keyframes popIn        { 0% { transform: scale(0.82); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes shake        { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
     @keyframes dropBounce {
-      0%   { transform: translate3d(0,-780px,0); animation-timing-function: cubic-bezier(0.55,0.06,0.9,0.55); }
-      46%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
-      63%  { transform: translate3d(0,-36px,0);  animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
-      79%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
-      90%  { transform: translate3d(0,-11px,0);  animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
+      0%   { transform: translate3d(0,-720px,0); animation-timing-function: cubic-bezier(0.4,0,0.78,0.42); }
+      48%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.2,0.62,0.35,1); }
+      66%  { transform: translate3d(0,-64px,0);  animation-timing-function: cubic-bezier(0.4,0,0.78,0.42); }
+      80%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.2,0.62,0.35,1); }
+      89%  { transform: translate3d(0,-22px,0);  animation-timing-function: cubic-bezier(0.4,0,0.78,0.42); }
+      95%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.2,0.62,0.35,1); }
+      98%  { transform: translate3d(0,-6px,0);   animation-timing-function: cubic-bezier(0.4,0,0.78,0.42); }
       100% { transform: translate3d(0,0,0); }
     }
+    /* card under the active one rising into place */
+    @keyframes cardRise { from { transform: translate3d(0,-9px,0) scale(0.965); } to { transform: translate3d(0,0,0) scale(1); } }
 
     .anim-slide-r { animation: slideInRight 480ms ${EASE_SOFT} both; }
     .anim-slide-u { animation: slideInUp 520ms ${EASE_SOFT} both; }
     .anim-fade    { animation: fadeIn 420ms ${EASE_SOFT} both; }
     .anim-pop     { animation: popIn 540ms ${EASE_SPRING} both; }
     .anim-shake   { animation: shake 360ms ${EASE}; }
-    .anim-drop    { animation: dropBounce 1400ms both; }
+    .anim-drop    { animation: dropBounce 1900ms both; }
+    .card-rise    { animation: cardRise 340ms ${EASE_SOFT} backwards; }
 
     .stagger > * { animation: slideInUp 480ms ${EASE_SOFT} both; }`;
   const staggerDelays = Array.from({ length: 27 }, (_, i) =>

@@ -81,13 +81,8 @@ function ReviewScreen({ onExit, onComplete }) {
 
       {/* Card stack */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px' }}>
-        <div style={{
-          position: 'relative', width: '100%', maxWidth: 300, height: CARD_H + 27,
-          transform: `translateX(${swipeX}px) rotate(${swipeX * 0.025}deg)`,
-          opacity: swipeX ? 0 : 1,
-          transition: `transform 240ms ${DS.ease}, opacity 240ms ${DS.ease}`,
-        }}>
-          {/* peek cards behind */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: 300, height: CARD_H + 27 }}>
+          {/* peek cards behind — static; they stay put as the active card leaves */}
           {Array.from({ length: peek }, (_, i) => peek - i).map((k) => (
             <div key={k} style={{
               position: 'absolute', top: (3 - k) * 9, left: `${k * 3}%`, right: `${k * 3}%`,
@@ -95,35 +90,38 @@ function ReviewScreen({ onExit, onComplete }) {
               border: `2px solid ${VOCAB.cardBorder}`, boxSizing: 'border-box', zIndex: 0,
             }} />
           ))}
-          {/* active card */}
-          <button onClick={() => setFlipped(f => !f)}
-            style={{
-              position: 'absolute', top: 27, left: 0, right: 0, height: CARD_H,
-              borderRadius: 24, boxSizing: 'border-box', cursor: 'pointer',
-              background: flipped ? VOCAB.cardBack : VOCAB.cardFront,
-              border: `2px solid ${VOCAB.cardBorder}`,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              padding: 24, zIndex: 1, fontFamily: DS.sans, textAlign: 'center',
-              transition: `background 260ms ${DS.ease}`,
+          {/* active card — only this one swipes away; the next rises into place */}
+          <div key={idx} className="card-rise" style={{
+            position: 'absolute', top: 27, left: 0, right: 0, height: CARD_H, zIndex: 1,
+            perspective: 1600,
+            transform: `translateX(${swipeX}px) rotate(${swipeX * 0.03}deg)`,
+            opacity: swipeX ? 0 : 1,
+            transition: `transform 240ms ${DS.ease}, opacity 240ms ${DS.ease}`,
+          }}>
+            <div onClick={() => setFlipped(f => !f)} style={{
+              position: 'relative', width: '100%', height: '100%', cursor: 'pointer',
+              transformStyle: 'preserve-3d',
+              transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+              transition: `transform 560ms ${DS.ease}`,
             }}>
-            {flipped ? (
-              <div key="b" className="anim-fade">
+              <div style={cardFace(false)}>
+                <div style={{
+                  fontFamily: DS.display, fontSize: 26, fontWeight: 600,
+                  color: DS.ink, letterSpacing: -0.4, lineHeight: 1.2, textAlign: 'center',
+                }}>{card.en}</div>
+              </div>
+              <div style={cardFace(true)}>
                 <div style={{
                   fontFamily: DS.display, fontSize: 23, fontWeight: 700,
-                  color: DS.ink, lineHeight: 1.25, letterSpacing: -0.4,
+                  color: DS.ink, lineHeight: 1.25, letterSpacing: -0.4, textAlign: 'center',
                 }}>{card.def}</div>
                 <div style={{
                   fontSize: 14, color: DS.ink3, marginTop: 14, lineHeight: 1.45,
-                  fontWeight: 500, letterSpacing: -0.1,
+                  fontWeight: 500, letterSpacing: -0.1, textAlign: 'center',
                 }}>{card.ex}</div>
               </div>
-            ) : (
-              <div key="f" className="anim-fade" style={{
-                fontFamily: DS.display, fontSize: 26, fontWeight: 600,
-                color: DS.ink, letterSpacing: -0.4, lineHeight: 1.2,
-              }}>{card.en}</div>
-            )}
-          </button>
+            </div>
+          </div>
         </div>
 
         <div style={{
@@ -165,6 +163,19 @@ function ReviewScreen({ onExit, onComplete }) {
       </div>
     </div>
   );
+}
+
+// One flip-card face. Front (word) is white; back (definition) fills #EDF1F6.
+function cardFace(back) {
+  return {
+    position: 'absolute', inset: 0, borderRadius: 24, boxSizing: 'border-box',
+    border: `2px solid ${VOCAB.cardBorder}`,
+    background: back ? VOCAB.cardBack : VOCAB.cardFront,
+    backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
+    transform: back ? 'rotateY(180deg)' : 'none',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    padding: 24,
+  };
 }
 
 function vocabAnswerBtn(bg) {
