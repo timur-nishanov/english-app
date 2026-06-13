@@ -307,6 +307,7 @@ function App() {
     // unit's pastel on the category preview, white everywhere else.
     let tint = '#FFFFFF';
     if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
+    else if (screen.name === 'profile') tint = window.HOME_HERO || '#1B77E7';
     else if (screen.name === 'category') {
       const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
       if (c) tint = c.solid || c.bg;
@@ -506,7 +507,33 @@ function App() {
   );
 }
 
-// ─── Profile — clean cards, no italic serif ──────────────────────
+// ─── Profile — Headspace structure, our blue hero style ──────────
+const PROFILE_HERO = '#1B77E7';
+
+function ProfileSection({ children }) {
+  return (
+    <div style={{
+      fontFamily: DS.display, fontSize: 19, fontWeight: 700, color: DS.ink,
+      letterSpacing: -0.4, margin: '26px 4px 8px',
+    }}>{children}</div>
+  );
+}
+
+function StatRow({ icon, value, label }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 4px' }}>
+      <img src={`icons/${icon}`} alt="" width="34" height="34" style={{ flexShrink: 0 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="tick" style={{
+          fontFamily: DS.display, fontSize: 20, fontWeight: 700, color: DS.ink,
+          letterSpacing: -0.4, lineHeight: 1.1,
+        }}>{value}</div>
+        <div style={{ fontSize: 13, color: DS.ink3, marginTop: 2, letterSpacing: -0.1 }}>{label}</div>
+      </div>
+    </div>
+  );
+}
+
 function ProfileScreen({ state, streak, weakCount, onBack }) {
   const activity = state.activity || {};
   const totalLessons = TOPICS.reduce((s, t) => s + t.lessons, 0);
@@ -514,6 +541,7 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
 
   const totals = activityTotals(activity);
   const accuracy = totals.exercises ? Math.round((totals.correct / totals.exercises) * 100) : 0;
+  const practiceMins = Math.round((totals.exercises + totals.cards) * 0.5);
 
   // Real last-7-days activity for the chart
   const week = lastNDays(7).map((d) => ({
@@ -526,53 +554,92 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
   const keys = Object.keys(activity).sort();
   const months = ['January','February','March','April','May','June','July',
     'August','September','October','November','December'];
-  let since = '';
+  let since = 'Your learning profile';
   if (keys.length) {
     const first = new Date(keys[0] + 'T00:00:00');
-    since = ` · learning since ${months[first.getMonth()]}`;
+    since = `B2–C1 · learning since ${months[first.getMonth()]}`;
   }
 
+  const inProgress = TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1);
+
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
+    <div style={{
+      height: '100%', overflow: 'auto', overscrollBehavior: 'contain',
+      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Blue hero — covers the safe-area, holds the back button */}
       <div style={{
-        padding: `${DS.topSafe}px 20px 20px`, background: DS.paper,
+        background: PROFILE_HERO, flexShrink: 0, position: 'relative',
+        height: `calc(max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) + 136px)`,
       }}>
-        <BackButton onClick={onBack} label="Home" color={DS.ink} />
-        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{
-            width: 60, height: 60, borderRadius: 99,
-            background: DS.ink, color: DS.paperCard,
-            fontFamily: DS.display, fontWeight: 700,
-            fontSize: 26, letterSpacing: -0.5,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>T</div>
-          <div>
-            <h1 style={{
-              fontFamily: DS.display, fontSize: 24, fontWeight: 700,
-              letterSpacing: -0.4, color: DS.ink, margin: 0, lineHeight: 1.1,
-            }}>Timur</h1>
-            <div style={{
-              fontSize: 13, color: DS.ink3, marginTop: 4, letterSpacing: -0.1,
-            }}>B2–C1{since}</div>
-          </div>
-        </div>
+        <button onClick={onBack} className="tap" aria-label="Back to home"
+          style={{
+            position: 'absolute', left: 16,
+            top: `max(${DS.topSafe - 4}px, calc(env(safe-area-inset-top, ${DS.topSafe}px) - 4px))`,
+            width: 38, height: 38, borderRadius: 999, border: 'none',
+            background: '#FFFFFF', color: PROFILE_HERO, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+          }}>
+          <svg width="18" height="18" viewBox="0 0 16 16">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" fill="none"
+              strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '8px 20px 30px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 22 }}>
-          <StatBlock label="Day streak" value={streak} />
-          <StatBlock label="Accuracy" value={totals.exercises ? `${accuracy}%` : '—'} />
-          <StatBlock label="Lessons done" value={`${doneLessons}/${totalLessons}`} />
-          <StatBlock label="Weak spots" value={weakCount || 0} />
+      {/* White sheet — convex arc, avatar on the arc, then content */}
+      <div className="anim-slide-u" style={{
+        flex: '1 0 auto', marginTop: -56,
+        background: DS.paper, position: 'relative',
+        borderTopLeftRadius: '50% 56px', borderTopRightRadius: '50% 56px',
+        padding: `60px 20px calc(40px + env(safe-area-inset-bottom, 0px))`,
+      }}>
+        {/* Avatar — straddles the arc, white ring */}
+        <div style={{
+          position: 'absolute', top: -45, left: '50%', transform: 'translateX(-50%)',
+          width: 90, height: 90, borderRadius: 999, boxSizing: 'border-box',
+          border: '5px solid #FFFFFF', overflow: 'hidden', background: DS.ink,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ color: '#FFFFFF', fontFamily: DS.display, fontWeight: 700, fontSize: 30 }}>T</span>
+          <img src="icons/ava.png" alt=""
+            onError={e => { e.target.style.display = 'none'; }}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
 
+        <h1 style={{
+          fontFamily: DS.display, fontSize: 26, fontWeight: 700,
+          letterSpacing: -0.5, margin: 0, lineHeight: 1.2, color: DS.ink, textAlign: 'center',
+        }}>Timur</h1>
         <div style={{
-          fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
-        }}>Last 7 days</div>
-        <div style={{
-          background: DS.paperCard, borderRadius: 18, padding: 18, marginBottom: 22,
-          boxShadow: DS.shadowSm,
-        }}>
+          fontSize: 14, color: DS.ink3, marginTop: 6, letterSpacing: -0.1, textAlign: 'center',
+        }}>{since}</div>
+
+        {/* Stats */}
+        <ProfileSection>Stats</ProfileSection>
+        <StatRow icon="majesticons_timer.svg" value={`${practiceMins} min${practiceMins === 1 ? '' : 's'}`} label="Total practice time" />
+        <StatRow icon="majesticons_list-box.svg" value={totals.exercises} label="Exercises answered" />
+        <StatRow icon="majesticons_info-circle.svg" value={totals.exercises ? `${accuracy}%` : '—'} label="Answer accuracy" />
+        <StatRow icon="majesticons_compass-2.svg" value={`${doneLessons}/${totalLessons}`} label="Lessons completed" />
+
+        {/* Streak */}
+        <ProfileSection>Streak</ProfileSection>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '6px 4px' }}>
+          <img src="icons/majesticons_fire.svg" alt="" width="38" height="38" style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div className="tick" style={{
+              fontFamily: DS.display, fontSize: 24, fontWeight: 700, color: DS.ink, letterSpacing: -0.5, lineHeight: 1.1,
+            }}>{streak} day{streak === 1 ? '' : 's'}</div>
+            <div style={{ fontSize: 13, color: DS.ink3, marginTop: 2, letterSpacing: -0.1 }}>
+              {streak > 0 ? 'Keep it going — practise today' : 'Practise today to start a streak'}
+            </div>
+          </div>
+        </div>
+
+        {/* This week */}
+        <ProfileSection>This week</ProfileSection>
+        <div style={{ background: DS.paperCard, borderRadius: 18, padding: 18, margin: '0 0 4px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 96, gap: 8 }}>
             {week.map((d, i) => {
               const today = i === week.length - 1;
@@ -582,68 +649,42 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
                   <span className="tick" style={{ fontSize: 10, fontWeight: 600, color: d.exercises ? DS.ink3 : 'transparent', letterSpacing: -0.1 }}>{d.exercises || 0}</span>
                   <div style={{
                     width: '100%', height: h,
-                    background: today ? DS.ink : (d.exercises ? DS.ink4 : DS.ink5),
+                    background: today ? PROFILE_HERO : (d.exercises ? DS.ink4 : DS.ink5),
                     borderRadius: 6,
                     transition: `height 400ms ${DS.ease}`,
                   }} />
-                  <span className="tick" style={{ fontSize: 11, fontWeight: 600, color: today ? DS.ink : DS.ink3, letterSpacing: -0.1 }}>{d.letter}</span>
+                  <span className="tick" style={{ fontSize: 11, fontWeight: 600, color: today ? PROFILE_HERO : DS.ink3, letterSpacing: -0.1 }}>{d.letter}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div style={{
-          fontSize: 13, color: DS.ink3, fontWeight: 500, letterSpacing: -0.1, margin: '6px 4px 10px',
-        }}>Units in progress</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1).length === 0 && (
-            <div style={{
-              background: DS.paperCard, borderRadius: 14, padding: '14px 14px',
-              fontSize: 13, color: DS.ink3, letterSpacing: -0.1, boxShadow: DS.shadowSm,
-            }}>No units in progress yet — start a lesson to see it here.</div>
-          )}
-          {TOPICS.filter(t => (state.progress[t.id] || 0) > 0 && (state.progress[t.id] || 0) < 1).map((t) => {
-            const c = (window.UNIT_COLORS && window.UNIT_COLORS[t.id]) || { bg: DS.paperDeep, fg: DS.ink };
-            return (
-              <div key={t.id} style={{
-                background: DS.paperCard, borderRadius: 14, padding: '12px 14px',
-                display: 'flex', alignItems: 'center', gap: 12,
-                boxShadow: DS.shadowSm,
-              }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 10,
-                  background: c.bg, color: c.fg,
-                  fontFamily: DS.display, fontWeight: 700, fontSize: 15,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', letterSpacing: -0.4,
-                }}>{t.mark}</div>
-                <span style={{
-                  flex: 1, fontFamily: DS.display, fontWeight: 600,
-                  fontSize: 15, color: DS.ink, letterSpacing: -0.3,
-                }}>{t.title}</span>
-                <span className="tick" style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1 }}>{Math.round((state.progress[t.id] || 0) * 100)}%</span>
-              </div>
-            );
-          })}
-        </div>
+        {/* Units in progress */}
+        {inProgress.length > 0 && (
+          <>
+            <ProfileSection>Units in progress</ProfileSection>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {inProgress.map((t) => {
+                const meta = (window.UNIT_META && window.UNIT_META[t.id]) || { icon: 'majesticons_skull.svg' };
+                return (
+                  <div key={t.id} style={{
+                    background: DS.paperCard, borderRadius: 14, padding: '12px 14px',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                  }}>
+                    <img src={`icons/${meta.icon}`} alt="" width="24" height="24" style={{ flexShrink: 0 }} />
+                    <span style={{
+                      flex: 1, fontFamily: DS.display, fontWeight: 600,
+                      fontSize: 15, color: DS.ink, letterSpacing: -0.3,
+                    }}>{t.title}</span>
+                    <span className="tick" style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1 }}>{Math.round((state.progress[t.id] || 0) * 100)}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  );
-}
-
-function StatBlock({ label, value }) {
-  return (
-    <div style={{
-      background: DS.paperCard, borderRadius: 16, padding: '14px 14px',
-      boxShadow: DS.shadowSm,
-    }}>
-      <div style={{
-        fontSize: 12, fontWeight: 500, color: DS.ink3, letterSpacing: -0.1,
-      }}>{label}</div>
-      <div className="tick" style={{
-        fontFamily: DS.display, fontSize: 26, fontWeight: 700, color: DS.ink,
-        marginTop: 4, letterSpacing: -0.6,
-      }}>{value}</div>
     </div>
   );
 }

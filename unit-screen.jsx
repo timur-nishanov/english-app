@@ -1,65 +1,24 @@
 // ─── UNIT PREVIEW — Headspace-style hero, two toggles, Start ──────
 // Colour hero (the unit's vivid colour) with a back button and the unit
-// glyph in a white circle straddling a convex arc. On the white sheet:
-// centred title + subtitle, a stats row, and two toggles — Production
-// tasks and Quick recognition — then a Start button in the unit colour.
-// Only these elements (matching the Figma mockup); no mode pills, no
-// shuffle control.
-
-function UnitStatIcon({ kind, color }) {
-  if (kind === 'exercises') {
-    return (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
-        <path d="M8 9.5h8M8 13h8M8 16.5h5" />
-      </svg>
-    );
-  }
-  // clock / minutes
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="13" r="8" />
-      <path d="M12 13V9M9.5 2.5h5" />
-    </svg>
-  );
-}
-
-function ToggleRowIcon({ kind, color }) {
-  if (kind === 'production') {
-    return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14.5 5.5l4 4L8 20H4v-4L14.5 5.5z" />
-        <path d="M13 7l4 4" />
-      </svg>
-    );
-  }
-  // eye / recognition
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
+// glyph — white, on a vivid circle with a white ring — straddling a
+// smooth convex arc. On the white sheet: centred title + subtitle, a
+// stats row, and two iOS toggles (Production tasks / Quick recognition),
+// then a Start button in the unit colour. Only these elements.
 
 function IOSToggle({ on, onToggle }) {
   return (
     <button onClick={onToggle} className="tap" role="switch" aria-checked={on}
       style={{
-        width: 51, height: 31, borderRadius: 999, flexShrink: 0,
+        width: 58, height: 32, borderRadius: 999, flexShrink: 0,
         background: on ? DS.toggleOn : DS.ink5, border: 'none',
         position: 'relative', cursor: 'pointer', padding: 0,
-        transition: `background 220ms ${DS.ease}`,
+        transition: `background 240ms ${DS.ease}`,
       }}>
       <span style={{
-        position: 'absolute', top: 2, left: on ? 22 : 2,
-        width: 27, height: 27, borderRadius: 999, background: '#FFFFFF',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-        transition: `left 220ms ${DS.ease}`,
+        position: 'absolute', top: 2, left: on ? 28 : 2,
+        width: 28, height: 28, borderRadius: 999, background: '#FFFFFF',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.28), 0 0 1px rgba(0,0,0,0.1)',
+        transition: `left 240ms ${DS.ease}`,
       }} />
     </button>
   );
@@ -71,7 +30,7 @@ function ToggleRow({ icon, label, on, onToggle, last }) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12, padding: '18px 4px',
       }}>
-        <ToggleRowIcon kind={icon} color={DS.ink2} />
+        <img src={`icons/${icon}`} alt="" width="24" height="24" style={{ flexShrink: 0 }} />
         <span style={{
           flex: 1, fontSize: 16, fontWeight: 500, color: DS.ink, letterSpacing: -0.2,
         }}>{label}</span>
@@ -117,7 +76,7 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
       {/* Colour hero — covers the safe-area, holds the back button */}
       <div style={{
         background: vivid, flexShrink: 0, position: 'relative',
-        height: `calc(max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) + 124px)`,
+        height: `calc(max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) + 136px)`,
       }}>
         <button onClick={onBack} className="tap" aria-label="Back to units"
           style={{
@@ -136,19 +95,20 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
 
       {/* White sheet — convex arc, content, Start pinned at the bottom */}
       <div className="anim-slide-u" style={{
-        flex: 1, minHeight: 0, marginTop: -44,
+        flex: 1, minHeight: 0, marginTop: -56,
         background: DS.paper, position: 'relative',
-        borderTopLeftRadius: '50% 44px', borderTopRightRadius: '50% 44px',
+        borderTopLeftRadius: '50% 56px', borderTopRightRadius: '50% 56px',
         display: 'flex', flexDirection: 'column',
-        padding: `60px 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
+        padding: `64px 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
       }}>
-        {/* Unit glyph in a white circle, straddling the arc */}
+        {/* Unit glyph — white, on a vivid circle with a white ring, on the arc */}
         <div style={{
-          position: 'absolute', top: -46, left: '50%', transform: 'translateX(-50%)',
-          width: 92, height: 92, borderRadius: 999, background: '#FFFFFF',
+          position: 'absolute', top: -45, left: '50%', transform: 'translateX(-50%)',
+          width: 90, height: 90, borderRadius: 999, boxSizing: 'border-box',
+          background: vivid, border: '6px solid #FFFFFF',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <MaskIcon src={`icons/${meta.icon}`} size={40} color={vivid} />
+          <MaskIcon src={`icons/${meta.icon}`} size={38} color="#FFFFFF" />
         </div>
 
         <h1 style={{
@@ -163,17 +123,17 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
 
         {/* Stats */}
         <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18,
           marginTop: 16,
         }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <UnitStatIcon kind="exercises" color={vivid} />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <img src="icons/majesticons_list-box.svg" alt="" width="20" height="20" />
             <span className="tick" style={{ fontSize: 14, fontWeight: 600, color: DS.ink2, letterSpacing: -0.1 }}>
               {count} exercise{count === 1 ? '' : 's'}
             </span>
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <UnitStatIcon kind="mins" color={DS.toggleOn} />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <img src="icons/majesticons_timer.svg" alt="" width="20" height="20" />
             <span className="tick" style={{ fontSize: 14, fontWeight: 600, color: DS.ink2, letterSpacing: -0.1 }}>
               {mins} min{mins === 1 ? '' : 's'}
             </span>
@@ -182,9 +142,9 @@ function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }
 
         {/* Toggles */}
         <div style={{ marginTop: 26 }}>
-          <ToggleRow icon="production" label="Production tasks"
+          <ToggleRow icon="majesticons_edit-pen-2.svg" label="Production tasks"
             on={production} onToggle={() => setProduction(v => !v)} />
-          <ToggleRow icon="recognition" label="Quick recognition"
+          <ToggleRow icon="majesticons_eye.svg" label="Quick recognition"
             on={recognition} onToggle={() => setRecognition(v => !v)} last />
         </div>
 
