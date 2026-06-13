@@ -92,12 +92,21 @@ const DS = {
     @keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn        { 0% { transform: scale(0.82); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes shake        { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+    @keyframes dropBounce {
+      0%   { transform: translate3d(0,-780px,0); animation-timing-function: cubic-bezier(0.55,0.06,0.9,0.55); }
+      46%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
+      63%  { transform: translate3d(0,-36px,0);  animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
+      79%  { transform: translate3d(0,0,0);      animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
+      90%  { transform: translate3d(0,-11px,0);  animation-timing-function: cubic-bezier(0.4,0,0.5,1); }
+      100% { transform: translate3d(0,0,0); }
+    }
 
     .anim-slide-r { animation: slideInRight 480ms ${EASE_SOFT} both; }
     .anim-slide-u { animation: slideInUp 520ms ${EASE_SOFT} both; }
     .anim-fade    { animation: fadeIn 420ms ${EASE_SOFT} both; }
     .anim-pop     { animation: popIn 540ms ${EASE_SPRING} both; }
     .anim-shake   { animation: shake 360ms ${EASE}; }
+    .anim-drop    { animation: dropBounce 1400ms both; }
 
     .stagger > * { animation: slideInUp 480ms ${EASE_SOFT} both; }`;
   const staggerDelays = Array.from({ length: 27 }, (_, i) =>

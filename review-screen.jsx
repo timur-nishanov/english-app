@@ -1,4 +1,15 @@
-// ─── VOCABULARY REVIEW — clean flashcards, SF Pro ───────────────
+// ─── VOCABULARY REVIEW — card stack, reveal on tap ──────────────
+// Single source for the palette so the spec colours live in one place.
+const VOCAB = {
+  cardBorder: '#EDF1F6',
+  cardFront:  '#FFFFFF',
+  cardBack:   '#EDF1F6',   // revealed fill
+  noBg:   '#FDDDDD', noFg:   '#E61F1F',
+  yesBg:  '#BBEDD5', yesFg:  '#15A35E',
+  track:  '#EDF1F6', fill:   '#ACB3BC',
+  success: '#15A35E',
+};
+const CARD_H = 282;
 
 function ReviewScreen({ onExit, onComplete }) {
   const [idx, setIdx] = React.useState(0);
@@ -10,6 +21,7 @@ function ReviewScreen({ onExit, onComplete }) {
 
   const card = deck[idx];
   const done = idx >= deck.length;
+  const total = deck.length;
 
   React.useEffect(() => {
     if (done && !recorded.current) {
@@ -19,33 +31,7 @@ function ReviewScreen({ onExit, onComplete }) {
   }, [done, knownCount, deck.length, onComplete]);
 
   if (done) {
-    return (
-      <div style={{
-        height: '100%', background: DS.paper,
-        display: 'flex', flexDirection: 'column',
-        padding: `${DS.topSafe}px 24px 24px`, fontFamily: DS.sans,
-        color: DS.ink, textAlign: 'center',
-      }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="anim-pop" style={{
-            width: 130, height: 130, borderRadius: 99,
-            background: DS.ink, color: DS.paperCard,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: DS.display, fontWeight: 700,
-            fontSize: 38, letterSpacing: -1.2,
-            marginBottom: 20,
-          }}>{knownCount}<span style={{ fontSize: 20, opacity: 0.5 }}>/{deck.length}</span></div>
-          <h1 className="anim-slide-u" style={{
-            fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-            letterSpacing: -0.7, margin: '4px 0 6px',
-          }}>Deck complete</h1>
-          <p style={{
-            color: DS.ink3, fontSize: 15, marginBottom: 28, letterSpacing: -0.1,
-          }}>See you tomorrow for the next deck.</p>
-        </div>
-        <PrimaryButton onClick={onExit} color={DS.ink}>Back to home</PrimaryButton>
-      </div>
-    );
+    return <VocabSuccess known={knownCount} total={total} onExit={onExit} />;
   }
 
   const next = (known) => {
@@ -54,9 +40,8 @@ function ReviewScreen({ onExit, onComplete }) {
       SRS.recordResult(revId, known);
     }
     if (known) setKnownCount(c => c + 1);
-    setFlipped(false);
-    setSwipeX(known ? 360 : -360);
-    setTimeout(() => { setSwipeX(0); setIdx(i => i + 1); }, 260);
+    setSwipeX(known ? 380 : -380);
+    setTimeout(() => { setFlipped(false); setSwipeX(0); setIdx(i => i + 1); }, 240);
   };
 
   // Shuffle current + remaining cards without recording an SRS result
@@ -65,104 +50,163 @@ function ReviewScreen({ onExit, onComplete }) {
     setDeck(d => [...d.slice(0, idx), ...shuffleArray(d.slice(idx))]);
   };
 
+  const pct = (idx / total) * 100;
+  // Up to three dummy cards peek behind the active one — purely visual,
+  // we still step through all 20 words via idx.
+  const peek = Math.min(3, total - idx - 1);
+
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: DS.paper, fontFamily: DS.sans }}>
-      <LessonTopBar pct={(idx / deck.length) * 100} onExit={onExit} label={`${idx + 1}/${deck.length}`} />
-
-      <div style={{ flex: 1, padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{
-          perspective: 1200,
-          transform: `translateX(${swipeX}px) rotate(${swipeX * 0.04}deg)`,
-          opacity: swipeX ? 0 : 1,
-          transition: `transform 260ms ${DS.ease}, opacity 260ms ${DS.ease}`,
-        }}>
-          <div
-            onClick={() => setFlipped(f => !f)}
-            style={{
-              position: 'relative', width: '100%', height: 360,
-              transformStyle: 'preserve-3d',
-              transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-              transition: `transform 560ms ${DS.ease}`,
-              cursor: 'pointer',
-            }}>
-            <FlashFace back={false} card={card} n={idx + 1} />
-            <FlashFace back={true} card={card} n={idx + 1} />
-          </div>
-        </div>
-      </div>
-
-      <div style={{ padding: '0 20px 10px' }}>
-        <ShuffleButton onClick={doShuffle} />
-      </div>
-      <div style={{ padding: '0 20px 24px', display: 'flex', gap: 10 }}>
-        <button onClick={() => next(false)} className="tap" style={secondaryBtnStyle(DS.wrong, DS.wrongSoft)}>
-          Still learning
+    <div style={{
+      height: '100%', display: 'flex', flexDirection: 'column',
+      background: DS.paper, fontFamily: DS.sans,
+    }}>
+      {/* Top bar — close, progress, trophy */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 16,
+        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 10px`,
+        flexShrink: 0,
+      }}>
+        <button onClick={onExit} className="tap" aria-label="Close"
+          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0, lineHeight: 0 }}>
+          <img src="icons/x.svg" alt="" width="28" height="28" />
         </button>
-        <button onClick={() => next(true)} className="tap" style={secondaryBtnStyle(DS.correct, DS.correctSoft)}>
-          I know it
+        <div style={{ flex: 1, height: 12, borderRadius: 999, background: VOCAB.track, overflow: 'hidden' }}>
+          <div style={{
+            width: `${pct}%`, height: '100%', background: VOCAB.fill, borderRadius: 999,
+            transition: `width 360ms ${DS.ease}`,
+          }} />
+        </div>
+        <img src="icons/trophy.svg" alt="" width="24" height="24" style={{ flexShrink: 0 }} />
+      </div>
+
+      {/* Card stack */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px' }}>
+        <div style={{
+          position: 'relative', width: '100%', maxWidth: 300, height: CARD_H + 27,
+          transform: `translateX(${swipeX}px) rotate(${swipeX * 0.025}deg)`,
+          opacity: swipeX ? 0 : 1,
+          transition: `transform 240ms ${DS.ease}, opacity 240ms ${DS.ease}`,
+        }}>
+          {/* peek cards behind */}
+          {Array.from({ length: peek }, (_, i) => peek - i).map((k) => (
+            <div key={k} style={{
+              position: 'absolute', top: (3 - k) * 9, left: `${k * 3}%`, right: `${k * 3}%`,
+              height: CARD_H, borderRadius: 24, background: VOCAB.cardFront,
+              border: `2px solid ${VOCAB.cardBorder}`, boxSizing: 'border-box', zIndex: 0,
+            }} />
+          ))}
+          {/* active card */}
+          <button onClick={() => setFlipped(f => !f)}
+            style={{
+              position: 'absolute', top: 27, left: 0, right: 0, height: CARD_H,
+              borderRadius: 24, boxSizing: 'border-box', cursor: 'pointer',
+              background: flipped ? VOCAB.cardBack : VOCAB.cardFront,
+              border: `2px solid ${VOCAB.cardBorder}`,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: 24, zIndex: 1, fontFamily: DS.sans, textAlign: 'center',
+              transition: `background 260ms ${DS.ease}`,
+            }}>
+            {flipped ? (
+              <div key="b" className="anim-fade">
+                <div style={{
+                  fontFamily: DS.display, fontSize: 23, fontWeight: 700,
+                  color: DS.ink, lineHeight: 1.25, letterSpacing: -0.4,
+                }}>{card.def}</div>
+                <div style={{
+                  fontSize: 14, color: DS.ink3, marginTop: 14, lineHeight: 1.45,
+                  fontWeight: 500, letterSpacing: -0.1,
+                }}>{card.ex}</div>
+              </div>
+            ) : (
+              <div key="f" className="anim-fade" style={{
+                fontFamily: DS.display, fontSize: 26, fontWeight: 600,
+                color: DS.ink, letterSpacing: -0.4, lineHeight: 1.2,
+              }}>{card.en}</div>
+            )}
+          </button>
+        </div>
+
+        <div style={{
+          fontSize: 14, fontWeight: 600, color: DS.ink3, letterSpacing: 0.28,
+          textTransform: 'uppercase', marginTop: 26,
+        }}>Tap to reveal</div>
+      </div>
+
+      {/* Answer buttons */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexShrink: 0 }}>
+        <button onClick={() => next(false)} className="tap" aria-label="Still learning"
+          style={vocabAnswerBtn(VOCAB.noBg)}>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M22.6667 9.33337L9.33334 22.6667M9.33334 9.33337L22.6667 22.6667"
+              stroke={VOCAB.noFg} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <button onClick={() => next(true)} className="tap" aria-label="I know it"
+          style={vocabAnswerBtn(VOCAB.yesBg)}>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M26.6667 8L12 22.6667L5.33333 16"
+              stroke={VOCAB.yesFg} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Shuffle */}
+      <div style={{
+        display: 'flex', justifyContent: 'center',
+        padding: `18px 0 calc(20px + env(safe-area-inset-bottom, 0px))`, flexShrink: 0,
+      }}>
+        <button onClick={doShuffle} className="tap" aria-label="Shuffle"
+          style={{
+            width: 56, height: 56, borderRadius: 999, border: 'none', cursor: 'pointer',
+            background: VOCAB.track, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+          <img src="icons/refresh.svg" alt="" width="24" height="24" />
         </button>
       </div>
     </div>
   );
 }
 
-function secondaryBtnStyle(color, soft) {
+function vocabAnswerBtn(bg) {
   return {
-    flex: 1, padding: '15px 16px', borderRadius: 999,
-    background: soft, border: 'none', color,
-    fontSize: 14, fontWeight: 600, letterSpacing: -0.2,
-    cursor: 'pointer', fontFamily: DS.sans,
+    width: 82, height: 82, borderRadius: 999, border: 'none', cursor: 'pointer',
+    background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: 0,
   };
 }
 
-function FlashFace({ back, card, n }) {
+// ─── Deck-complete success — big green circle drops in with a bounce ──
+function VocabSuccess({ known, total, onExit }) {
   return (
     <div style={{
-      position: 'absolute', inset: 0, borderRadius: 24,
-      background: back ? DS.ink : DS.paperCard,
-      color: back ? DS.paperCard : DS.ink,
-      backfaceVisibility: 'hidden',
-      transform: back ? 'rotateY(180deg)' : 'none',
-      padding: 26, boxSizing: 'border-box',
-      display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-      textAlign: 'center',
-      boxShadow: back ? DS.shadowLg : DS.shadowMd,
+      height: '100%', background: DS.paper, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', fontFamily: DS.sans, color: DS.ink, textAlign: 'center',
+      padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
     }}>
-      {back ? (
-        <>
-          <div style={{
-            fontSize: 12, fontWeight: 500, letterSpacing: -0.1,
-            opacity: 0.6, marginBottom: 10,
-          }}>Definition</div>
-          <div style={{
-            fontFamily: DS.display,
-            fontSize: 22, fontWeight: 600, lineHeight: 1.3,
-            margin: '4px 0 18px', letterSpacing: -0.5,
-          }}>{card.def}</div>
-          <div style={{
-            fontSize: 14, lineHeight: 1.5, opacity: 0.7, letterSpacing: -0.1,
-            paddingTop: 14, borderTop: `1px solid rgba(255,255,255,0.14)`,
-            width: '100%',
-          }}>"{card.ex}"</div>
-        </>
-      ) : (
-        <>
-          <div style={{
-            fontSize: 12, fontWeight: 600, letterSpacing: -0.1,
-            color: DS.accent, marginBottom: 6,
-          }}>Word</div>
-          <div style={{
-            fontFamily: DS.display,
-            fontSize: 34, fontWeight: 700, marginTop: 8,
-            color: DS.ink, letterSpacing: -1.2, lineHeight: 1.1,
-          }}>{card.en}</div>
-          <div style={{
-            position: 'absolute', bottom: 22,
-            fontSize: 13, color: DS.ink3, letterSpacing: -0.1,
-            fontWeight: 500,
-          }}>Tap to reveal</div>
-        </>
-      )}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+        <div className="anim-drop" style={{
+          width: 216, height: 216, borderRadius: 999, background: VOCAB.success,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 56,
+        }}>
+          <MaskIcon src="icons/check.svg" size={100} color="#FFFFFF" />
+        </div>
+        <h1 style={{
+          fontFamily: DS.display, fontSize: 28, fontWeight: 700,
+          letterSpacing: -0.5, margin: 0, color: DS.ink,
+        }}>Well done!</h1>
+        <p style={{
+          fontSize: 16, color: DS.ink3, margin: '12px 0 0', fontWeight: 500,
+          letterSpacing: -0.1, lineHeight: 1.5,
+        }}>See you tomorrow for the next deck</p>
+        <div className="tick" style={{
+          fontSize: 14, fontWeight: 600, color: DS.ink, letterSpacing: 0.28, marginTop: 14,
+        }}>{known}/{total}</div>
+      </div>
+      <button onClick={onExit} className="tap" style={{
+        width: '100%', border: 'none', borderRadius: 999, padding: '17px 20px',
+        background: '#1B77E7', color: '#FFFFFF', cursor: 'pointer',
+        fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.2,
+      }}>Back to home</button>
     </div>
   );
 }
