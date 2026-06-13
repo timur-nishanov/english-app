@@ -41,6 +41,9 @@ const DS = {
   streak:     '#E89165',
   streakSoft: '#FBE5D7',
 
+  // iOS system green — used by the unit-preview toggles
+  toggleOn:   '#34C759',
+
   // Hairlines — very soft
   line:       '#E5E5E7',
   lineSoft:   '#EEEEF0',
@@ -314,6 +317,22 @@ function ChevronRightIcon({ size = 14, color = 'currentColor', strokeWidth = 2 }
   );
 }
 
+// Tints a monochrome SVG file to an arbitrary colour by using it as a CSS
+// mask — needed when the source icon ships in a fixed grey but we want it
+// recoloured (e.g. the unit glyph rendered in the theme colour).
+function MaskIcon({ src, size = 24, color = 'currentColor', style }) {
+  return (
+    <span aria-hidden style={{
+      display: 'inline-block', width: size, height: size, background: color,
+      WebkitMaskImage: `url("${src}")`, maskImage: `url("${src}")`,
+      WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat',
+      WebkitMaskPosition: 'center', maskPosition: 'center',
+      WebkitMaskSize: 'contain', maskSize: 'contain',
+      ...style,
+    }} />
+  );
+}
+
 // Clean shuffle icon (Feather-style) — two crossing arrows
 function ShuffleIcon({ size = 22, color = 'currentColor', strokeWidth = 2 }) {
   return (
@@ -369,6 +388,7 @@ window.CheckIcon = CheckIcon;
 window.CrossIcon = CrossIcon;
 window.BoltIcon = BoltIcon;
 window.ChevronRightIcon = ChevronRightIcon;
+window.MaskIcon = MaskIcon;
 window.ShuffleButton = ShuffleButton;
 window.shuffleArray = shuffleArray;
 window.BigButton = PrimaryButton;

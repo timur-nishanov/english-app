@@ -1,157 +1,204 @@
-// ─── CATEGORY SCREEN — Headspace-style hero, settings on a white sheet ──
-// Bright pastel hero in the unit's colour: centered mark, unit label and
-// title. The white sheet below rises into the hero with a convex arc
-// (elliptical top corners). Settings stay minimal: mode pills + shuffle
-// toggle, Start pinned at the bottom.
+// ─── UNIT PREVIEW — Headspace-style hero, two toggles, Start ──────
+// Colour hero (the unit's vivid colour) with a back button and the unit
+// glyph in a white circle straddling a convex arc. On the white sheet:
+// centred title + subtitle, a stats row, and two toggles — Production
+// tasks and Quick recognition — then a Start button in the unit colour.
+// Only these elements (matching the Figma mockup); no mode pills, no
+// shuffle control.
+
+function UnitStatIcon({ kind, color }) {
+  if (kind === 'exercises') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
+        <path d="M8 9.5h8M8 13h8M8 16.5h5" />
+      </svg>
+    );
+  }
+  // clock / minutes
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 13V9M9.5 2.5h5" />
+    </svg>
+  );
+}
+
+function ToggleRowIcon({ kind, color }) {
+  if (kind === 'production') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+        stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14.5 5.5l4 4L8 20H4v-4L14.5 5.5z" />
+        <path d="M13 7l4 4" />
+      </svg>
+    );
+  }
+  // eye / recognition
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IOSToggle({ on, onToggle }) {
+  return (
+    <button onClick={onToggle} className="tap" role="switch" aria-checked={on}
+      style={{
+        width: 51, height: 31, borderRadius: 999, flexShrink: 0,
+        background: on ? DS.toggleOn : DS.ink5, border: 'none',
+        position: 'relative', cursor: 'pointer', padding: 0,
+        transition: `background 220ms ${DS.ease}`,
+      }}>
+      <span style={{
+        position: 'absolute', top: 2, left: on ? 22 : 2,
+        width: 27, height: 27, borderRadius: 999, background: '#FFFFFF',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+        transition: `left 220ms ${DS.ease}`,
+      }} />
+    </button>
+  );
+}
+
+function ToggleRow({ icon, label, on, onToggle, last }) {
+  return (
+    <div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12, padding: '18px 4px',
+      }}>
+        <ToggleRowIcon kind={icon} color={DS.ink2} />
+        <span style={{
+          flex: 1, fontSize: 16, fontWeight: 500, color: DS.ink, letterSpacing: -0.2,
+        }}>{label}</span>
+        <IOSToggle on={on} onToggle={onToggle} />
+      </div>
+      {!last && <div style={{ margin: '0 4px', borderTop: `1.5px dashed ${DS.line}` }} />}
+    </div>
+  );
+}
 
 function CategoryScreen({ topic, lesson, prefs, onStart, onChangePrefs, onBack }) {
-  const c = (window.UNIT_COLORS && window.UNIT_COLORS[topic.id]) || { bg: DS.paperDeep, fg: DS.ink };
+  const colors = (window.UNIT_COLORS && window.UNIT_COLORS[topic.id]) || {};
+  const vivid = colors.solid || DS.accent;
+  const meta = (window.UNIT_META && window.UNIT_META[topic.id]) || { icon: 'majesticons_skull.svg' };
 
-  const exercises = lesson.exercises;
+  const [production, setProduction] = React.useState(prefs ? prefs.production !== false : true);
+  const [recognition, setRecognition] = React.useState(prefs ? prefs.recognition !== false : true);
 
-  const [shuffle, setShuffle] = React.useState(prefs ? !!prefs.shuffle : false);
-  const [mode, setMode] = React.useState((prefs && prefs.mode) || 'mix');
-
+  const isProd = (e) => (window.isProduction ? window.isProduction(e)
+    : (e.type === 'gaptype' || e.type === 'type' || e.type === 'bank'));
   const matchesMode = (e) => {
-    if (mode === 'mix') return true;
-    const isProd = window.isProduction ? window.isProduction(e) : (e.type === 'gaptype' || e.type === 'type' || e.type === 'bank');
-    return mode === 'production' ? isProd : !isProd;
+    if (production && recognition) return true;
+    if (production) return isProd(e);
+    if (recognition) return !isProd(e);
+    return false;
   };
-  const count = exercises.filter(matchesMode).length;
+  const count = lesson.exercises.filter(matchesMode).length;
+  const mins = Math.max(1, Math.round(count * 0.8));
+  const mode = production && recognition ? 'mix' : production ? 'production' : 'recognition';
+  const canStart = count > 0 && (production || recognition);
 
   const start = () => {
-    onChangePrefs(topic.id, { shuffle, mode });
-    onStart(topic.id, null, shuffle, mode);
-  };
-
-  const modeLabels = { mix: 'Mix', production: 'Production only', recognition: 'Quick recognition' };
-  const renderModePill = (m) => {
-    const on = mode === m;
-    return (
-      <button key={m} onClick={() => setMode(m)} className="tap"
-        style={{
-          display: 'inline-flex', alignItems: 'center', flexShrink: 0,
-          padding: '10px 16px', borderRadius: 999, cursor: 'pointer',
-          fontFamily: DS.sans, fontSize: 13, fontWeight: 600, letterSpacing: -0.1,
-          background: on ? DS.ink : DS.paperCard,
-          color: on ? '#FFFFFF' : DS.ink3,
-          border: 'none', whiteSpace: 'nowrap',
-        }}>
-        {modeLabels[m]}
-      </button>
-    );
+    if (!canStart) return;
+    onChangePrefs(topic.id, { production, recognition });
+    onStart(topic.id, null, false, mode);
   };
 
   return (
     <div style={{
       height: '100%', display: 'flex', flexDirection: 'column',
-      background: c.bg, color: DS.ink, fontFamily: DS.sans,
+      background: vivid, color: DS.ink, fontFamily: DS.sans,
     }}>
-      {/* Hero — unit colour, centered title. Covers the iOS safe-area
-          with its own background (same trick as LessonTopBar) so the
-          status bar sits on the unit colour even when Safari throttles
-          dynamic theme-color updates. */}
-      <div className="anim-fade" style={{
-        padding: `max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) 20px 0`,
-        flexShrink: 0, position: 'relative',
+      {/* Colour hero — covers the safe-area, holds the back button */}
+      <div style={{
+        background: vivid, flexShrink: 0, position: 'relative',
+        height: `calc(max(${DS.topSafe}px, env(safe-area-inset-top, ${DS.topSafe}px)) + 124px)`,
       }}>
         <button onClick={onBack} className="tap" aria-label="Back to units"
           style={{
             position: 'absolute', left: 16,
             top: `max(${DS.topSafe - 4}px, calc(env(safe-area-inset-top, ${DS.topSafe}px) - 4px))`,
             width: 38, height: 38, borderRadius: 999, border: 'none',
-            background: '#FFFFFF', color: c.fg, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 0,
+            background: '#FFFFFF', color: vivid, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
           }}>
           <svg width="18" height="18" viewBox="0 0 16 16">
             <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" fill="none"
-              strokeLinecap="round" strokeLinejoin="round"/>
+              strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          textAlign: 'center', padding: '10px 28px 0',
-        }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: 999, background: '#FFFFFF',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <img
-              src={`icons/${((window.UNIT_META && window.UNIT_META[topic.id]) || {}).icon || 'majesticons_skull.svg'}`}
-              alt="" width="30" height="30" />
-          </div>
-          <div style={{
-            fontSize: 13, color: c.fg, fontWeight: 600, letterSpacing: -0.1,
-            marginTop: 16, opacity: 0.8,
-          }}>Unit {topic.n}</div>
-          <h1 style={{
-            fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-            letterSpacing: -0.6, margin: '4px 0 0', lineHeight: 1.15, color: DS.ink,
-          }}>{topic.title}</h1>
-          <div style={{
-            fontSize: 14, color: DS.ink2, lineHeight: 1.45, letterSpacing: -0.1,
-            marginTop: 8, opacity: 0.75, maxWidth: 280,
-          }}>{topic.subtitle}</div>
-        </div>
       </div>
 
-      {/* White sheet — convex arc top edge, settings + Start */}
+      {/* White sheet — convex arc, content, Start pinned at the bottom */}
       <div className="anim-slide-u" style={{
-        flex: 1, minHeight: 0, marginTop: 28,
-        background: DS.paper,
-        borderTopLeftRadius: '50% 36px', borderTopRightRadius: '50% 36px',
+        flex: 1, minHeight: 0, marginTop: -44,
+        background: DS.paper, position: 'relative',
+        borderTopLeftRadius: '50% 44px', borderTopRightRadius: '50% 44px',
         display: 'flex', flexDirection: 'column',
+        padding: `60px 20px calc(24px + env(safe-area-inset-bottom, 0px))`,
       }}>
-        <div style={{ flex: 1, overflow: 'auto', padding: '34px 20px 12px' }}>
-          <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1, margin: '0 4px 10px' }}>
-            Mode
-          </div>
-          {/* One row, horizontal scroll, full-bleed to the screen edges */}
-          <div className="scroll" style={{
-            display: 'flex', gap: 8, overflowX: 'auto',
-            margin: '0 -20px', padding: '0 20px',
+        {/* Unit glyph in a white circle, straddling the arc */}
+        <div style={{
+          position: 'absolute', top: -46, left: '50%', transform: 'translateX(-50%)',
+          width: 92, height: 92, borderRadius: 999, background: '#FFFFFF',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <MaskIcon src={`icons/${meta.icon}`} size={40} color={vivid} />
+        </div>
+
+        <h1 style={{
+          fontFamily: DS.display, fontSize: 26, fontWeight: 700,
+          letterSpacing: -0.5, margin: 0, lineHeight: 1.2, color: DS.ink,
+          textAlign: 'center',
+        }}>{topic.title}</h1>
+        <div style={{
+          fontSize: 15, color: DS.ink3, lineHeight: 1.4, letterSpacing: -0.1,
+          marginTop: 6, textAlign: 'center', fontWeight: 500,
+        }}>{topic.subtitle}</div>
+
+        {/* Stats */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
+          marginTop: 16,
+        }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <UnitStatIcon kind="exercises" color={vivid} />
+            <span className="tick" style={{ fontSize: 14, fontWeight: 600, color: DS.ink2, letterSpacing: -0.1 }}>
+              {count} exercise{count === 1 ? '' : 's'}
+            </span>
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <UnitStatIcon kind="mins" color={DS.toggleOn} />
+            <span className="tick" style={{ fontSize: 14, fontWeight: 600, color: DS.ink2, letterSpacing: -0.1 }}>
+              {mins} min{mins === 1 ? '' : 's'}
+            </span>
+          </span>
+        </div>
+
+        {/* Toggles */}
+        <div style={{ marginTop: 26 }}>
+          <ToggleRow icon="production" label="Production tasks"
+            on={production} onToggle={() => setProduction(v => !v)} />
+          <ToggleRow icon="recognition" label="Quick recognition"
+            on={recognition} onToggle={() => setRecognition(v => !v)} last />
+        </div>
+
+        <div style={{ flex: 1 }} />
+
+        <button onClick={start} disabled={!canStart} className="tap"
+          style={{
+            width: '100%', border: 'none', borderRadius: 999,
+            padding: '17px 20px', cursor: canStart ? 'pointer' : 'default',
+            background: canStart ? vivid : DS.ink5, color: '#FFFFFF',
+            fontFamily: DS.sans, fontSize: 16, fontWeight: 700, letterSpacing: -0.2,
           }}>
-            {['mix','production','recognition'].map(renderModePill)}
-          </div>
-
-          <div style={{ fontSize: 13, color: DS.ink3, fontWeight: 600, letterSpacing: -0.1, margin: '24px 4px 10px' }}>
-            Order
-          </div>
-          <button onClick={() => setShuffle(s => !s)} className="row-press"
-            style={{
-              width: '100%', border: 'none', cursor: 'pointer', textAlign: 'left',
-              background: DS.paperCard, borderRadius: 16, padding: '14px 14px',
-              display: 'flex', alignItems: 'center', gap: 12,
-              fontFamily: DS.sans,
-            }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: DS.display, fontSize: 15, fontWeight: 600, color: DS.ink, letterSpacing: -0.2 }}>
-                Shuffle the order
-              </div>
-              <div style={{ fontSize: 13, color: DS.ink3, marginTop: 2, letterSpacing: 0 }}>
-                Don’t always start from the same exercise
-              </div>
-            </div>
-            <div style={{
-              width: 46, height: 28, borderRadius: 99, flexShrink: 0,
-              background: shuffle ? c.fg : DS.ink5, position: 'relative',
-              transition: `background 200ms ${DS.ease}`,
-            }}>
-              <div style={{
-                width: 22, height: 22, borderRadius: 99, background: '#FFFFFF',
-                position: 'absolute', top: 3, left: shuffle ? 21 : 3,
-                transition: `left 200ms ${DS.ease}`,
-              }} />
-            </div>
-          </button>
-        </div>
-
-        <div style={{ padding: '8px 20px 24px' }}>
-          <PrimaryButton onClick={start} color={count ? DS.ink : DS.ink5} disabled={!count}>
-            {count ? `Start · ${count} exercise${count === 1 ? '' : 's'}` : 'Nothing to practise in this mode'}
-          </PrimaryButton>
-        </div>
+          {canStart ? 'Start' : 'Turn on a task type to start'}
+        </button>
       </div>
     </div>
   );
