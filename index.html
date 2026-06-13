@@ -282,6 +282,94 @@ function shuffleList(a) {
   }
 })();
 
+// ─── Screen transitions — iOS-style push / pop ──────────────────
+// Keeps the outgoing and incoming screens mounted together for one
+// animation, sliding them like a navigation stack. Direction comes from
+// a depth map: deeper = push (new from the right, old parallaxes left),
+// shallower = pop (old slides off right, revealing the screen beneath).
+const SCREEN_DEPTH = {
+  home: 0, category: 1, profile: 1, review: 1, vocabtest: 1,
+  quicktest: 1, weakspots: 1, daily: 1, lesson: 2, results: 3,
+};
+const depthOf = (name) => (SCREEN_DEPTH[name] != null ? SCREEN_DEPTH[name] : 1);
+const STAGE_MS = 440;
+const STAGE_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+function stageLayerStyle(layer) {
+  const tr = `transform ${STAGE_MS}ms ${STAGE_EASE}, opacity ${STAGE_MS}ms ${STAGE_EASE}`;
+  const base = {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    background: DS.paper, willChange: 'transform, opacity', overflow: 'hidden',
+  };
+  const push = layer.dir !== 'pop';
+  if (layer.t === 'entering') {
+    return { ...base, transition: 'none',
+      transform: push ? 'translate3d(100%,0,0)' : 'translate3d(-26%,0,0)',
+      opacity: push ? 1 : 0.6,
+      zIndex: push ? 3 : 1,
+      boxShadow: push ? '-10px 0 30px rgba(4,22,45,0.13)' : 'none' };
+  }
+  if (layer.t === 'leaving') {
+    return { ...base, transition: tr,
+      transform: push ? 'translate3d(-26%,0,0)' : 'translate3d(100%,0,0)',
+      opacity: push ? 0.6 : 1,
+      zIndex: push ? 1 : 3,
+      boxShadow: push ? 'none' : '-10px 0 30px rgba(4,22,45,0.13)' };
+  }
+  // active
+  return { ...base, transition: tr, transform: 'translate3d(0,0,0)', opacity: 1,
+    zIndex: 2, boxShadow: 'none' };
+}
+
+function Stage({ screenKey, screenName, children }) {
+  const [layers, setLayers] = React.useState(
+    () => [{ key: screenKey, t: 'active', dir: 'push', node: children }]);
+  const prevKey = React.useRef(screenKey);
+  const prevName = React.useRef(screenName);
+  const prevChildren = React.useRef(children);
+
+  React.useEffect(() => {
+    if (screenKey === prevKey.current) return;
+    const dir = depthOf(screenName) >= depthOf(prevName.current) ? 'push' : 'pop';
+    const oldKey = prevKey.current;
+    const oldNode = prevChildren.current;
+    prevKey.current = screenKey;
+    prevName.current = screenName;
+
+    setLayers(prev => {
+      const leaving = prev
+        .filter(l => l.t !== 'leaving')
+        .map(l => ({ ...l, t: 'leaving', dir, node: l.key === oldKey ? oldNode : l.node }));
+      return [...leaving, { key: screenKey, t: 'entering', dir, node: null }];
+    });
+
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        setLayers(prev => prev.map(l => (l.key === screenKey ? { ...l, t: 'active' } : l)));
+      });
+    });
+    const tmo = setTimeout(() => {
+      setLayers(prev => prev.filter(l => l.t !== 'leaving'));
+    }, STAGE_MS + 80);
+    return () => { cancelAnimationFrame(raf1); if (raf2) cancelAnimationFrame(raf2); clearTimeout(tmo); };
+  }, [screenKey]);
+
+  // Snapshot the latest committed children so the leaving layer can freeze
+  // the previous screen while the active layer keeps rendering live.
+  React.useEffect(() => { prevChildren.current = children; });
+
+  return (
+    <div style={{ position: 'relative', height: '100%', width: '100%', overflow: 'hidden', background: DS.paper }}>
+      {layers.map(l => (
+        <div key={l.key} style={stageLayerStyle(l)}>
+          {l.key === screenKey ? children : l.node}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const [screen, setScreen] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('engapp-screen')) || { name: 'home' }; }
@@ -499,10 +587,13 @@ function App() {
     );
   }
 
+  const screenKey = `${screen.name}:${screen.topicId || ''}:${screen.lessonId || ''}`;
   return (
     <div id="app-stage">
       <IOSDevice width={402} height={844}>
-        {content}
+        <Stage screenKey={screenKey} screenName={screen.name}>
+          {content}
+        </Stage>
       </IOSDevice>
     </div>
   );
