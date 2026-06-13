@@ -916,42 +916,9 @@ function FeedbackBar({ answered, ex, onContinue }) {
 
 function ResultsScreen({ mistakes, total, onDone }) {
   const correct = Math.max(0, total - mistakes);
-  const acc = Math.round((correct / total) * 100);
   return (
-    <div style={{
-      height: '100%', background: DS.paper,
-      display: 'flex', flexDirection: 'column',
-      padding: `${DS.topSafe}px 24px 24px`,
-      color: DS.ink, textAlign: 'center', fontFamily: DS.sans,
-    }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="anim-pop" style={{
-          width: 120, height: 120, borderRadius: 99,
-          background: DS.ink, color: DS.paperCard,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: DS.display, fontWeight: 700,
-          fontSize: 42, letterSpacing: -1.5,
-          marginBottom: 22,
-        }}>
-          {acc}<span style={{ fontSize: 22, fontWeight: 600, marginLeft: 1 }}>%</span>
-        </div>
-
-        <h1 className="anim-slide-u" style={{
-          fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-          letterSpacing: -0.7, margin: '0 0 6px', color: DS.ink,
-        }}>Lesson complete</h1>
-        <p className="anim-slide-u" style={{
-          color: DS.ink3, fontSize: 15, marginBottom: 28,
-          animationDelay: '160ms', letterSpacing: -0.1,
-        }}>Great work — keep the streak going.</p>
-        <div className="stagger" style={{ display: 'flex', gap: 10, width: '100%' }}>
-          <StatCard label="Correct" value={correct} />
-          <StatCard label="Mistakes" value={mistakes} />
-          <StatCard label="Total" value={total} />
-        </div>
-      </div>
-      <PrimaryButton onClick={onDone} color={DS.ink}>Continue</PrimaryButton>
-    </div>
+    <SuccessScreen value={correct} total={total}
+      subtitle="Lesson complete — keep the streak going" onDone={onDone} doneLabel="Continue" />
   );
 }
 

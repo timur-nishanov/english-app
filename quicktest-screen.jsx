@@ -122,32 +122,9 @@ function QuickTestScreen({ onExit, onComplete }) {
   };
 
   if (finished) {
-    const acc = Math.round((correctCount / doneCount) * 100);
     return (
-      <div style={{
-        height: '100%', background: DS.paper,
-        display: 'flex', flexDirection: 'column',
-        padding: `${DS.topSafe}px 24px 24px`, fontFamily: DS.sans,
-        color: DS.ink, textAlign: 'center',
-      }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="anim-pop" style={{
-            width: 130, height: 130, borderRadius: 99,
-            background: DS.ink, color: '#FFFFFF',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: DS.display, fontWeight: 700,
-            fontSize: 38, letterSpacing: -1.2, marginBottom: 20,
-          }}>{acc}<span style={{ fontSize: 20, opacity: 0.5 }}>%</span></div>
-          <h1 className="anim-slide-u" style={{
-            fontFamily: DS.display, fontSize: 28, fontWeight: 700,
-            letterSpacing: -0.7, margin: '4px 0 6px',
-          }}>Practice done</h1>
-          <p style={{ color: DS.ink3, fontSize: 15, marginBottom: 28, letterSpacing: -0.1 }}>
-            {correctCount}/{doneCount} correct · {mistakes} mistake{mistakes === 1 ? '' : 's'}.
-          </p>
-        </div>
-        <PrimaryButton onClick={onExit} color={DS.ink}>Back to home</PrimaryButton>
-      </div>
+      <SuccessScreen value={correctCount} total={doneCount}
+        subtitle={`Practice done · ${mistakes} mistake${mistakes === 1 ? '' : 's'}`} onDone={onExit} />
     );
   }
 
