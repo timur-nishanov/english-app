@@ -292,6 +292,22 @@ const SCREEN_DEPTH = {
   quicktest: 1, weakspots: 1, daily: 1, lesson: 2, results: 3,
 };
 const depthOf = (name) => (SCREEN_DEPTH[name] != null ? SCREEN_DEPTH[name] : 1);
+
+// Single source of truth for a screen's top-zone colour. Everything that
+// must match the top of the screen — the status bar (theme-color), the
+// page background behind bounce-scroll, and the screen's own scroll
+// container — reads from here, so colours can never drift apart.
+function screenTheme(screen) {
+  if (!screen) return '#FFFFFF';
+  if (screen.name === 'home') return window.HOME_HERO || '#E8F1FC';
+  if (screen.name === 'profile') return PROFILE_HERO;
+  if (screen.name === 'category') {
+    const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
+    return (c && (c.solid || c.bg)) || '#FFFFFF';
+  }
+  return '#FFFFFF'; // lesson / review / quick test / etc. — white top bar
+}
+window.screenTheme = screenTheme;
 const STAGE_MS = 440;
 const STAGE_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
@@ -390,29 +406,20 @@ function App() {
 
   React.useLayoutEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
-    // The status bar takes the screen's top colour so it reads as
-    // seamless: soft blue-grey on Home, blue on the profile, the unit's
-    // vivid colour on the category preview, white everywhere else.
-    // pageBg paints html/body so overscroll springs the right tone — for
-    // Home that is the canvas colour (no white band at the top), for the
-    // colour-hero screens it stays white so the bottom never flashes.
-    let tint = '#FFFFFF', pageBg = '#FFFFFF';
-    if (screen.name === 'home') { tint = window.HOME_HERO || '#E8F1FC'; pageBg = tint; }
-    else if (screen.name === 'profile') tint = '#1B77E7';
-    else if (screen.name === 'category') {
-      const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
-      if (c) tint = c.solid || c.bg;
-    }
+    // One colour drives the status bar AND the page background, so the
+    // top of the screen, the iOS status bar and any bounce-scroll all
+    // share the current screen's theme colour — no white flashes.
+    const theme = screenTheme(screen);
     const apply = () => {
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', tint);
+      if (meta) meta.setAttribute('content', theme);
     };
     // Apply before paint, then again next frame — iOS coalesces rapid
     // theme-color writes and otherwise keeps the previous screen's colour.
     apply();
     const raf = requestAnimationFrame(apply);
-    document.documentElement.style.background = pageBg;
-    document.body.style.background = pageBg;
+    document.documentElement.style.background = theme;
+    document.body.style.background = theme;
     return () => cancelAnimationFrame(raf);
   }, [screen]);
   React.useEffect(() => {
@@ -657,7 +664,8 @@ function ProfileScreen({ state, streak, weakCount, onBack }) {
   return (
     <div style={{
       height: '100%', overflow: 'auto', overscrollBehavior: 'contain',
-      background: DS.paper, color: DS.ink, fontFamily: DS.sans,
+      // Scroll canvas = screen theme, so bounce shows the blue top tone.
+      background: PROFILE_HERO, color: DS.ink, fontFamily: DS.sans,
       display: 'flex', flexDirection: 'column',
     }}>
       {/* Blue hero — covers the safe-area, holds the back button */}
