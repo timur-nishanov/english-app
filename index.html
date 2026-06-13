@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#1B77E7">
+<meta name="theme-color" content="#E8F1FC">
 <title>English Daily</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
 
   /* On phones, fill the whole screen instead of showing the device mockup */
   @media (max-width: 600px), (pointer: coarse) {
-    html, body { overflow: hidden; background: #FFFFFF; }
+    html, body { overflow: hidden; background: #E8F1FC; }
     #app-stage { padding: 0; gap: 0; width: 100%; }
   }
 </style>
@@ -302,12 +302,15 @@ function App() {
 
   React.useLayoutEffect(() => {
     localStorage.setItem('engapp-screen', JSON.stringify(screen));
-    // The status bar has no colour of its own — it takes the screen's
-    // top colour so it reads as transparent: soft blue on Home, the
-    // unit's pastel on the category preview, white everywhere else.
-    let tint = '#FFFFFF';
-    if (screen.name === 'home') tint = window.HOME_HERO || '#FFFFFF';
-    else if (screen.name === 'profile') tint = window.HOME_HERO || '#1B77E7';
+    // The status bar takes the screen's top colour so it reads as
+    // seamless: soft blue-grey on Home, blue on the profile, the unit's
+    // vivid colour on the category preview, white everywhere else.
+    // pageBg paints html/body so overscroll springs the right tone — for
+    // Home that is the canvas colour (no white band at the top), for the
+    // colour-hero screens it stays white so the bottom never flashes.
+    let tint = '#FFFFFF', pageBg = '#FFFFFF';
+    if (screen.name === 'home') { tint = window.HOME_HERO || '#E8F1FC'; pageBg = tint; }
+    else if (screen.name === 'profile') tint = '#1B77E7';
     else if (screen.name === 'category') {
       const c = window.UNIT_COLORS && window.UNIT_COLORS[screen.topicId];
       if (c) tint = c.solid || c.bg;
@@ -320,10 +323,8 @@ function App() {
     // theme-color writes and otherwise keeps the previous screen's colour.
     apply();
     const raf = requestAnimationFrame(apply);
-    // Each screen paints its own background; keep the page itself white so
-    // overscroll never flashes a stale tint.
-    document.documentElement.style.background = '#FFFFFF';
-    document.body.style.background = '#FFFFFF';
+    document.documentElement.style.background = pageBg;
+    document.body.style.background = pageBg;
     return () => cancelAnimationFrame(raf);
   }, [screen]);
   React.useEffect(() => {
